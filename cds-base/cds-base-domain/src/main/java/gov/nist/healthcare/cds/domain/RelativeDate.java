@@ -22,17 +22,11 @@ public class RelativeDate extends Date implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private String timePeriod;
+	private int year;
+	private int month;
+	private int day;
 	@Enumerated(EnumType.STRING)
 	private RelativeTo relativeTo;
-	
-	public String getTimePeriod() {
-		return timePeriod;
-	}
-
-	public void setTimePeriod(String timePeriod) {
-		this.timePeriod = timePeriod;
-	}
 
 	public RelativeTo getRelativeTo() {
 		return relativeTo;
@@ -46,5 +40,31 @@ public class RelativeDate extends Date implements Serializable{
 	{ 
 	    return ToStringBuilder.reflectionToString(this); 
 	}
+
+	public int getYear() {
+		return year;
+	}
+
+	public void setYear(int year) {
+		this.year = year;
+	}
+
+	public int getMonth() {
+		return month;
+	}
+
+	public void setMonth(int month) {
+		this.month = month;
+	}
+
+	public int getDay() {
+		return day;
+	}
+
+	public void setDay(int day) {
+		this.day = day;
+	}
+	
+	
 	
 }

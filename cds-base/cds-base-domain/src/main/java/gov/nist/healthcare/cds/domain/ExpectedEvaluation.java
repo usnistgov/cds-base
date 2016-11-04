@@ -26,7 +26,7 @@ public class ExpectedEvaluation implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String evaluationReason;
-	@ManyToOne(cascade = CascadeType.MERGE, optional = false)
+	@ManyToOne
 	private Vaccine relatedTo;
 	@Enumerated(EnumType.STRING)
 	private EvaluationStatus status;

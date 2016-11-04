@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -39,7 +40,9 @@ public class TestCase implements Serializable {
 	private List<Event> events;
 	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private List<ExpectedForecast> forecast;
-	
+	@JsonIgnore
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+	private TestPlan testPlan;
 	
 	public String getName() {
 		return name;
@@ -100,5 +103,12 @@ public class TestCase implements Serializable {
 	{ 
 	    return ToStringBuilder.reflectionToString(this); 
 	}
+	public TestPlan getTestPlan() {
+		return testPlan;
+	}
+	public void setTestPlan(TestPlan testPlan) {
+		this.testPlan = testPlan;
+	}
+	
 	
 }

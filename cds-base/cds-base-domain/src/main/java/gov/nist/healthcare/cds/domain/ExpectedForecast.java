@@ -34,7 +34,7 @@ public class ExpectedForecast implements Serializable {
 	private Date recommended;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Date pastDue;
-	@ManyToOne(cascade = CascadeType.MERGE, optional = false)
+	@ManyToOne
 	private Vaccine target;
 	@Enumerated(EnumType.STRING)
 	private SerieStatus serieStatus;

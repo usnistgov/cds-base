@@ -22,7 +22,7 @@ public class Vaccine implements Serializable {
 	
 	private String name;
 	private String details;
-	private String CVX;
+	private String cvx;
 	public Long getId() {
 		return id;
 	}
@@ -41,12 +41,13 @@ public class Vaccine implements Serializable {
 	public void setDetails(String details) {
 		this.details = details;
 	}
-	public String getCVX() {
-		return CVX;
+	public String getCvx() {
+		return cvx;
 	}
-	public void setCVX(String cVX) {
-		CVX = cVX;
+	public void setCvx(String cvx) {
+		this.cvx = cvx;
 	}
+	
 	@Override
 	public String toString() 
 	{ 

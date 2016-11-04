@@ -1,6 +1,8 @@
 package gov.nist.healthcare.cds.domain;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -26,6 +28,16 @@ public class FixedDate extends Date implements Serializable {
 	
 	public FixedDate(){
 		
+	}
+	
+	public FixedDate(String date){
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+		try {
+			this.date = formatter.parse(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public FixedDate(java.util.Date d){

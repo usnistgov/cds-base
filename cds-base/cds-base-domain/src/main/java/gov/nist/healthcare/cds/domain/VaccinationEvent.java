@@ -20,7 +20,7 @@ public class VaccinationEvent extends Event {
 
 	private int doseNumber;
 	private String MVX;
-	@ManyToOne(cascade = CascadeType.MERGE, optional = false)
+	@ManyToOne
 	private Vaccine administred;
 	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private List<ExpectedEvaluation> evaluations;
