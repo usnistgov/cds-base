@@ -18,10 +18,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Entity
 public class ExpectedForecast implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8188917257211279163L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -89,6 +85,21 @@ public class ExpectedForecast implements Serializable {
 		this.serieStatus = serieStatus;
 	}
 	
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (id == null || obj == null || getClass() != obj.getClass())
+            return false;
+        ExpectedForecast that = (ExpectedForecast) obj;
+        return id.equals(that.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return id == null ? 0 : id.hashCode();
+    }
+    
 	@Override
 	public String toString() 
 	{ 

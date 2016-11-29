@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("vaccination")
 public class VaccinationEvent extends Event {
 
-	private int doseNumber;
+	private int doseNumber = 1;
 	private String MVX;
 	@ManyToOne
 	private Vaccine administred;

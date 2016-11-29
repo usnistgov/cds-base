@@ -2,7 +2,9 @@ package gov.nist.healthcare.cds.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -32,16 +34,16 @@ public class TestCase implements Serializable {
 	private String description;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Patient patient;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+	@OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.REFRESH}, optional = false, orphanRemoval = true)
 	private MetaData metaData;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+	@OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.REFRESH}, optional = false, orphanRemoval = true)
 	private Date evalDate;
 	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-	private List<Event> events;
+	private Set<Event> events;
 	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-	private List<ExpectedForecast> forecast;
+	private Set<ExpectedForecast> forecast;
 	@JsonIgnore
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private TestPlan testPlan;
 	
 	public String getName() {
@@ -80,22 +82,22 @@ public class TestCase implements Serializable {
 	public void setEvalDate(Date evalDate) {
 		this.evalDate = evalDate;
 	}
-	public List<Event> getEvents() {
+	public Set<Event> getEvents() {
 		return events;
 	}
-	public void setEvents(List<Event> events) {
+	public void setEvents(Set<Event> events) {
 		this.events = events;
 	}
 	
 	public void addEvent(Event e){
 		if(events == null)
-			events = new ArrayList<Event>();
+			events = new HashSet<Event>();
 		events.add(e);
 	}
-	public List<ExpectedForecast> getForecast() {
+	public Set<ExpectedForecast> getForecast() {
 		return forecast;
 	}
-	public void setForecast(List<ExpectedForecast> forecast) {
+	public void setForecast(Set<ExpectedForecast> forecast) {
 		this.forecast = forecast;
 	}
 	@Override
@@ -109,6 +111,23 @@ public class TestCase implements Serializable {
 	public void setTestPlan(TestPlan testPlan) {
 		this.testPlan = testPlan;
 	}
+	
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (id == null || obj == null || getClass() != obj.getClass())
+            return false;
+        TestCase that = (TestCase) obj;
+        return id.equals(that.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return id == null ? 0 : id.hashCode();
+    }
+	
+	
 	
 	
 }

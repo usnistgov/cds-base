@@ -1,5 +1,6 @@
 package gov.nist.healthcare.cds.domain;
 
+import gov.nist.healthcare.cds.enumeration.EvaluationReason;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 
 import java.io.Serializable;
@@ -30,6 +31,8 @@ public class ExpectedEvaluation implements Serializable {
 	private Vaccine relatedTo;
 	@Enumerated(EnumType.STRING)
 	private EvaluationStatus status;
+	@Enumerated(EnumType.STRING)
+	private EvaluationReason reason;
 	
 	public Long getId() {
 		return id;
@@ -62,5 +65,25 @@ public class ExpectedEvaluation implements Serializable {
 	    return ToStringBuilder.reflectionToString(this); 
 	}
 	
-	
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (id == null || obj == null || getClass() != obj.getClass())
+            return false;
+        ExpectedEvaluation that = (ExpectedEvaluation) obj;
+        return id.equals(that.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return id == null ? 0 : id.hashCode();
+    }
+	public EvaluationReason getReason() {
+		return reason;
+	}
+	public void setReason(EvaluationReason reason) {
+		this.reason = reason;
+	}
+    
 }

@@ -34,6 +34,20 @@ public class UnserializedDate extends Date {
 	public void setRelativeTo(RelativeTo relativeTo) {
 		this.relativeTo = relativeTo;
 	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (id == null || obj == null || getClass() != obj.getClass())
+            return false;
+        Date that = (Date) obj;
+        return id.equals(that.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return id == null ? 0 : id.hashCode();
+    }
 	
 	
 }

@@ -8,7 +8,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -84,7 +86,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				pt.setDateOfBirth(date(p.getDob()));
 			}
 			
-			List<Event> evts = tc.getEvents();
+			Set<Event> evts = tc.getEvents();
 			EventsType evtst = new EventsType();
 			if(evts != null){
 				for(Event e : evts){
@@ -121,7 +123,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				}
 			}
 			
-			List<ExpectedForecast> efs = tc.getForecast();
+			Set<ExpectedForecast> efs = tc.getForecast();
 			ForecastsType fts = new ForecastsType();
 			if(efs != null){
 				for(ExpectedForecast ef : efs){
@@ -259,7 +261,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			}
 			
 			EventsType evts = tcp.getEvents();
-			List<Event> evs = new ArrayList<Event>();
+			Set<Event> evs = new HashSet<Event>();
 			
 			if(evts != null){
 				List<EventType> etl = evts.getEvent();
@@ -304,7 +306,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				}
 			}
 			
-			List<ExpectedForecast> efs = new ArrayList<ExpectedForecast>();
+			Set<ExpectedForecast> efs = new HashSet<ExpectedForecast>();
 			ForecastsType fts = tcp.getForecasts();
 			if(fts != null){
 				for(ForecastType ft : fts.getForecast()){

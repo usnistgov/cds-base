@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -92,8 +93,8 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 				
 				tc.setPatient(p);
 				tc.setMetaData(md);
-				tc.setForecast(Arrays.asList(fc));
-				tc.setEvents(new ArrayList<Event>());
+				tc.setForecast(new HashSet<ExpectedForecast>(Arrays.asList(fc)));
+				tc.setEvents(new HashSet<Event>());
 				
 				int d = 0;
 				for(int j = 8; j < 8 + (6 * 7); j += 6){
