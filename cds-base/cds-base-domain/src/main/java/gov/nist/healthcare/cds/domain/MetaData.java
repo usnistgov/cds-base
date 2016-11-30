@@ -22,8 +22,7 @@ public class MetaData implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	@Version
-	private int version;
+	private String version;
 	private boolean imported;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private FixedDate dateCreated;
@@ -36,10 +35,10 @@ public class MetaData implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public int getVersion() {
+	public String getVersion() {
 		return version;
 	}
-	public void setVersion(int version) {
+	public void setVersion(String version) {
 		this.version = version;
 	}
 	public boolean isImported() {

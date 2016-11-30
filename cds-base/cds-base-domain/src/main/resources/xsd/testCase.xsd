@@ -77,7 +77,10 @@
 
     <complexType name="EvaluationType">
     	<sequence>
-    		<element name="Vaccine" type="tns:VaccineType" minOccurs="1" maxOccurs="1"></element>
+    		<element name="Vaccine" type="tns:VaccineType" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="EvaluationReason" type="tns:EvaluationReasonType" minOccurs="0" maxOccurs="1"></element>
     	</sequence>
     	<attribute name="status" type="tns:statusType" use="required"></attribute>
     </complexType>
@@ -137,5 +140,10 @@
     <complexType name="SerieStatusType">
     	<attribute name="code" type="string" use="required"></attribute>
     	<attribute name="details" type="string" use="optional"></attribute>
+    </complexType>
+
+    <complexType name="EvaluationReasonType">
+    	<attribute name="code" type="string" use="required"></attribute>
+    	<attribute name="value" type="string" use="required"></attribute>
     </complexType>
 </schema>

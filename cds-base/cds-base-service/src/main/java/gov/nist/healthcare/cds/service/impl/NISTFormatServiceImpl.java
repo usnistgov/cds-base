@@ -45,6 +45,7 @@ import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
 import gov.nist.healthcare.cds.domain.xml.XMLError;
 import gov.nist.healthcare.cds.domain.xml.beans.*;
+import gov.nist.healthcare.cds.enumeration.EvaluationReason;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.Gender;
 import gov.nist.healthcare.cds.enumeration.RelativeTo;
@@ -110,6 +111,12 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 						}
 						else {
 							et.setStatus(StatusType.INVALID);
+						}
+						if(exe.getReason() != null){
+							EvaluationReasonType evrt = new EvaluationReasonType();
+							evrt.setCode(exe.getReason().name());
+							evrt.setValue(exe.getReason().getDetails());
+							et.setEvaluationReason(evrt);
 						}
 						VaccineType vte = new VaccineType();
 						vte.setCvx(exe.getRelatedTo().getCvx());
@@ -288,6 +295,10 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 							}
 							else {
 								expe.setStatus(EvaluationStatus.INVALID);
+							}
+							
+							if(exe.getEvaluationReason() != null){
+								expe.setReason(EvaluationReason.valueOf(exe.getEvaluationReason().getCode()));
 							}
 							
 							Vaccine vte = vaccineRepository.findByCvx(exe.getVaccine().getCvx());

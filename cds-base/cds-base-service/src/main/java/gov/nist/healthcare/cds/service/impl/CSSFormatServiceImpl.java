@@ -81,7 +81,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 				
 				MetaData md = new MetaData();
 				md.setImported(true);
-				md.setVersion(1);
+				md.setVersion("1");
 				md.setDateCreated(new FixedDate(dateAdded));
 				md.setDateLastUpdated(new FixedDate(dateUpdate));
 				
