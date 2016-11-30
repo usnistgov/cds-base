@@ -1,6 +1,7 @@
 package gov.nist.healthcare.cds.domain;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
@@ -23,7 +24,7 @@ public class VaccinationEvent extends Event {
 	@ManyToOne
 	private Vaccine administred;
 	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-	private List<ExpectedEvaluation> evaluations;
+	private Set<ExpectedEvaluation> evaluations;
 	
 	public int getDoseNumber() {
 		return doseNumber;
@@ -43,10 +44,10 @@ public class VaccinationEvent extends Event {
 	public void setAdministred(Vaccine administred) {
 		this.administred = administred;
 	}
-	public List<ExpectedEvaluation> getEvaluations() {
+	public Set<ExpectedEvaluation> getEvaluations() {
 		return evaluations;
 	}
-	public void setEvaluations(List<ExpectedEvaluation> evaluations) {
+	public void setEvaluations(Set<ExpectedEvaluation> evaluations) {
 		this.evaluations = evaluations;
 	}
 	@Override

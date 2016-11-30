@@ -36,7 +36,7 @@ public class TestCase implements Serializable {
 	private Patient patient;
 	@OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.REFRESH}, optional = false, orphanRemoval = true)
 	private MetaData metaData;
-	@OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.REFRESH}, optional = false, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Date evalDate;
 	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private Set<Event> events;

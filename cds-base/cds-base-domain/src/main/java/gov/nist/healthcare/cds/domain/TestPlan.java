@@ -27,7 +27,7 @@ public class TestPlan implements Serializable {
 	private MetaData metaData;
 	@JsonIgnore
 	private String user;
-	@OneToMany(cascade={CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER, mappedBy="testPlan")
+	@OneToMany(cascade={CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER,  orphanRemoval = true, mappedBy="testPlan")
 	private List<TestCase> testCases;
 	
 	public Long getId() {

@@ -24,11 +24,11 @@ public class ExpectedForecast implements Serializable {
 	private Long id;
 	private int doseNumber;
 	private String forecastReason;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
 	private Date earliest;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
 	private Date recommended;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
 	private Date pastDue;
 	@ManyToOne
 	private Vaccine target;

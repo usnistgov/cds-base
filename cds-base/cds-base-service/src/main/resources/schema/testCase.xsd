@@ -51,7 +51,7 @@
 
     <complexType name="EventsType">
     	<sequence>
-    		<element name="Event" type="tns:EventType" minOccurs="1" maxOccurs="unbounded"></element>
+    		<element name="Event" type="tns:EventType" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 

@@ -101,7 +101,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					
 					evt.setAdministred(vt);
 					
-					List<ExpectedEvaluation> evals = vev.getEvaluations();
+					Set<ExpectedEvaluation> evals = vev.getEvaluations();
 					EvaluationsType evalst = new EvaluationsType();
 					for(ExpectedEvaluation exe : evals){
 						EvaluationType et = new EvaluationType();
@@ -277,7 +277,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 						throw new VaccineNotFoundException(e.getAdministred().getCvx());
 					}
 					
-					List<ExpectedEvaluation> evals = new ArrayList<ExpectedEvaluation>();
+					Set<ExpectedEvaluation> evals = new HashSet<ExpectedEvaluation>();
 					EvaluationsType evalst = e.getEvaluations();
 					if(evalst != null){
 						List<EvaluationType> evtl = evalst.getEvaluation();
