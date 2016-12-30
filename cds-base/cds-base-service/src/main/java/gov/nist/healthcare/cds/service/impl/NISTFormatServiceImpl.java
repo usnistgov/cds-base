@@ -66,6 +66,8 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 	@Autowired
 	private ProductRepository productRepository;
 	
+	final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
+	
 	@Override
 	public String _export(TestCase tc) {
 		try {
@@ -386,7 +388,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 	public List<XMLError> _validate(String file) {
 		try {
 			InputStream schu = NISTFormatServiceImpl.class.getResourceAsStream("/schema/testCase.xsd");
-//			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.DEFAULT_NS_PREFIX);
+			SchemaFactory factory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
 			StringReader reader = new StringReader(file);
 			Schema schema;
 			schema = factory.newSchema(new StreamSource(schu));
