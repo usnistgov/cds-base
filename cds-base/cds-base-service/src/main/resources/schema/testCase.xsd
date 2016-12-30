@@ -67,6 +67,7 @@
     <complexType name="VaccineType">
     	<attribute name="name" type="string" use="required"></attribute>
     	<attribute name="cvx" type="string" use="required"></attribute>
+    	<attribute name="mvx" type="string" use="optional"></attribute>
     </complexType>
 
     <complexType name="EvaluationsType">

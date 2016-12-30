@@ -34,7 +34,7 @@ public class TestCase implements Serializable {
 	private String description;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Patient patient;
-	@OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.REFRESH}, optional = false, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private MetaData metaData;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Date evalDate;

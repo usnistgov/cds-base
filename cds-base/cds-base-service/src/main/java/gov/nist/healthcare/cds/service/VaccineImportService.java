@@ -1,10 +1,12 @@
 package gov.nist.healthcare.cds.service;
 
-import gov.nist.healthcare.cds.domain.TestCase;
+import gov.nist.healthcare.cds.domain.VaccineMapping;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 public interface VaccineImportService {
-	public List<TestCase> _import(InputStream in);
+	Set<VaccineMapping> _import(InputStream vaccines, InputStream groups, InputStream manufacturer, InputStream products) throws IOException;
 }

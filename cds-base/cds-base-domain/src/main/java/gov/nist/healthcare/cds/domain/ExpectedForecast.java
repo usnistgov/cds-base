@@ -19,6 +19,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Entity
 public class ExpectedForecast implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7808535673936520763L;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;

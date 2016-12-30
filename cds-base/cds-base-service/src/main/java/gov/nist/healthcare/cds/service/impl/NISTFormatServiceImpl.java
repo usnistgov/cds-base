@@ -36,12 +36,15 @@ import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedEvaluation;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.FixedDate;
+import gov.nist.healthcare.cds.domain.Injection;
 import gov.nist.healthcare.cds.domain.MetaData;
 import gov.nist.healthcare.cds.domain.Patient;
+import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.RelativeDate;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
+import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
 import gov.nist.healthcare.cds.domain.xml.XMLError;
 import gov.nist.healthcare.cds.domain.xml.beans.*;
@@ -50,6 +53,7 @@ import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.Gender;
 import gov.nist.healthcare.cds.enumeration.RelativeTo;
 import gov.nist.healthcare.cds.enumeration.SerieStatus;
+import gov.nist.healthcare.cds.repositories.ProductRepository;
 import gov.nist.healthcare.cds.repositories.VaccineRepository;
 import gov.nist.healthcare.cds.service.NISTFormatService;
 
@@ -58,6 +62,9 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 
 	@Autowired
 	private VaccineRepository vaccineRepository;
+	
+	@Autowired
+	private ProductRepository productRepository;
 	
 	@Override
 	public String _export(TestCase tc) {
@@ -97,8 +104,18 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					VaccinationEvent vev = (VaccinationEvent) e;
 					
 					VaccineType vt = new VaccineType();
-					vt.setCvx(vev.getAdministred().getCvx());
-					vt.setName(vev.getAdministred().getName());
+					Injection inject = vev.getAdministred();
+					if(inject instanceof Vaccine){
+						Vaccine v = (Vaccine) inject;
+						vt.setCvx(v.getCvx());
+						vt.setName(v.getName());
+					}
+					else if(inject instanceof Product){
+						Product v = (Product) inject;
+						vt.setCvx(v.getVx().getCvx());
+						vt.setMvx(v.getMx().getMvx());
+						vt.setName(v.getName());
+					}
 					
 					evt.setAdministred(vt);
 					
@@ -277,11 +294,21 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					vev.setType(gov.nist.healthcare.cds.enumeration.EventType.valueOf(e.getType()));
 					vev.setDate(date(e.getEventDate()));
 					
-					Vaccine vt = vaccineRepository.findByCvx(e.getAdministred().getCvx());
-					if(vt != null){
-						vev.setAdministred(vt);
-					} else {
-						throw new VaccineNotFoundException(e.getAdministred().getCvx());
+					if(e.getAdministred().getMvx() != null && !e.getAdministred().getMvx().isEmpty()){
+						Product pr = productRepository.getProduct(e.getAdministred().getMvx(), e.getAdministred().getCvx());
+						if(pr != null){
+							vev.setAdministred(pr);
+						} else {
+							throw new ProductNotFoundException(e.getAdministred().getCvx(),e.getAdministred().getMvx());
+						}
+					}
+					else {
+						Vaccine vt = vaccineRepository.findOne(e.getAdministred().getCvx());
+						if(vt != null){
+							vev.setAdministred(vt);
+						} else {
+							throw new VaccineNotFoundException(e.getAdministred().getCvx());
+						}
 					}
 					
 					Set<ExpectedEvaluation> evals = new HashSet<ExpectedEvaluation>();
@@ -301,7 +328,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 								expe.setReason(EvaluationReason.valueOf(exe.getEvaluationReason().getCode()));
 							}
 							
-							Vaccine vte = vaccineRepository.findByCvx(exe.getVaccine().getCvx());
+							Vaccine vte = vaccineRepository.findOne(exe.getVaccine().getCvx());
 							if(vte != null){
 								expe.setRelatedTo(vte);
 							} else {
@@ -328,7 +355,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					ef.setForecastReason(ft.getForecastReason());
 					ef.setSerieStatus(SerieStatus.valueOf(ft.getSerieStatus().getCode()));
 					
-					Vaccine vt = vaccineRepository.findByCvx(ft.getTarget().getCvx());
+					Vaccine vt = vaccineRepository.findOne(ft.getTarget().getCvx());
 					if(vt != null){
 						ef.setTarget(vt);
 					} else {
@@ -345,9 +372,9 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			
 			return tc;
 		}
-		catch(VaccineNotFoundException vne){
-			throw vne;
-		}
+//		catch(VaccineNotFoundException vne){
+//			throw vne;
+//		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
@@ -359,7 +386,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 	public List<XMLError> _validate(String file) {
 		try {
 			InputStream schu = NISTFormatServiceImpl.class.getResourceAsStream("/schema/testCase.xsd");
-			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+//			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.DEFAULT_NS_PREFIX);
 			StringReader reader = new StringReader(file);
 			Schema schema;
 			schema = factory.newSchema(new StreamSource(schu));

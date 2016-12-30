@@ -5,7 +5,6 @@ import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;

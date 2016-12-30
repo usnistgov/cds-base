@@ -3,8 +3,8 @@ package gov.nist.healthcare.cds.enumeration;
 public enum EvaluationStatus {
 	VALID("Valid Vaccination"), 
 	INVALID("Invalid Vaccination"),
-	EXTRANEOUS(""),
-	SUBSTANDARD("");
+	EXTRANEOUS("Extraneous"),
+	SUBSTANDARD("Sub-standard");
 	
 	private String details;
 	private EvaluationStatus(String d){

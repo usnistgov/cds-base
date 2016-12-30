@@ -15,16 +15,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for SerieStatusType complex type.
+ * <p>Java class for EvaluationReasonType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="SerieStatusType">
+ * &lt;complexType name="EvaluationReasonType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="code" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="details" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -33,13 +33,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SerieStatusType")
-public class SerieStatusType {
+@XmlType(name = "EvaluationReasonType")
+public class EvaluationReasonType {
 
     @XmlAttribute(name = "code", required = true)
     protected String code;
-    @XmlAttribute(name = "details")
-    protected String details;
+    @XmlAttribute(name = "value", required = true)
+    protected String value;
 
     /**
      * Gets the value of the code property.
@@ -66,27 +66,27 @@ public class SerieStatusType {
     }
 
     /**
-     * Gets the value of the details property.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getDetails() {
-        return details;
+    public String getValue() {
+        return value;
     }
 
     /**
-     * Sets the value of the details property.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setDetails(String value) {
-        this.details = value;
+    public void setValue(String value) {
+        this.value = value;
     }
 
 }

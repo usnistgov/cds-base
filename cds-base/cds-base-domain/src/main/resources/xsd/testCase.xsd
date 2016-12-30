@@ -29,7 +29,7 @@
 
     <complexType name="MetaDataType">
     	<sequence>
-    		<element name="version" type="int" minOccurs="1" maxOccurs="1"></element>
+    		<element name="version" type="string" minOccurs="1" maxOccurs="1"></element>
     		<element name="dateCreated" type="date" minOccurs="1" maxOccurs="1"></element>
     		<element name="dateLastUpdated" type="date" minOccurs="1" maxOccurs="1"></element>
     	</sequence>
@@ -67,6 +67,7 @@
     <complexType name="VaccineType">
     	<attribute name="name" type="string" use="required"></attribute>
     	<attribute name="cvx" type="string" use="required"></attribute>
+    	<attribute name="mvx" type="string" use="optional"></attribute>
     </complexType>
 
     <complexType name="EvaluationsType">

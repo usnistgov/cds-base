@@ -27,7 +27,7 @@ import gov.nist.healthcare.cds.domain.MetaData;
 import gov.nist.healthcare.cds.domain.Patient;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
-import gov.nist.healthcare.cds.domain.Vaccine;
+import gov.nist.healthcare.cds.domain.VaccineMapping;
 import gov.nist.healthcare.cds.domain.xml.XMLError;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.Gender;
@@ -99,7 +99,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 				int d = 0;
 				for(int j = 8; j < 8 + (6 * 7); j += 6){
 					d++;
-					Vaccine v = new Vaccine();
+					VaccineMapping v = new VaccineMapping();
 					VaccinationEvent ve = new VaccinationEvent();
 					
 					Date dateA = r.getCell(j).getDateCellValue();
@@ -124,21 +124,21 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					
 					evalt.setEvaluationReason(reason);
 					
-					v.setCvx(cvx+"");
-					v.setName(vName);
-					v.setDetails("#");
-					
-					Vaccine f = null;
-					if((f = vaccineRepository.findByCvx(cvx+"")) != null){
-						ve.setAdministred(f);
-						evalt.setRelatedTo(f);
-						fc.setTarget(f);
-					}
-					else {
-						ve.setAdministred(v);
-						evalt.setRelatedTo(v);
-						fc.setTarget(v);
-					}
+//					v.setCvx(cvx+"");
+//					v.setName(vName);
+//					v.setDetails("#");
+//					
+//					VaccineMapping f = null;
+//					if((f = vaccineRepository.findByCvx(cvx+"")) != null){
+//						ve.setAdministred(f);
+//						evalt.setRelatedTo(f);
+//						fc.setTarget(f);
+//					}
+//					else {
+//						ve.setAdministred(v);
+//						evalt.setRelatedTo(v);
+//						fc.setTarget(v);
+//					}
 					
 					tc.getEvents().add(ve);
 				}
