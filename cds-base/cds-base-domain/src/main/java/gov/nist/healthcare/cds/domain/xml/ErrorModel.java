@@ -2,27 +2,27 @@ package gov.nist.healthcare.cds.domain.xml;
 
 import org.xml.sax.SAXParseException;
 
-public class XMLError {
+public class ErrorModel {
 	private int line;
 	private int column;
 	private String message;
 	
 	
 	
-	public XMLError() {
+	public ErrorModel() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	
 	
-	public XMLError(int line, int column, String message) {
+	public ErrorModel(int line, int column, String message) {
 		super();
 		this.line = line;
 		this.column = column;
 		this.message = message;
 	}
 
-	public XMLError(SAXParseException e) {
+	public ErrorModel(SAXParseException e) {
 		super();
 		this.line = e.getLineNumber();
 		this.column = e.getColumnNumber();

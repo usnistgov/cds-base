@@ -46,7 +46,7 @@ import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
-import gov.nist.healthcare.cds.domain.xml.XMLError;
+import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 import gov.nist.healthcare.cds.domain.xml.beans.*;
 import gov.nist.healthcare.cds.enumeration.EvaluationReason;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
@@ -385,7 +385,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 	}
 
 	@Override
-	public List<XMLError> _validate(String file) {
+	public List<ErrorModel> _validate(String file) {
 		try {
 			InputStream schu = NISTFormatServiceImpl.class.getResourceAsStream("/schema/testCase.xsd");
 			SchemaFactory factory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
@@ -394,30 +394,30 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			schema = factory.newSchema(new StreamSource(schu));
 			Validator validator = schema.newValidator();
 			
-			final ArrayList<XMLError> errors = new ArrayList<XMLError>();
+			final ArrayList<ErrorModel> errors = new ArrayList<ErrorModel>();
 			validator.setErrorHandler(new ErrorHandler() {
 				@Override
 				public void warning(SAXParseException exception)
 						throws SAXException {
-					errors.add(new XMLError(exception));
+					errors.add(new ErrorModel(exception));
 				}
 	
 				@Override
 				public void fatalError(SAXParseException exception)
 						throws SAXException {
-					errors.add(new XMLError(exception));
+					errors.add(new ErrorModel(exception));
 				}
 	
 				@Override
 				public void error(SAXParseException exception)
 						throws SAXException {
-					errors.add(new XMLError(exception));
+					errors.add(new ErrorModel(exception));
 				}
 			});
 			validator.validate(new StreamSource(reader));
 			return errors;
 		} catch (SAXParseException e) {
-			return Arrays.asList(new XMLError(e));
+			return Arrays.asList(new ErrorModel(e));
 		} catch (SAXException e) {
 			return null;
 		} catch (IOException e) {

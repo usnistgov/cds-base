@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VaccineRepository extends JpaRepository<Vaccine, String>{
 	public Vaccine findByName(String name);
+	public Vaccine findByNameIgnoreCase(String name);
 }

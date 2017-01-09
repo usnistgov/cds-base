@@ -27,7 +27,7 @@ public class TestPlan implements Serializable {
 	private MetaData metaData;
 	@JsonIgnore
 	private String user;
-	@OneToMany(cascade={CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER,  orphanRemoval = true, mappedBy="testPlan")
+	@OneToMany(cascade={CascadeType.PERSIST, CascadeType.REFRESH,  CascadeType.REMOVE}, fetch = FetchType.EAGER, mappedBy="testPlan")
 	private List<TestCase> testCases;
 	
 	public Long getId() {
@@ -63,6 +63,7 @@ public class TestPlan implements Serializable {
 	public void addTestCase(TestCase tc){
 		if(this.testCases == null)
 			this.testCases = new ArrayList<TestCase>();
+		tc.setTestPlan(this);
 		this.testCases.add(tc);
 	}
     @Override

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VaccineGroupRepository extends JpaRepository<VaccineGroup, Long>{
-//	public VaccineMapping findByName(String name);
-//	public VaccineMapping findByCvx(String cvx);
+	public VaccineGroup findByNameIgnoreCase(String name);
+	public VaccineGroup findByCvx(String cvx);
 }

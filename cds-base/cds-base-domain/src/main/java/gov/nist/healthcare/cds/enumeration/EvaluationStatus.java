@@ -1,8 +1,8 @@
 package gov.nist.healthcare.cds.enumeration;
 
 public enum EvaluationStatus {
-	VALID("Valid Vaccination"), 
-	INVALID("Invalid Vaccination"),
+	VALID("Valid"), 
+	INVALID("Not Valid"),
 	EXTRANEOUS("Extraneous"),
 	SUBSTANDARD("Sub-standard");
 	
