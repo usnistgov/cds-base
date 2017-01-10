@@ -39,6 +39,7 @@ import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
+import gov.nist.healthcare.cds.enumeration.EventType;
 import gov.nist.healthcare.cds.enumeration.Gender;
 import gov.nist.healthcare.cds.repositories.ProductRepository;
 import gov.nist.healthcare.cds.repositories.TestCaseRepository;
@@ -155,7 +156,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					for(int j = 8; j < 8 + (6 * 7); j += 6){
 						col = j;
 						VaccinationEvent ve = new VaccinationEvent();
-						
+						ve.setType(EventType.VACCINATION);
 						Date dateA = r.getCell(j).getDateCellValue();
 						if(dateA == null)
 							break;

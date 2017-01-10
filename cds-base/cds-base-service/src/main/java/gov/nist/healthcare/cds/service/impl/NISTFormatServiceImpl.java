@@ -159,11 +159,13 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					ft.setPastDue(date(ef.getPastDue()));
 					ft.setForecastReason(ef.getForecastReason());
 					
-					SerieStatusType sst = new SerieStatusType();
-					sst.setCode(ef.getSerieStatus().toString());
-					sst.setDetails(ef.getSerieStatus().getDetails());
-					
-					ft.setSerieStatus(sst);
+					if(ef.getSerieStatus() != null){
+						SerieStatusType sst = new SerieStatusType();
+						sst.setCode(ef.getSerieStatus().toString());
+						sst.setDetails(ef.getSerieStatus().getDetails());
+						
+						ft.setSerieStatus(sst);
+					}
 					
 					VaccineType vt = new VaccineType();
 					vt.setCvx(ef.getTarget().getCvx());
@@ -355,8 +357,10 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					ef.setRecommended(date(ft.getRecommended()));
 					ef.setPastDue(date(ft.getPastDue()));
 					ef.setForecastReason(ft.getForecastReason());
-					ef.setSerieStatus(SerieStatus.valueOf(ft.getSerieStatus().getCode()));
-					
+					if(ft.getSerieStatus() != null){
+						ef.setSerieStatus(SerieStatus.valueOf(ft.getSerieStatus().getCode()));
+					}
+
 					Vaccine vt = vaccineRepository.findOne(ft.getTarget().getCvx());
 					if(vt != null){
 						ef.setTarget(vt);

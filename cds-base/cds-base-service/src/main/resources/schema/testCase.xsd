@@ -98,10 +98,10 @@
     		<element name="target" type="tns:VaccineType" minOccurs="1"
     			maxOccurs="1">
     		</element>
-    		<element name="SerieStatus" type="tns:SerieStatusType" minOccurs="1"
+    		<element name="SerieStatus" type="tns:SerieStatusType" minOccurs="0"
     			maxOccurs="1">
     		</element>
-            <element name="ForecastReason" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="ForecastReason" type="string" minOccurs="0" maxOccurs="1"></element>
             <element name="Earliest" type="tns:DateType" minOccurs="1"
     			maxOccurs="1">
     		</element>
