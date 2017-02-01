@@ -14,62 +14,56 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 @Entity
-public class ExpectedForecast implements Serializable {
-	
+public class ActualForecast implements Serializable {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7808535673936520763L;
-	
+	private static final long serialVersionUID = -6665951930928860474L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	private String doseNumber = "#";
-	private String forecastReason;
+	private String doseNumber;
 	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
-	private Date earliest;
+	private FixedDate earliest;
 	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
-	private Date recommended;
+	private FixedDate recommended;
 	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
-	private Date pastDue;
+	private FixedDate pastDue;
 	@ManyToOne
 	private Vaccine target;
 	@Enumerated(EnumType.STRING)
 	private SerieStatus serieStatus;
 	
-	
 	public Long getId() {
 		return id;
 	}
-	
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getForecastReason() {
-		return forecastReason;
+	public String getDoseNumber() {
+		return doseNumber;
 	}
-	public void setForecastReason(String forecastReason) {
-		this.forecastReason = forecastReason;
+	public void setDoseNumber(String doseNumber) {
+		this.doseNumber = doseNumber;
 	}
-	public Date getEarliest() {
+	public FixedDate getEarliest() {
 		return earliest;
 	}
-	public void setEarliest(Date earliest) {
+	public void setEarliest(FixedDate earliest) {
 		this.earliest = earliest;
 	}
-	public Date getRecommended() {
+	public FixedDate getRecommended() {
 		return recommended;
 	}
-	public void setRecommended(Date recommended) {
+	public void setRecommended(FixedDate recommended) {
 		this.recommended = recommended;
 	}
-	public Date getPastDue() {
+	public FixedDate getPastDue() {
 		return pastDue;
 	}
-	public void setPastDue(Date pastDue) {
+	public void setPastDue(FixedDate pastDue) {
 		this.pastDue = pastDue;
 	}
 	public Vaccine getTarget() {
@@ -85,34 +79,6 @@ public class ExpectedForecast implements Serializable {
 		this.serieStatus = serieStatus;
 	}
 	
-    public String getDoseNumber() {
-		return doseNumber;
-	}
-
-	public void setDoseNumber(String doseNumber) {
-		this.doseNumber = doseNumber;
-	}
-
-	@Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (id == null || obj == null || getClass() != obj.getClass())
-            return false;
-        ExpectedForecast that = (ExpectedForecast) obj;
-        return id.equals(that.id);
-    }
-    
-    @Override
-    public int hashCode() {
-        return id == null ? 0 : id.hashCode();
-    }
-    
-	@Override
-	public String toString() 
-	{ 
-	    return ToStringBuilder.reflectionToString(this); 
-	}
 	
-	
+
 }

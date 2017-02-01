@@ -41,6 +41,7 @@ import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.EventType;
 import gov.nist.healthcare.cds.enumeration.Gender;
+import gov.nist.healthcare.cds.enumeration.SerieStatus;
 import gov.nist.healthcare.cds.repositories.ProductRepository;
 import gov.nist.healthcare.cds.repositories.TestCaseRepository;
 import gov.nist.healthcare.cds.repositories.VaccineGroupRepository;
@@ -97,6 +98,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					String tcName = r.getCell(1).getStringCellValue();
 					Date dob = r.getCell(2).getDateCellValue();
 					String gender = r.getCell(3).getStringCellValue();
+					String serieStatus = r.getCell(7).getStringCellValue();
 //					int doseNumber  = (int) r.getCell(50).getNumericCellValue();
 					Date earliest    = r.getCell(51).getDateCellValue();
 					Date recommended = r.getCell(52).getDateCellValue();
@@ -121,7 +123,14 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					md.setDateLastUpdated(new FixedDate(dateUpdate));
 					
 					ExpectedForecast fc = new ExpectedForecast();
-					fc.setDoseNumber(0);
+					if(serieStatus != null && !serieStatus.isEmpty()){
+						SerieStatus ss = SerieStatus.getSerieStatus(serieStatus);
+						if(ss != null){
+							fc.setSerieStatus(ss);
+						}
+					}
+					
+					fc.setDoseNumber("0");
 					fc.setEarliest(new FixedDate(earliest));
 					fc.setRecommended(new FixedDate(recommended));
 					fc.setPastDue(new FixedDate(pastDue));

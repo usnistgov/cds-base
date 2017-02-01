@@ -33,4 +33,28 @@ public enum SerieStatus {
 	public void setDetails(String details) {
 		this.details = details;
 	}
+	
+	public static SerieStatus  getSerieStatus(String details) {
+		String lookup = details.toLowerCase();
+		switch(lookup){
+		case "assumed complete or immune" : return SerieStatus.A;
+		case "complete" : return SerieStatus.C;
+		case "due" : return SerieStatus.D;
+		case "error" : return SerieStatus.E;
+		case "finished" : return SerieStatus.F;
+		case "aged out" : return SerieStatus.G;
+		case "immune" : return SerieStatus.I;
+		case "due later" : return SerieStatus.L;
+		case "not complete" : return SerieStatus.N;
+		case "overdue" : return SerieStatus.O;
+		case "no results" : return SerieStatus.R;
+		case "complete for season" : return SerieStatus.S;
+		case "unknown" : return SerieStatus.U;
+		case "consider" : return SerieStatus.V;
+		case "waivered" : return SerieStatus.W;
+		case "contraindicated" : return SerieStatus.X;
+		case "recommended but not required" : return SerieStatus.Z;
+		default : return null;
+		}
+	}
 }
