@@ -35,6 +35,8 @@ public class ExpectedForecast implements Serializable {
 	private Date recommended;
 	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
 	private Date pastDue;
+	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
+	private Date complete;
 	@ManyToOne
 	private Vaccine target;
 	@Enumerated(EnumType.STRING)
@@ -91,6 +93,15 @@ public class ExpectedForecast implements Serializable {
 
 	public void setDoseNumber(String doseNumber) {
 		this.doseNumber = doseNumber;
+	}
+
+	
+	public Date getComplete() {
+		return complete;
+	}
+
+	public void setComplete(Date complete) {
+		this.complete = complete;
 	}
 
 	@Override

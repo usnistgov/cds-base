@@ -32,6 +32,8 @@ public class TestCase implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String name;
+	@Column(unique = true, nullable = true)
+	private String uid;
 	private String description;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Patient patient;
@@ -100,6 +102,12 @@ public class TestCase implements Serializable {
 	}
 	public void setForecast(Set<ExpectedForecast> forecast) {
 		this.forecast = forecast;
+	}
+	public String getUid() {
+		return uid;
+	}
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 	@Override
 	public String toString() 
