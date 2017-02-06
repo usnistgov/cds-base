@@ -100,7 +100,13 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					Date dob = r.getCell(2).getDateCellValue();
 					String gender = r.getCell(3).getStringCellValue();
 					String serieStatus = r.getCell(7).getStringCellValue();
-					int doseNumber  = (int) r.getCell(50).getNumericCellValue();
+					String doseNumber = "";
+					if(r.getCell(50).getCellType() == Cell.CELL_TYPE_STRING){
+						doseNumber = r.getCell(50).getStringCellValue();
+					}
+					else {
+						doseNumber = r.getCell(50).getNumericCellValue() + "";
+					}
 					Date earliest    = r.getCell(51).getDateCellValue();
 					Date recommended = r.getCell(52).getDateCellValue();
 					Date pastDue     = r.getCell(53).getDateCellValue();
@@ -113,6 +119,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					tc.setUid(uid);
 					tc.setDescription(tcName);
 					tc.setEvalDate(new FixedDate(evalDate));
+					tc.setGroupTag(target);
 					
 					Patient p = new Patient();
 					p.setDob(new FixedDate(dob));
@@ -132,7 +139,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 						}
 					}
 					
-					fc.setDoseNumber(doseNumber+"");
+					fc.setDoseNumber(doseNumber);
 					fc.setEarliest(new FixedDate(earliest));
 					fc.setRecommended(new FixedDate(recommended));
 					fc.setPastDue(new FixedDate(pastDue));

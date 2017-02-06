@@ -11,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -20,7 +22,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="DATE_TYPE")
+@Table(name = "xdates")
+@DiscriminatorColumn(name="dateType")
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.WRAPPER_OBJECT,
@@ -37,17 +40,19 @@ public abstract class Date implements Serializable {
 	private static final long serialVersionUID = -833018968888415267L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected String id;
+	@GeneratedValue(strategy = GenerationType.TABLE)
+	protected Long id;
+	
 
-	public String getId() {
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	@Override
 	public String toString() 
 	{ 

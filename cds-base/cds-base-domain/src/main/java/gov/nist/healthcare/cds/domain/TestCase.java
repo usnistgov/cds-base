@@ -20,6 +20,7 @@ import javax.persistence.OneToOne;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class TestCase implements Serializable {
@@ -48,7 +49,17 @@ public class TestCase implements Serializable {
 	@JsonIgnore
 	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private TestPlan testPlan;
+	@JsonProperty("group")
+	private String groupTag;
 	
+	
+
+	public String getGroupTag() {
+		return groupTag;
+	}
+	public void setGroupTag(String groupTag) {
+		this.groupTag = groupTag;
+	}
 	public String getName() {
 		return name;
 	}

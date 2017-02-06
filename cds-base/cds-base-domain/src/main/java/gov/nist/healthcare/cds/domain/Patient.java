@@ -24,41 +24,20 @@ public class Patient implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String id;
-	private String firstName;
-	private String lastName;
+	private Long id;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Date dob;
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
-	@OneToOne
-	private TestCase testCase;
 	
 	
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	public TestCase getTestCase() {
-		return testCase;
-	}
-	public void setTestCase(TestCase testCase) {
-		this.testCase = testCase;
-	}
+
 	public Date getDob() {
 		return dob;
 	}

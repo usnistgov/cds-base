@@ -1,11 +1,9 @@
 package gov.nist.healthcare.cds.domain;
 
-import gov.nist.healthcare.cds.enumeration.EventType;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,13 +14,14 @@ import javax.persistence.OneToOne;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import gov.nist.healthcare.cds.enumeration.EventType;
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="EVENT_TYPE")
+@DiscriminatorColumn(name="eventType")
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.WRAPPER_OBJECT,
@@ -33,18 +32,32 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public abstract class Event {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected String id;
+	@GeneratedValue(strategy = GenerationType.TABLE)
+	protected Long id;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Date date;
-	@Enumerated(EnumType.STRING)
+	@Enumerated
 	private EventType type;
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
+	
+	
 
-	public void setId(String id) {
+	public EventType getType() {
+		return type;
+	}
+
+
+
+	public void setType(EventType type) {
+		this.type = type;
+	}
+
+
+
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -54,14 +67,6 @@ public abstract class Event {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-
-	public EventType getType() {
-		return type;
-	}
-
-	public void setType(EventType type) {
-		this.type = type;
 	}
 	
 	@Override

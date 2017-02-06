@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class VaccinationEvent extends Event {
 
 	private int doseNumber = 1;
-	private String MVX;
 	@ManyToOne
 	private Injection administred;
 	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
@@ -30,12 +29,6 @@ public class VaccinationEvent extends Event {
 	}
 	public void setDoseNumber(int doseNumber) {
 		this.doseNumber = doseNumber;
-	}
-	public String getMVX() {
-		return MVX;
-	}
-	public void setMVX(String mVX) {
-		MVX = mVX;
 	}
 	public Injection getAdministred() {
 		return administred;
