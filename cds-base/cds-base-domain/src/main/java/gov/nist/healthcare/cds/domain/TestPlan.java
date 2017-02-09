@@ -1,9 +1,12 @@
 package gov.nist.healthcare.cds.domain;
 
+import gov.nist.healthcare.cds.domain.wrapper.MetaData;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -23,7 +26,7 @@ public class TestPlan implements Serializable {
 	private Long id;
 	private String name;
 	private String description;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+//	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private MetaData metaData;
 	@JsonIgnore
 	private String user;

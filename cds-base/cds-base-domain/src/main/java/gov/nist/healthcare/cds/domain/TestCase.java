@@ -1,11 +1,14 @@
 package gov.nist.healthcare.cds.domain;
 
+import gov.nist.healthcare.cds.domain.wrapper.MetaData;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,7 +41,7 @@ public class TestCase implements Serializable {
 	private String description;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Patient patient;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+//	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private MetaData metaData;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Date evalDate;
@@ -47,7 +50,7 @@ public class TestCase implements Serializable {
 	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private Set<ExpectedForecast> forecast;
 	@JsonIgnore
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+	@ManyToOne
 	private TestPlan testPlan;
 	@JsonProperty("group")
 	private String groupTag;
@@ -125,14 +128,14 @@ public class TestCase implements Serializable {
 	{ 
 	    return ToStringBuilder.reflectionToString(this); 
 	}
+	
 	public TestPlan getTestPlan() {
 		return testPlan;
 	}
 	public void setTestPlan(TestPlan testPlan) {
 		this.testPlan = testPlan;
 	}
-	
-    @Override
+	@Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;

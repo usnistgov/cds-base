@@ -1,4 +1,4 @@
-package gov.nist.healthcare.cds.domain;
+package gov.nist.healthcare.cds.domain.wrapper;
 
 public class CDCImportConfig {
 	private boolean all;

@@ -27,18 +27,24 @@ public class SoftwareConfig implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+	private String name;
 	private String endPoint;
-	
 	@Column(nullable=true)
 	@Enumerated(EnumType.STRING)
-	private FHIRAdapter adapter;
-
+	private FHIRAdapter connector;
 	@JsonIgnore
 	private String user;
 	
 	public Long getId() {
 		return id;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setId(Long id) {
@@ -52,16 +58,16 @@ public class SoftwareConfig implements Serializable {
 	public void setEndPoint(String endPoint) {
 		this.endPoint = endPoint;
 	}
-
-	public FHIRAdapter getAdapter() {
-		return adapter;
-	}
-
-	public void setAdapter(FHIRAdapter adapter) {
-		this.adapter = adapter;
-	}
 	
-    @Override
+    public FHIRAdapter getConnector() {
+		return connector;
+	}
+
+	public void setConnector(FHIRAdapter connector) {
+		this.connector = connector;
+	}
+
+	@Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;

@@ -1,7 +1,10 @@
 package gov.nist.healthcare.cds.auth.config;
 
+import java.io.IOException;
+
 import gov.nist.healthcare.cds.auth.security.AccountUserDetailService;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @Configuration
 @ComponentScan("gov.nist.healthcare.cds.auth")
@@ -52,6 +56,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 				.httpBasic()
 					.authenticationEntryPoint(authenticationEntryPoint)
+			.and()
+				.logout()
+					.logoutSuccessHandler(new LogoutSuccessHandler() {
+						@Override
+						public void onLogoutSuccess(HttpServletRequest request,
+								HttpServletResponse response, Authentication authentication) throws IOException,
+								ServletException {
+							 if (authentication != null && authentication.getDetails() != null) {
+						            try {
+						            	request.getSession().invalidate();
+						            } catch (Exception e) {
+						                e.printStackTrace();
+						            }
+						        }
+						 
+							 response.setStatus(HttpServletResponse.SC_OK);
+							 response.sendRedirect("/");
+						}
+					})
 			.and()
 				.sessionManagement()
 					.maximumSessions(1);

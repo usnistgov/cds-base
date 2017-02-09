@@ -1,4 +1,4 @@
-package gov.nist.healthcare.cds.domain;
+package gov.nist.healthcare.cds.domain.wrapper;
 
 public class EnumContainer {
 	private String code;

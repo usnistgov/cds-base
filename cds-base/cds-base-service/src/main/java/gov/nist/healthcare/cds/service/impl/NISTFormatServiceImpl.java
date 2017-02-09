@@ -37,7 +37,6 @@ import gov.nist.healthcare.cds.domain.ExpectedEvaluation;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.domain.Injection;
-import gov.nist.healthcare.cds.domain.MetaData;
 import gov.nist.healthcare.cds.domain.Patient;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.RelativeDate;
@@ -46,6 +45,7 @@ import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
+import gov.nist.healthcare.cds.domain.wrapper.MetaData;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 import gov.nist.healthcare.cds.domain.xml.beans.*;
 import gov.nist.healthcare.cds.enumeration.EvaluationReason;
@@ -80,8 +80,8 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			if(tc.getMetaData() != null){
 				MetaData md = tc.getMetaData();
 				mdt.setVersion(md.getVersion());
-				mdt.setDateCreated(date(md.getDateCreated()).getFixed().getDate());
-				mdt.setDateLastUpdated(date(md.getDateLastUpdated()).getFixed().getDate());
+//				mdt.setDateCreated(date(md.getDateCreated()).getFixed().getDate());
+//				mdt.setDateLastUpdated(date(md.getDateLastUpdated()).getFixed().getDate());
 			}
 			
 			PatientType pt = new PatientType();
@@ -272,8 +272,8 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			if(tcp.getMetaData() != null){
 				MetaDataType mdt = tcp.getMetaData();
 				md.setVersion(mdt.getVersion());
-				md.setDateCreated(new FixedDate(mdt.getDateCreated().toGregorianCalendar().getTime()));
-				md.setDateLastUpdated(new FixedDate(mdt.getDateLastUpdated().toGregorianCalendar().getTime()));
+				md.setDateCreated(mdt.getDateCreated().toGregorianCalendar().getTime());
+				md.setDateLastUpdated(mdt.getDateLastUpdated().toGregorianCalendar().getTime());
 			}
 			
 			Patient p = new Patient();

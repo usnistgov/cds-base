@@ -34,8 +34,11 @@ public class TestExecution implements Serializable {
 	@OneToOne(cascade = CascadeType.ALL, optional = false)
 	private SoftwareConfig software;
 	private String textResponse;
-	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-	private Set<ActualForecast> forecasts;
+	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+	private Set<ExpectedForecast> forecasts;
+	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+	private Set<VaccinationEvent> events;
+
 	
 	public Long getId() {
 		return id;
@@ -79,5 +82,18 @@ public class TestExecution implements Serializable {
 	public void setTextResponse(String textResponse) {
 		this.textResponse = textResponse;
 	}
+	public Set<ExpectedForecast> getForecasts() {
+		return forecasts;
+	}
+	public void setForecasts(Set<ExpectedForecast> forecasts) {
+		this.forecasts = forecasts;
+	}
+	public Set<VaccinationEvent> getEvents() {
+		return events;
+	}
+	public void setEvents(Set<VaccinationEvent> events) {
+		this.events = events;
+	}
+	
 	
 }

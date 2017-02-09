@@ -1,5 +1,6 @@
-package gov.nist.healthcare.cds.domain;
+package gov.nist.healthcare.cds.domain.wrapper;
 
+import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 
 import java.util.ArrayList;

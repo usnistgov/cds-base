@@ -21,13 +21,10 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gov.nist.healthcare.cds.domain.CDCImport;
-import gov.nist.healthcare.cds.domain.CDCImportConfig;
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedEvaluation;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.FixedDate;
-import gov.nist.healthcare.cds.domain.MetaData;
 import gov.nist.healthcare.cds.domain.Patient;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.TestCase;
@@ -37,6 +34,9 @@ import gov.nist.healthcare.cds.domain.VaccineGroup;
 import gov.nist.healthcare.cds.domain.VaccineMapping;
 import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
+import gov.nist.healthcare.cds.domain.wrapper.CDCImport;
+import gov.nist.healthcare.cds.domain.wrapper.CDCImportConfig;
+import gov.nist.healthcare.cds.domain.wrapper.MetaData;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.EventType;
@@ -128,8 +128,8 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					MetaData md = new MetaData();
 					md.setImported(true);
 					md.setVersion("1");
-					md.setDateCreated(new FixedDate(dateAdded));
-					md.setDateLastUpdated(new FixedDate(dateUpdate));
+					md.setDateCreated(dateAdded);
+					md.setDateLastUpdated(dateUpdate);
 					
 					ExpectedForecast fc = new ExpectedForecast();
 					if(serieStatus != null && !serieStatus.isEmpty()){
