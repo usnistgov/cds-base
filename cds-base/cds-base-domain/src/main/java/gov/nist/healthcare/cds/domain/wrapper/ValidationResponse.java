@@ -20,5 +20,4 @@ public class ValidationResponse {
 		this.evaluatedEvents = evaluatedEvents;
 	}
 	
-	
 }

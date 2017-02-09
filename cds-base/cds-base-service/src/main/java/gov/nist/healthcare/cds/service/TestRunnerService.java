@@ -4,7 +4,7 @@ import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.wrapper.ValidationResponse;
 
-public interface TestCaseValidationService {
+public interface TestRunnerService {
 
 	ValidationResponse validate(SoftwareConfig config, TestCase tc);
 	
