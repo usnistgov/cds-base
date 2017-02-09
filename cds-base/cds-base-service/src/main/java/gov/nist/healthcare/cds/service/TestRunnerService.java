@@ -2,10 +2,10 @@ package gov.nist.healthcare.cds.service;
 
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
-import gov.nist.healthcare.cds.domain.wrapper.ValidationResponse;
+import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
 
 public interface TestRunnerService {
 
-	ValidationResponse validate(SoftwareConfig config, TestCase tc);
+	EngineResponse validate(SoftwareConfig config, TestCase tc);
 	
 }

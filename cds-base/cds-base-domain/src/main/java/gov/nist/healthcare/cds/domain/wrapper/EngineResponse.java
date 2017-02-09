@@ -2,7 +2,7 @@ package gov.nist.healthcare.cds.domain.wrapper;
 
 import java.util.List;
 
-public class ValidationResponse {
+public class EngineResponse {
 	
 	private List<ActualForecast> forecasts;
 	private List<ResponseVaccinationEvent> evaluatedEvents;
