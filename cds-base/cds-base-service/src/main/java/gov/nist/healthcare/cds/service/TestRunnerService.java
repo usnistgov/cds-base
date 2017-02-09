@@ -6,6 +6,6 @@ import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
 
 public interface TestRunnerService {
 
-	EngineResponse validate(SoftwareConfig config, TestCase tc);
+	EngineResponse run(SoftwareConfig config, TestCase tc);
 	
 }
