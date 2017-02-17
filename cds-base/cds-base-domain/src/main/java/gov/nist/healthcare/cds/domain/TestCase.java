@@ -36,7 +36,7 @@ public class TestCase implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String name;
-	@Column(unique = true, nullable = true)
+	@Column(nullable = true)
 	private String uid;
 	private String description;
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)

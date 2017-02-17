@@ -1,15 +1,12 @@
 package gov.nist.healthcare.cds.domain;
 
 import java.io.Serializable;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -34,10 +31,8 @@ public class TestExecution implements Serializable {
 	@OneToOne(cascade = CascadeType.ALL, optional = false)
 	private SoftwareConfig software;
 	private String textResponse;
-	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
-	private Set<ExpectedForecast> forecasts;
-	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
-	private Set<VaccinationEvent> events;
+//	@OneToOne(cascade = CascadeType.ALL, optional = false)
+//	private ValidationReport report;
 
 	
 	public Long getId() {
@@ -82,18 +77,11 @@ public class TestExecution implements Serializable {
 	public void setTextResponse(String textResponse) {
 		this.textResponse = textResponse;
 	}
-	public Set<ExpectedForecast> getForecasts() {
-		return forecasts;
-	}
-	public void setForecasts(Set<ExpectedForecast> forecasts) {
-		this.forecasts = forecasts;
-	}
-	public Set<VaccinationEvent> getEvents() {
-		return events;
-	}
-	public void setEvents(Set<VaccinationEvent> events) {
-		this.events = events;
-	}
-	
-	
+//	public ValidationReport getReport() {
+//		return report;
+//	}
+//	public void setReport(ValidationReport report) {
+//		this.report = report;
+//	}
+
 }

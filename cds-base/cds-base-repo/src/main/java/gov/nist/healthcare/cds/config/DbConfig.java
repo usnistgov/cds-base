@@ -12,7 +12,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -75,7 +74,7 @@ public class DbConfig {
 		// If the value of this property is true, Hibernate will format the SQL
 		
 		// that is written to the console.
-		
+//		
 		jpaProperties.put("hibernate.cache.provider_class",
 				env.getRequiredProperty("hibernate.cache.provider_class"));
 		
@@ -93,8 +92,13 @@ public class DbConfig {
 		
 		jpaProperties.put("hibernate.cache.region.factory_class",
 				env.getProperty("hibernate.cache.region.factory_class"));
-	     
+	    
+		jpaProperties.put("javax.persistence.storeMode",
+				env.getProperty("javax.persistence.storeMode"));
+
 //		jpaProperties.setProperty("net.sf.ehcache.configurationResourceName", env.getProperty("net.sf.ehcache.configurationResourceName"));
+		
+		
 		entityManagerFactoryBean.setJpaProperties(jpaProperties);
 		return entityManagerFactoryBean;
 	}

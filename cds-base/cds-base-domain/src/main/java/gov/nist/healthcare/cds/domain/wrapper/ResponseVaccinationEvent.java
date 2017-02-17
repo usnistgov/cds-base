@@ -15,6 +15,7 @@ public class ResponseVaccinationEvent extends Event {
 	public int getDoseNumber() {
 		return doseNumber;
 	}
+	
 	public void setDoseNumber(int doseNumber) {
 		this.doseNumber = doseNumber;
 	}
@@ -22,18 +23,21 @@ public class ResponseVaccinationEvent extends Event {
 	public VaccineRef getAdministred() {
 		return administred;
 	}
+	
 	public void setAdministred(VaccineRef administred) {
 		this.administred = administred;
 	}
+	
 	public Set<ActualEvaluation> getEvaluations() {
 		return evaluations;
 	}
+	
 	public void setEvaluations(Set<ActualEvaluation> evaluations) {
 		this.evaluations = evaluations;
 	}
+	
 	@Override
-	public String toString() 
-	{ 
+	public String toString() { 
 	    return ToStringBuilder.reflectionToString(this); 
 	}
 	
