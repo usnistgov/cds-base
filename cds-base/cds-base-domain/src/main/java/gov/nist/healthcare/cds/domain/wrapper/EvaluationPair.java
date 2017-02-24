@@ -6,10 +6,7 @@ public class EvaluationPair {
 	
 	private ExpectedEvaluation expected;
 	private ActualEvaluation actual;
-	private boolean earliest;
-	private boolean recommended;
-	private boolean pastDue;
-	private boolean complete;
+	private boolean match;
 	
 
 	public ExpectedEvaluation getExpected() {
@@ -24,30 +21,13 @@ public class EvaluationPair {
 	public void setActual(ActualEvaluation actual) {
 		this.actual = actual;
 	}
-	public boolean isEarliest() {
-		return earliest;
+	public boolean isMatch() {
+		return match;
 	}
-	public void setEarliest(boolean earliest) {
-		this.earliest = earliest;
+	public void setMatch(boolean match) {
+		this.match = match;
 	}
-	public boolean isRecommended() {
-		return recommended;
-	}
-	public void setRecommended(boolean recommended) {
-		this.recommended = recommended;
-	}
-	public boolean isPastDue() {
-		return pastDue;
-	}
-	public void setPastDue(boolean pastDue) {
-		this.pastDue = pastDue;
-	}
-	public boolean isComplete() {
-		return complete;
-	}
-	public void setComplete(boolean complete) {
-		this.complete = complete;
-	}
+	
 	
 	
 }

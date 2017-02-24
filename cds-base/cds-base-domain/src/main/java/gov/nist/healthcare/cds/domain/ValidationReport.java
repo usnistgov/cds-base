@@ -1,27 +1,25 @@
 package gov.nist.healthcare.cds.domain;
 
-import java.util.List;
 
-import gov.nist.healthcare.cds.domain.wrapper.EvaluatedEvent;
-import gov.nist.healthcare.cds.domain.wrapper.ForecastValidation;
+import gov.nist.healthcare.cds.domain.wrapper.EventsReport;
+import gov.nist.healthcare.cds.domain.wrapper.ForecastsReport;
 
-import javax.persistence.Entity;
 
 public class ValidationReport {
 	
-	private ForecastValidation forecasts;
-	private List<EvaluatedEvent> events;
+	private ForecastsReport forecasts;
+	private EventsReport events;
 	
-	public ForecastValidation getForecasts() {
+	public ForecastsReport getForecasts() {
 		return forecasts;
 	}
-	public void setForecasts(ForecastValidation forecasts) {
+	public void setForecasts(ForecastsReport forecasts) {
 		this.forecasts = forecasts;
 	}
-	public List<EvaluatedEvent> getEvents() {
+	public EventsReport getEvents() {
 		return events;
 	}
-	public void setEvents(List<EvaluatedEvent> events) {
+	public void setEvents(EventsReport events) {
 		this.events = events;
 	}
 

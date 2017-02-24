@@ -5,7 +5,7 @@ import java.util.List;
 public class EngineResponse {
 	
 	private List<ActualForecast> forecasts;
-	private List<ResponseVaccinationEvent> evaluatedEvents;
+	private List<ResponseVaccinationEvent> events;
 	
 	public List<ActualForecast> getForecasts() {
 		return forecasts;
@@ -13,11 +13,11 @@ public class EngineResponse {
 	public void setForecasts(List<ActualForecast> forecasts) {
 		this.forecasts = forecasts;
 	}
-	public List<ResponseVaccinationEvent> getEvaluatedEvents() {
-		return evaluatedEvents;
+	public List<ResponseVaccinationEvent> getEvents() {
+		return events;
 	}
-	public void setEvaluatedEvents(List<ResponseVaccinationEvent> evaluatedEvents) {
-		this.evaluatedEvents = evaluatedEvents;
+	public void setEvents(List<ResponseVaccinationEvent> evaluatedEvents) {
+		this.events = evaluatedEvents;
 	}
 	
 }

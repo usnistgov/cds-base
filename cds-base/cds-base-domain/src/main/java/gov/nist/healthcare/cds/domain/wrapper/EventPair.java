@@ -1,16 +1,16 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import gov.nist.healthcare.cds.domain.ExpectedEvaluation;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
 
-public class EvaluatedEvent {
+public class EventPair {
 	
 	private VaccinationEvent event;
 	private List<EvaluationPair> pairs;
-	private List<ActualEvaluation> aUnmatched;
-	private List<ExpectedEvaluation> eUnmatched;
+	private List<ExpectedEvaluation> unmatched;
 	
 	public VaccinationEvent getEvent() {
 		return event;
@@ -19,21 +19,22 @@ public class EvaluatedEvent {
 		this.event = event;
 	}
 	public List<EvaluationPair> getPairs() {
+		if(pairs == null){
+			pairs = new ArrayList<EvaluationPair>();
+		}
 		return pairs;
 	}
 	public void setPairs(List<EvaluationPair> pairs) {
 		this.pairs = pairs;
 	}
-	public List<ActualEvaluation> getaUnmatched() {
-		return aUnmatched;
+	public List<ExpectedEvaluation> getUnmatched() {
+		if(unmatched == null){
+			unmatched = new ArrayList<ExpectedEvaluation>();
+		}
+		return unmatched;
 	}
-	public void setaUnmatched(List<ActualEvaluation> aUnmatched) {
-		this.aUnmatched = aUnmatched;
+	public void setUnmatched(List<ExpectedEvaluation> unmatched) {
+		this.unmatched = unmatched;
 	}
-	public List<ExpectedEvaluation> geteUnmatched() {
-		return eUnmatched;
-	}
-	public void seteUnmatched(List<ExpectedEvaluation> eUnmatched) {
-		this.eUnmatched = eUnmatched;
-	}
+	
 }

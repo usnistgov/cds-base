@@ -6,6 +6,7 @@ public class ForecastPair {
 	
 	private ExpectedForecast expected;
 	private ActualForecast actual;
+	private boolean dose;
 	private boolean earliest;
 	private boolean recommended;
 	private boolean pastDue;
@@ -47,6 +48,13 @@ public class ForecastPair {
 	public void setComplete(boolean complete) {
 		this.complete = complete;
 	}
+	public boolean isDose() {
+		return dose;
+	}
+	public void setDose(boolean dose) {
+		this.dose = dose;
+	}
+	
 	
 	
 }
