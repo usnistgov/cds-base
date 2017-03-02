@@ -1,10 +1,13 @@
 package gov.nist.healthcare.cds.service;
-import gov.nist.healthcare.cds.domain.TestCase;
-import gov.nist.healthcare.cds.domain.ValidationReport;
+import java.util.List;
+
 import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
+import gov.nist.healthcare.cds.domain.wrapper.ForecastRequirement;
+import gov.nist.healthcare.cds.domain.wrapper.Report;
+import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 
 public interface ValidationService {
 
-	ValidationReport validate(EngineResponse response, TestCase tc);
+	Report validate(EngineResponse response, List<VaccinationEventRequirement> events, List<ForecastRequirement> expForecast);
 	
 }

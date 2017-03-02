@@ -2,33 +2,21 @@ package gov.nist.healthcare.cds.domain.wrapper;
 
 import java.util.Date;
 
-import gov.nist.healthcare.cds.domain.Forecast;
+import gov.nist.healthcare.cds.domain.ExpectedForecast;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+public class ForecastRequirement {
 
-public class ActualForecast extends Forecast {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private VaccineRef vaccine;
+	private ExpectedForecast expForecast;
 	private Date earliest;
 	private Date recommended;
 	private Date pastDue;
 	private Date complete;
 	
-	@Override
-	public String toString() 
-	{ 
-	    return ToStringBuilder.reflectionToString(this); 
+	public ExpectedForecast getExpForecast() {
+		return expForecast;
 	}
-	public VaccineRef getVaccine() {
-		return vaccine;
-	}
-
-	public void setVaccine(VaccineRef vaccine) {
-		this.vaccine = vaccine;
+	public void setExpForecast(ExpectedForecast expForecast) {
+		this.expForecast = expForecast;
 	}
 	public Date getEarliest() {
 		return earliest;

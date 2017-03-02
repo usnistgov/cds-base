@@ -5,6 +5,11 @@ public class VaccineRef {
 	private String mvx;
 	private boolean hasMvx;
 	
+	public VaccineRef(String cvx, String mvx){
+		this.cvx = cvx;
+		this.mvx = mvx;
+		this.hasMvx = mvx.isEmpty();
+	}
 	public boolean isHasMvx() {
 		return hasMvx;
 	}

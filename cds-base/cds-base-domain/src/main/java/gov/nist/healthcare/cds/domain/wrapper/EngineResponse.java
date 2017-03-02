@@ -4,6 +4,7 @@ import java.util.List;
 
 public class EngineResponse {
 	
+	private String response;
 	private List<ActualForecast> forecasts;
 	private List<ResponseVaccinationEvent> events;
 	
@@ -19,5 +20,12 @@ public class EngineResponse {
 	public void setEvents(List<ResponseVaccinationEvent> evaluatedEvents) {
 		this.events = evaluatedEvents;
 	}
+	public String getResponse() {
+		return response;
+	}
+	public void setResponse(String response) {
+		this.response = response;
+	}
+	
 	
 }

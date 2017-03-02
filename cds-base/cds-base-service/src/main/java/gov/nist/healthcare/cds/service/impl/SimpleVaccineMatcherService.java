@@ -1,11 +1,14 @@
 package gov.nist.healthcare.cds.service.impl;
 
+import org.springframework.stereotype.Service;
+
 import gov.nist.healthcare.cds.domain.Injection;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.service.VaccineMatcherService;
 
+@Service
 public class SimpleVaccineMatcherService implements VaccineMatcherService {
 
 	@Override
