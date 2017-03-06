@@ -10,6 +10,11 @@ public class VaccineRef {
 		this.mvx = mvx;
 		this.hasMvx = mvx.isEmpty();
 	}
+	
+	public VaccineRef(){
+		this.hasMvx = false;
+	}
+	
 	public boolean isHasMvx() {
 		return hasMvx;
 	}
@@ -27,5 +32,7 @@ public class VaccineRef {
 	}
 	public void setMvx(String mvx) {
 		this.mvx = mvx;
+		if(mvx != "")
+			this.hasMvx = true;
 	}
 }

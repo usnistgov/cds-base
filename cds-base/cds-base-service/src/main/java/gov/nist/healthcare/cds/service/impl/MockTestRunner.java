@@ -20,7 +20,7 @@ import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.service.TestRunnerService;
 
-@Service
+//@Service
 public class MockTestRunner implements TestRunnerService {
 
 	@Override
