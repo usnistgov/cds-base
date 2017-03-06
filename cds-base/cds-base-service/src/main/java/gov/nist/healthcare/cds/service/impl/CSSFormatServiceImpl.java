@@ -105,7 +105,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 						doseNumber = r.getCell(50).getStringCellValue();
 					}
 					else {
-						doseNumber = r.getCell(50).getNumericCellValue() + "";
+						doseNumber = (int) r.getCell(50).getNumericCellValue() + "";
 					}
 					Date earliest    = r.getCell(51).getDateCellValue();
 					Date recommended = r.getCell(52).getDateCellValue();
@@ -170,7 +170,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					tc.setForecast(new HashSet<ExpectedForecast>(Arrays.asList(fc)));
 					tc.setEvents(new HashSet<Event>());
 					
-					int d = 0;
+					int d = 1;
 					for(int j = 8; j < 8 + (6 * 7); j += 6){
 						col = j;
 						VaccinationEvent ve = new VaccinationEvent();
@@ -193,7 +193,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 						
 						ve.setDate(new FixedDate(dateA));
 						ve.setDoseNumber(d);
-						
+						d++;
 						ExpectedEvaluation evalt = new ExpectedEvaluation();
 						if(eval.toUpperCase().equals("VALID")){
 							evalt.setStatus(EvaluationStatus.VALID);
