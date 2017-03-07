@@ -42,11 +42,6 @@ public class ExecutionService implements TestCaseExecutionService {
 	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date dt) throws UnresolvableDate {
 		java.util.Date today = dt;
 		TestCasePayLoad tcP = this.payLoad(tc, today);
-		conf = new SoftwareConfig();
-		conf.setConnector(FHIRAdapter.TCH);
-		conf.setUser("TCH");
-		conf.setName("TCH FC");
-		conf.setEndPoint("http://tchforecasttester.org/fv/forecast");
 		EngineResponse response = runner.run(conf, tcP);
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, today, tcP.getEvaluationDate(), tcP.getDateOfBirth());
 		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, today,tcP.getEvaluationDate(), tcP.getDateOfBirth());

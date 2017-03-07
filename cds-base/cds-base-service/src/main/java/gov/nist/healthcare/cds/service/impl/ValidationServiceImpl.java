@@ -23,9 +23,11 @@ import gov.nist.healthcare.cds.domain.wrapper.ResultCounts;
 import gov.nist.healthcare.cds.domain.wrapper.StringCriterion;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventValidation;
+import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 import gov.nist.healthcare.cds.enumeration.ValidationStatus;
 import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.VaccineMatcherService;
+import gov.nist.healthcare.cds.service.ValidationConfigService;
 import gov.nist.healthcare.cds.service.ValidationService;
 
 @Service
@@ -35,7 +37,8 @@ public class ValidationServiceImpl implements ValidationService {
 	private VaccineMatcherService matcher;
 	@Autowired
 	private DateService dates;
-	
+	@Autowired
+	private ValidationConfigService config;
 
 	@Override
 	public Report validate(EngineResponse response, List<VaccinationEventRequirement> events, List<ForecastRequirement> expForecast) {
@@ -92,18 +95,18 @@ public class ValidationServiceImpl implements ValidationService {
 		vev.setVeRequirement(ve);
 		for(ExpectedEvaluation ee : ve.getvEvent().getEvaluations()){
 			ActualEvaluation ae = this.findMatch(rve.getEvaluations(), ee);
+			EvaluationCriterion cr = null;
 			if(ae == null){
-				vev.geteValidation().add(new EvaluationValidation(ee, new EvaluationCriterion(ValidationStatus.U)));
-				counts.addU();
+				cr = new EvaluationCriterion(ValidationStatus.U);
 			}
 			else if (ae.getStatus().equals(ee.getStatus())){
-				vev.geteValidation().add(new EvaluationValidation(ee, new EvaluationCriterion(ValidationStatus.P)));
-				counts.addP();
+				cr = new EvaluationCriterion(ValidationStatus.P);
 			}
 			else {
-				vev.geteValidation().add(new EvaluationValidation(ee, new EvaluationCriterion(ValidationStatus.F, ae.getStatus())));
-				counts.addF();
+				cr = new EvaluationCriterion(config.failed(ValidationCriterion.EvaluationStatus), ae.getStatus());
 			}
+			vev.geteValidation().add(new EvaluationValidation(ee, cr));
+			counts.consider(cr);
 		}
 		return vev;
 	}
@@ -144,89 +147,90 @@ public class ValidationServiceImpl implements ValidationService {
 		fv.setCounts(counts);
 		
 		// Dose
+		StringCriterion dose = null;
 		if(ef.getDoseNumber().isEmpty()){
-			fv.setDose(new StringCriterion(ValidationStatus.N));
+			dose = new StringCriterion(ValidationStatus.N);
 		}
 		else if(af.getDoseNumber().isEmpty()){
-			fv.setDose(new StringCriterion(ValidationStatus.U));
-			counts.addU();
+			dose = new StringCriterion(ValidationStatus.U);
 		}
 		else if(ef.getDoseNumber().equals(af.getDoseNumber())) {
-			fv.setDose(new StringCriterion(ValidationStatus.P));
-			counts.addP();
+			dose = new StringCriterion(ValidationStatus.P);
 		}
 		else {
-			fv.setDose(new StringCriterion(ValidationStatus.F, af.getDoseNumber()));
-			counts.addF();
+			dose = new StringCriterion(config.failed(ValidationCriterion.DoseNumber), af.getDoseNumber());
 		}
+		fv.setDose(dose);
+		counts.consider(dose);
 		
 		// Earliest
+		DateCriterion earliest;
 		if(fr.getEarliest() == null){
-			fv.setEarliest(new DateCriterion(ValidationStatus.N));
+			earliest = new DateCriterion(ValidationStatus.N);
 		}
 		else if(af.getEarliest() == null) {
-			fv.setEarliest(new DateCriterion(ValidationStatus.U));
-			counts.addU();
+			earliest = new DateCriterion(ValidationStatus.U);
 		}
 		else if(dates.same(fr.getEarliest(),af.getEarliest())){
-			fv.setEarliest(new DateCriterion(ValidationStatus.P));
-			counts.addP();
+			earliest = new DateCriterion(ValidationStatus.P);
 		}
 		else {
-			fv.setEarliest(new DateCriterion(ValidationStatus.F, af.getEarliest()));
-			counts.addF();
+			earliest = new DateCriterion(config.failed(ValidationCriterion.EarliestDate), af.getEarliest());
 		}
+		fv.setEarliest(earliest);
+		counts.consider(earliest);
+
 		
 		// Recommended
+		DateCriterion recommended;
 		if(fr.getRecommended() == null){
-			fv.setRecommended(new DateCriterion(ValidationStatus.N));
+			recommended = new DateCriterion(ValidationStatus.N);
 		}
 		else if(af.getRecommended() == null){
-			fv.setRecommended(new DateCriterion(ValidationStatus.U));
-			counts.addU();
+			recommended = new DateCriterion(ValidationStatus.U);
 		}
 		else if(dates.same(fr.getRecommended(),af.getRecommended())){
-			fv.setRecommended(new DateCriterion(ValidationStatus.P));
-			counts.addP();
+			recommended = new DateCriterion(ValidationStatus.P);
 		}
 		else {
-			fv.setRecommended(new DateCriterion(ValidationStatus.F, af.getRecommended()));
-			counts.addF();
+			recommended = new DateCriterion(config.failed(ValidationCriterion.RecommendedDate), af.getRecommended());
 		}
+		fv.setRecommended(recommended);
+		counts.consider(recommended);
 		
 		// pastDue
+		DateCriterion pastDue;
 		if(fr.getPastDue() == null){
-			fv.setPastDue(new DateCriterion(ValidationStatus.N));
+			pastDue = new DateCriterion(ValidationStatus.N);
 		}
 		else if(af.getPastDue() == null){
-			fv.setPastDue(new DateCriterion(ValidationStatus.U));
-			counts.addU();
+			pastDue = new DateCriterion(ValidationStatus.U);
 		}
 		else if(dates.same(fr.getPastDue(),af.getPastDue())){
-			fv.setPastDue(new DateCriterion(ValidationStatus.P));
-			counts.addP();
+			pastDue = new DateCriterion(ValidationStatus.P);
 		}
 		else {
-			fv.setPastDue(new DateCriterion(ValidationStatus.F, af.getPastDue()));
-			counts.addF();
+			pastDue = new DateCriterion(config.failed(ValidationCriterion.PastDueDate), af.getPastDue());
 		}
+		fv.setPastDue(pastDue);
+		counts.consider(pastDue);
 		
 		// Complete
+		DateCriterion complete;
 		if(fr.getComplete() == null){
-			fv.setComplete(new DateCriterion(ValidationStatus.N));
+			complete = new DateCriterion(ValidationStatus.N);
 		}
 		else if(af.getComplete() == null){
-			fv.setComplete(new DateCriterion(ValidationStatus.U));
-			counts.addU();
+			complete = new DateCriterion(ValidationStatus.U);
 		}
 		else if(dates.same(fr.getComplete(),af.getComplete())){
-			fv.setComplete(new DateCriterion(ValidationStatus.P));
-			counts.addP();
+			complete = new DateCriterion(ValidationStatus.P);
 		}
 		else {
-			fv.setComplete(new DateCriterion(ValidationStatus.F, af.getComplete()));
-			counts.addF();
+			complete =  new DateCriterion(config.failed(ValidationCriterion.CompleteDate), af.getComplete());
 		}
+		fv.setComplete(complete);
+		counts.consider(complete);
 		
 		return fv;
 	}
