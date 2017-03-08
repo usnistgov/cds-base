@@ -15,15 +15,11 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Table(name = "xdates")
-@DiscriminatorColumn(name="dateType")
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.WRAPPER_OBJECT,
@@ -37,21 +33,6 @@ public abstract class Date implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -833018968888415267L;
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.TABLE)
-	protected Long id;
-	
-
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	@Override
 	public String toString() 
@@ -59,19 +40,5 @@ public abstract class Date implements Serializable {
 	    return ToStringBuilder.reflectionToString(this); 
 	}
 	
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (id == null || obj == null || getClass() != obj.getClass())
-            return false;
-        Date that = (Date) obj;
-        return id.equals(that.id);
-    }
-    
-    @Override
-    public int hashCode() {
-        return id == null ? 0 : id.hashCode();
-    }
 	
 }

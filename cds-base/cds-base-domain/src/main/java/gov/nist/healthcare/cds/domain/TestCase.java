@@ -21,37 +21,28 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity
+@Document
 public class TestCase implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7648219993919989094L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private String id;
 	private String name;
-	@Column(nullable = true)
 	private String uid;
 	private String description;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Patient patient;
-//	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private MetaData metaData;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private Date evalDate;
-	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private Set<Event> events;
-	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private Set<ExpectedForecast> forecast;
-	@JsonIgnore
-	@ManyToOne
-	private TestPlan testPlan;
+	private String testPlan;
 	@JsonProperty("group")
 	private String groupTag;
 	
@@ -75,10 +66,10 @@ public class TestCase implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public Patient getPatient() {
@@ -129,10 +120,10 @@ public class TestCase implements Serializable {
 	    return ToStringBuilder.reflectionToString(this); 
 	}
 	
-	public TestPlan getTestPlan() {
+	public String getTestPlan() {
 		return testPlan;
 	}
-	public void setTestPlan(TestPlan testPlan) {
+	public void setTestPlan(String testPlan) {
 		this.testPlan = testPlan;
 	}
 	@Override

@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 public class CurrentUser {
 	private String username;
-	private Long accountId;
+	private String accountId;
 	private boolean isAuthenticated = false;
 	private boolean isPending = false;
 	private Collection<GrantedAuthority> authorities;
@@ -60,7 +60,7 @@ public class CurrentUser {
 	/**
 	 * @return the accountId
 	 */
-	public Long getAccountId() {
+	public String getAccountId() {
 		return accountId;
 	}
 
@@ -68,7 +68,7 @@ public class CurrentUser {
 	 * @param accountId
 	 *            the accountId to set
 	 */
-	public void setAccountId(Long accountId) {
+	public void setAccountId(String accountId) {
 		this.accountId = accountId;
 	}
 

@@ -4,7 +4,6 @@ package gov.nist.healthcare.cds.domain;
 import java.io.Serializable;
 import javax.persistence.MappedSuperclass;
 
-@MappedSuperclass
 public class Forecast implements Serializable {
 	
 	/**

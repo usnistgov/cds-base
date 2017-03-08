@@ -1,39 +1,32 @@
 package gov.nist.healthcare.cds.auth.domain;
 
 import java.util.Set;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.JoinColumn;
 
-@Entity
+@Document
 public class Account {
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
-	private Long id;
-	@Column(nullable=false)
+	private String id;
+//	@Column(nullable=false)
 	private String username;
-	@Column(nullable=false)
+//	@Column(nullable=false)
 	private String password;
 //	@Column(nullable=false)
 	private String email;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-	@JoinTable(name = "AccountRole",
-			   joinColumns = @JoinColumn(
-					   name = "accountId",
-					   referencedColumnName = "id"),
-				inverseJoinColumns = @JoinColumn(
-						name = "roleId",
-						referencedColumnName = "id"))
+//	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+//	@JoinTable(name = "AccountRole",
+//			   joinColumns = @JoinColumn(
+//					   name = "accountId",
+//					   referencedColumnName = "id"),
+//				inverseJoinColumns = @JoinColumn(
+//						name = "roleId",
+//						referencedColumnName = "id"))
+	@DBRef
 	private Set<Privilege> privileges;
 	
 	public Account(){
@@ -41,12 +34,19 @@ public class Account {
 	}
 	
 	
-	public Long getId() {
+
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+
+
+
+	public void setId(String id) {
 		this.id = id;
 	}
+
+
+
 	public String getUsername() {
 		return username;
 	}

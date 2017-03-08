@@ -13,8 +13,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@Entity
-@DiscriminatorValue("RELATIVE")
 @JsonTypeName("relative")
 public class RelativeDate extends Date implements Serializable{
 	/**

@@ -13,8 +13,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@Entity
-@DiscriminatorValue("FIXED")
 @JsonTypeName("fixed")
 public class FixedDate extends Date implements Serializable {
 	/**

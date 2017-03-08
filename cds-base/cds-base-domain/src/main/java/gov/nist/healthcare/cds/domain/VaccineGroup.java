@@ -5,8 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document
 public class VaccineGroup implements Serializable {
 
 	/**
@@ -14,6 +15,7 @@ public class VaccineGroup implements Serializable {
 	 */
 	private static final long serialVersionUID = 4539430668013568861L;
 	@Id
+	private String id;
 	private String cvx;
 	private String name;
 	

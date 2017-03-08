@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@Entity
-@DiscriminatorValue("GENERIC")
+@Document
 @JsonTypeName("generic")
 public class Vaccine extends Injection implements Serializable  {
 
@@ -19,10 +19,16 @@ public class Vaccine extends Injection implements Serializable  {
 	 * 
 	 */
 	private static final long serialVersionUID = 8871233411947052965L;
-	
 	private String name;
 	private String details;
 	
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	public String getCvx() {
 		return id;
 	}

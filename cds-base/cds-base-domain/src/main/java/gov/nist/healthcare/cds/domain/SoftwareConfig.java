@@ -13,20 +13,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity
+@Document
 public class SoftwareConfig implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -6056059554984678200L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private String id;
 	private String name;
 	private String endPoint;
 	@Column(nullable=true)
@@ -35,7 +35,7 @@ public class SoftwareConfig implements Serializable {
 	@JsonIgnore
 	private String user;
 	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 	
@@ -47,7 +47,7 @@ public class SoftwareConfig implements Serializable {
 		this.name = name;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

@@ -12,9 +12,17 @@ public class VaccineRef {
 	}
 	
 	public VaccineRef(){
+		this.cvx = "";
+		this.mvx = "";
 		this.hasMvx = false;
 	}
 	
+	
+	@Override
+	public String toString() {
+		return "VaccineRef [cvx=" + cvx + ", mvx=" + mvx + ", hasMvx=" + hasMvx + "]";
+	}
+
 	public boolean isHasMvx() {
 		return hasMvx;
 	}

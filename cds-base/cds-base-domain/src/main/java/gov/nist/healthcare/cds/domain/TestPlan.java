@@ -16,27 +16,29 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity
+@Document
 public class TestPlan implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private String id;
 	private String name;
 	private String description;
-//	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	private MetaData metaData;
 	@JsonIgnore
 	private String user;
-	@OneToMany(cascade={CascadeType.PERSIST, CascadeType.REFRESH,  CascadeType.REMOVE}, fetch = FetchType.EAGER, mappedBy="testPlan")
+	@DBRef
 	private List<TestCase> testCases;
 	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getName() {
@@ -58,6 +60,9 @@ public class TestPlan implements Serializable {
 		this.metaData = metaData;
 	}
 	public List<TestCase> getTestCases() {
+		if(testCases == null){
+			testCases = new ArrayList<>();
+		}
 		return testCases;
 	}
 	public void setTestCases(List<TestCase> testCases) {
@@ -66,7 +71,7 @@ public class TestPlan implements Serializable {
 	public void addTestCase(TestCase tc){
 		if(this.testCases == null)
 			this.testCases = new ArrayList<TestCase>();
-		tc.setTestPlan(this);
+		tc.setTestPlan(this.getId());
 		this.testCases.add(tc);
 	}
     @Override

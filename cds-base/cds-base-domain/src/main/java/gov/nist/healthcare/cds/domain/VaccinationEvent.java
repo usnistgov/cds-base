@@ -10,18 +10,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@Entity
 @DiscriminatorValue("VACCINATION")
 @JsonTypeName("vaccination")
 public class VaccinationEvent extends Event {
 
 	private int doseNumber = 1;
-	@ManyToOne
 	private Injection administred;
-	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private Set<ExpectedEvaluation> evaluations;
 	
 	public int getDoseNumber() {

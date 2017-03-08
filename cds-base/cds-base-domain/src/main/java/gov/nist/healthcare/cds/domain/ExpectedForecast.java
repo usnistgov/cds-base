@@ -16,26 +16,20 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
-@Entity
 public class ExpectedForecast extends Forecast implements Serializable {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7808535673936520763L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+
 	protected Long id;
-	@ManyToOne
 	private Vaccine target;
-	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
 	protected Date earliest;
-	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
 	protected Date recommended;
-	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
 	protected Date pastDue;
-	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
 	protected Date complete;
 	@Enumerated(EnumType.STRING)
 	protected SerieStatus serieStatus;

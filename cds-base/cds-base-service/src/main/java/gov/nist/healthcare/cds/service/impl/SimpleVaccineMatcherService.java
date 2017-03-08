@@ -23,9 +23,13 @@ public class SimpleVaccineMatcherService implements VaccineMatcherService {
 		
 		if(i instanceof Product){
 			Product p = (Product) i;
-			boolean cvx = p.getVx().getCvx().equals(ref.getCvx());
-			boolean mvx = (!p.getMx().getMvx().isEmpty() && p.getMx().getMvx().equals(ref.getMvx())) ||  p.getMx().getMvx().isEmpty();
-			return cvx && mvx || this.isGroupOf(ref.getCvx(), i);
+			System.out.println(ref);
+			if(!ref.getMvx().isEmpty()){
+				return ref.getCvx().equals(p.getVx().getCvx()) || this.isGroupOf(ref.getCvx(), i);
+			}
+			else {
+				return ref.getCvx().equals(p.getVx().getCvx()) && ref.getMvx().equals(p.getMx().getMvx());
+			}
 		}
 		else if (i instanceof Vaccine){
 			Vaccine v = (Vaccine) i;
@@ -38,10 +42,13 @@ public class SimpleVaccineMatcherService implements VaccineMatcherService {
 	}
 	
 	public boolean isGroupOf(String cvx, Injection i){
+		System.out.println("[VMATCHER] cvx "+cvx);
 		if(i instanceof Product){
 			Product p = (Product) i;
+			System.out.println("[VMATCHER] p.cvx "+p.getVx().getCvx());
 			VaccineMapping mp = vmRepo.findMapping(p.getVx().getCvx());
 			for(VaccineGroup vg : mp.getGroups()){
+				System.out.println("[VMATCHER] groups : "+vg.getCvx());
 				if(vg.getCvx().equals(cvx))
 					return true;
 			}
@@ -50,7 +57,9 @@ public class SimpleVaccineMatcherService implements VaccineMatcherService {
 		else if (i instanceof Vaccine){
 			Vaccine v = (Vaccine) i;
 			VaccineMapping mp = vmRepo.findMapping(v.getCvx());
+			System.out.println("[VMATCHER] v.cvx "+v.getCvx());
 			for(VaccineGroup vg : mp.getGroups()){
+				System.out.println("[VMATCHER] groups : "+vg.getCvx());
 				if(vg.getCvx().equals(cvx))
 					return true;
 			}

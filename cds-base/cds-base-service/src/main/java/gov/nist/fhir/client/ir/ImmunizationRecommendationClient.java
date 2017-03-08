@@ -15,15 +15,23 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 import java.net.URL;
-
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.UUID;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
-
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
 import org.eclipse.emf.ecore.EObject;
 
 import org.hl7.fhir.Bundle;
@@ -213,36 +221,35 @@ public class ImmunizationRecommendationClient {
         return xml;
     }
 
-    private static Response sendImmunizationInformation(Routing routing, SendingConfig sendingConfig) throws UnsupportedEncodingException, IOException {
-    	String URL = routing.getFhirAdapterUrl();
-    	HttpHeaders headers = new HttpHeaders();
-    	headers.add("content-type", "application/xml; charset=utf8");
-    	headers.add("accept", "application/xml");
-    	HttpEntity<String> entity = new HttpEntity<>(ImmunizationRecommendationClient.generateXml(routing, sendingConfig),headers);
-    	RestTemplate tmpl = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
-    	System.out.println("[HTM] "+URL);
-    	ResponseEntity<String> response = tmpl.exchange(URL, HttpMethod.POST,entity, String.class);
-    	Response responseObj = new Response();
-    	responseObj.setHttpCode(response.getStatusCode().toString());
-    	responseObj.setPayload(response.getBody());
-//        HttpPost request = new HttpPost(routing.getFhirAdapterUrl());
-//        StringEntity paramsXml = new StringEntity(ImmunizationRecommendationClient.generateXml(routing, sendingConfig));
-//        //System.out.println(convertStreamToString(paramsXml.getContent()));
-//        request.addHeader("content-type", "application/xml; charset=utf8");
-//        request.addHeader("accept", "application/xml");
-//        request.setEntity(paramsXml);
-//
-//        HttpClient httpClient = HttpClientBuilder.create().build();   
-//
-//        HttpResponse httpResponse = httpClient.execute(request);
-//        response.setHttpCode(String.valueOf(httpResponse.getStatusLine().getStatusCode()));
-//
-//        //TODO: Improve this.
-//        String body = convertStreamToString(httpResponse.getEntity().getContent());
-//        String xml = body.substring(body.indexOf("<"));
-//        response.setPayload(xml);
+    private static Response sendImmunizationInformation(Routing routing, SendingConfig sendingConfig) throws UnsupportedEncodingException, IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 
-        return responseObj;
+        Response response = new Response();
+        HttpPost request = new HttpPost(routing.getFhirAdapterUrl());
+        StringEntity paramsXml = new StringEntity(ImmunizationRecommendationClient.generateXml(routing, sendingConfig));
+        //System.out.println(convertStreamToString(paramsXml.getContent()));
+        request.addHeader("content-type", "application/xml; charset=utf8");
+        request.addHeader("accept", "application/xml");
+        request.setEntity(paramsXml);
+
+        // HttpClient httpClient = HttpClientBuilder.create().build();             
+        HttpClient httpClient = HttpClients.custom()
+            .setSSLSocketFactory(new SSLConnectionSocketFactory(SSLContexts.custom()
+                    .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                    .build()
+                )
+            ).build();
+        
+        
+
+        HttpResponse httpResponse = httpClient.execute(request);
+        response.setHttpCode(String.valueOf(httpResponse.getStatusLine().getStatusCode()));
+
+        //TODO: Improve this.
+        String body = convertStreamToString(httpResponse.getEntity().getContent());
+        String xml = body.substring(body.indexOf("<"));
+        response.setPayload(xml);
+
+        return response;
     }
 
     /*
@@ -268,7 +275,7 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
         return s.hasNext() ? s.next() : "";
     }
 
-    public Bundle getImmunizationRecommendation(Routing routing, SendingConfig sendingConfig) throws IOException {
+    public Bundle getImmunizationRecommendation(Routing routing, SendingConfig sendingConfig) throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 
         //EngineResponse engineResponse = new EngineResponse();
         //engineResponse.setForecasts(new ArrayList<ActualForecast>());
@@ -387,7 +394,12 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
 
         sendingConfig.setImmunizationData(imms);
 
-        irc.getImmunizationRecommendation(routing, sendingConfig);
+        try {
+			irc.getImmunizationRecommendation(routing, sendingConfig);
+		} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
     }
 

@@ -3,10 +3,11 @@ package gov.nist.healthcare.cds.domain.wrapper;
 
 import gov.nist.healthcare.cds.domain.TestCase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Report {
+public class Report implements Serializable {
 
 	private TestCase tc;
 	private java.util.Date evaluationDate;

@@ -49,8 +49,6 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 	@Autowired
 	private VaccineGroupRepository vxGroupRepository;
 	
-	@Autowired
-	private VaccineMappingRepository vxMappingRepository;
 	
 	@Override
 	public Set<VaccineMapping> _import(InputStream _vaccines, InputStream _groups, InputStream _manufacturer, InputStream _products) throws IOException {
@@ -68,9 +66,9 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 		manufacturer(ba_manufacturer);
 		
 		Set<VaccineMapping> l_vxm = new HashSet<VaccineMapping>();
-		Set<VaccineGroup> l_vg = new HashSet<VaccineGroup>();
-		Set<Vaccine> l_vx = new HashSet<Vaccine>();
-		Set<Product> l_pr = new HashSet<Product>();
+//		Set<VaccineGroup> l_vg = new HashSet<VaccineGroup>();
+//		Set<Vaccine> l_vx = new HashSet<Vaccine>();
+//		Set<Product> l_pr = new HashSet<Product>();
 		
 		try {
 			Workbook workbook = WorkbookFactory.create(ba_vaccines);
@@ -111,9 +109,10 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 				}
 				List<Product> s_pr_s = productRepository.save(s_pr);
 				
-				vxm.setGroups(new HashSet(s_vg_s));
-				vxm.setProducts(new HashSet(s_pr_s));
+				vxm.setGroups(new HashSet<VaccineGroup>(s_vg_s));
+				vxm.setProducts(new HashSet<Product>(s_pr_s));
 				vxm.setVx(vx_s);
+				vxm.setId(vx_s.getCvx());
 				
 				l_vxm.add(vxm);
 			}

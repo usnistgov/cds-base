@@ -13,6 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.mysql.fabric.xmlrpc.base.Array;
 
 
