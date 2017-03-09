@@ -8,7 +8,7 @@ public class VaccineRef {
 	public VaccineRef(String cvx, String mvx){
 		this.cvx = cvx;
 		this.mvx = mvx;
-		this.hasMvx = mvx.isEmpty();
+		this.hasMvx = !mvx.isEmpty();
 	}
 	
 	public VaccineRef(){
