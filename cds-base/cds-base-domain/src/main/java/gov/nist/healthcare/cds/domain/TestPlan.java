@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,6 +28,7 @@ public class TestPlan implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String id;
+	@NotNull
 	private String name;
 	private String description;
 	private MetaData metaData;

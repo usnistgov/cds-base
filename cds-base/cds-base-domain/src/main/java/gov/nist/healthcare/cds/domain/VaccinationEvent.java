@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -19,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class VaccinationEvent extends Event {
 
 	private int doseNumber = 1;
+	@NotNull
+	@Valid
 	private Injection administred;
 	private Set<ExpectedEvaluation> evaluations;
 	

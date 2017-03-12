@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -26,11 +28,18 @@ public class ExpectedForecast extends Forecast implements Serializable {
 	private static final long serialVersionUID = 7808535673936520763L;
 
 	protected Long id;
+	@NotNull
+	@Valid
 	private Vaccine target;
+	@NotNull
+	@Valid
 	protected Date earliest;
+	@NotNull
+	@Valid
 	protected Date recommended;
 	protected Date pastDue;
 	protected Date complete;
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	protected SerieStatus serieStatus;
 	

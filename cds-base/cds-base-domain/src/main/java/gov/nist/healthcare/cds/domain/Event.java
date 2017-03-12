@@ -1,6 +1,8 @@
 package gov.nist.healthcare.cds.domain;
 
 import javax.persistence.Enumerated;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -18,6 +20,8 @@ import gov.nist.healthcare.cds.enumeration.EventType;
 })
 public abstract class Event {
 	
+	@NotNull
+	@Valid
 	private Date date;
 	@Enumerated
 	private EventType type;

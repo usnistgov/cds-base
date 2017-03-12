@@ -12,8 +12,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
 
 public class Patient implements Serializable {
 	/**
@@ -21,8 +23,9 @@ public class Patient implements Serializable {
 	 */
 	private static final long serialVersionUID = 3581693775619531483L;
 	
+	@NotNull
 	private Date dob;
-	@Enumerated(EnumType.STRING)
+	@NotNull
 	private Gender gender;
 	
 	public Date getDob() {

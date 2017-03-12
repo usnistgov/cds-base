@@ -19,8 +19,12 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -34,13 +38,19 @@ public class TestCase implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String id;
+	@NotBlank
 	private String name;
 	private String uid;
 	private String description;
+	@NotNull
+	@Valid
 	private Patient patient;
 	private MetaData metaData;
+	@NotNull
 	private Date evalDate;
+	@Valid
 	private Set<Event> events;
+	@Valid
 	private Set<ExpectedForecast> forecast;
 	private String testPlan;
 	@JsonProperty("group")

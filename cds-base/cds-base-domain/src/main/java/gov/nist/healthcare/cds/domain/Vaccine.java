@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,7 +20,9 @@ public class Vaccine extends Injection implements Serializable  {
 	 * 
 	 */
 	private static final long serialVersionUID = 8871233411947052965L;
+	@NotNull
 	private String name;
+	@NotNull
 	private String details;
 	
 	
