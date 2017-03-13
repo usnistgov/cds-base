@@ -12,27 +12,35 @@ import fhir.util.Serialize;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.ssl.SSLContexts;
+import org.eclipse.emf.common.util.EList;
+
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.xmi.impl.XMLHelperImpl;
 
 import org.hl7.fhir.Bundle;
 import org.hl7.fhir.Code;
@@ -44,14 +52,9 @@ import org.hl7.fhir.FhirFactory;
 import org.hl7.fhir.Id;
 import org.hl7.fhir.Parameters;
 import org.hl7.fhir.ParametersParameter;
+import org.hl7.fhir.Patient;
 import org.hl7.fhir.ResourceContainer;
 import org.hl7.fhir.impl.BundleImpl;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -65,11 +68,14 @@ public class ImmunizationRecommendationClient {
     public static final String PARAMETER_NAME_SERVICE_URL = "serviceURL";
     public static final String PARAMETER_NAME_ASSESSMENT_DATE = "assessmentDate";
     public static final String PARAMETER_NAME_IMMUNIZATIONS = "immunizations";
-    private RestTemplate tmpl;
-    
-    //TODO: Change from strings to objects
+    public static final String PARAMETER_NAME_PATIENT = "patient";
+
     private static String generateXml(Routing routing, SendingConfig sendingConfig) {
 
+        
+        
+        
+        
         Parameters parameters = FhirFactory.eINSTANCE.createParameters();
         Id id = FhirFactory.eINSTANCE.createId();
         id.setValue(UUID.randomUUID().toString());
@@ -87,7 +93,19 @@ public class ImmunizationRecommendationClient {
         dobValue.setValue(FHIRUtil.convert2XMLCalendar(sendingConfig.getBirthdate()));
         dobParameter.setValueDate(dobValue);
         parameters.getParameter().add(dobParameter);
-
+/*
+        // Will swap in when ready
+        ParametersParameter patientParameter = FhirFactory.eINSTANCE.createParametersParameter();
+        patientParameter.setName(FHIRUtil.convert(PARAMETER_NAME_PATIENT));
+        Patient patient = FhirFactory.eINSTANCE.createPatient();
+        Code genderCode = FhirFactory.eINSTANCE.createCode();
+        genderCode.setValue(sendingConfig.getGender());
+        patient.setGender(genderCode);
+        patient.setBirthDate(dobValue);
+        ResourceContainer patientRC = FhirFactory.eINSTANCE.createResourceContainer();
+        patientRC.setPatient(patient);
+        patientParameter.setResource(patientRC);        
+  */      
         ParametersParameter serviceTypeParameter = FhirFactory.eINSTANCE.createParametersParameter();
         serviceTypeParameter.setName(FHIRUtil.convert(PARAMETER_NAME_SERVICE_TYPE));
         org.hl7.fhir.String serviceTypeString = FhirFactory.eINSTANCE.createString();
@@ -150,8 +168,11 @@ public class ImmunizationRecommendationClient {
         }
         Serialize seri = new Serialize();
         String xml = seri.it(parameters, "sut.xml");
+        
+ //       System.out.println(seri.it(patientParameter, "sut.xml"));
+        
         //System.out.println("GENERATED OBJECT HERE ----->\n" + xml);
-
+/*
         StringBuilder parameterXml = new StringBuilder();
         parameterXml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Parameters xmlns=\"http://hl7.org/fhir\">");
         parameterXml.append("<id value=\"" + UUID.randomUUID().toString() + "\"/>");
@@ -204,7 +225,7 @@ public class ImmunizationRecommendationClient {
         parameterXml.append("</Parameters>");
 
         //System.out.println("OTHER XML HERE!" + parameterXml.toString());
-        
+        */
         /*
                  This is what the schema says we should have produced...
         Update: schema was wrong(!)
@@ -218,6 +239,9 @@ public class ImmunizationRecommendationClient {
                     + "</Immunization>"
          */
         //return parameterXml.toString();
+        
+    //    System.out.println(xml);
+        
         return xml;
     }
 
@@ -225,12 +249,15 @@ public class ImmunizationRecommendationClient {
 
         Response response = new Response();
         HttpPost request = new HttpPost(routing.getFhirAdapterUrl());
-        StringEntity paramsXml = new StringEntity(ImmunizationRecommendationClient.generateXml(routing, sendingConfig));
+        String outgoingXml = ImmunizationRecommendationClient.generateXml(routing, sendingConfig);
+        StringEntity paramsXml = new StringEntity(outgoingXml);
         //System.out.println(convertStreamToString(paramsXml.getContent()));
         request.addHeader("content-type", "application/xml; charset=utf8");
         request.addHeader("accept", "application/xml");
         request.setEntity(paramsXml);
 
+        System.out.println("GOING OUT!" + outgoingXml);
+        
         // HttpClient httpClient = HttpClientBuilder.create().build();             
         HttpClient httpClient = HttpClients.custom()
             .setSSLSocketFactory(new SSLConnectionSocketFactory(SSLContexts.custom()
@@ -245,7 +272,7 @@ public class ImmunizationRecommendationClient {
         response.setHttpCode(String.valueOf(httpResponse.getStatusLine().getStatusCode()));
 
         //TODO: Improve this.
-        String body = convertStreamToString(httpResponse.getEntity().getContent());
+        String body = convertStreamToString(httpResponse.getEntity().getContent());        
         String xml = body.substring(body.indexOf("<"));
         response.setPayload(xml);
 
@@ -275,7 +302,7 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
         return s.hasNext() ? s.next() : "";
     }
 
-    public Bundle getImmunizationRecommendation(Routing routing, SendingConfig sendingConfig) throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+    public Bundle getImmunizationRecommendation(Routing routing, SendingConfig sendingConfig) throws IOException, UnsupportedEncodingException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
         //EngineResponse engineResponse = new EngineResponse();
         //engineResponse.setForecasts(new ArrayList<ActualForecast>());
@@ -284,7 +311,10 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
         //      Collection<Immunization> immunizations = new ArrayList<Immunization>();
         Response response = ImmunizationRecommendationClient.sendImmunizationInformation(routing, sendingConfig);
 
+        
+        //TODO: This workaround is no longer needed.  Fix it.
         String xml = response.getPayload();
+        /*
         String filename = UUID.randomUUID().toString();
         File tempFile = new File(filename + ".xml");
         PrintWriter writer = new PrintWriter(tempFile);
@@ -297,9 +327,13 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
         if (path.startsWith("file:")) {
             path = path.substring(5);
         }
+        */
         DeSerialize deserial = new DeSerialize();
-        EObject s1 = deserial.it(url);
-
+        //EObject s1 = deserial.it(url);
+        
+        
+        
+        EObject s1 = deserial.it(new StringReader(xml), "*.xml");
         //System.out.println(s1.toString() + "!!!" + s1.eResource());
         BundleImpl bundle = (BundleImpl) s1;
         //System.out.println(xml);
@@ -357,18 +391,18 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
             }
         }
          */
-        tempFile.delete();
+     //   tempFile.delete();
         //return recommendations;
         return bundle;
         //return engineResponse;
 
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UnsupportedEncodingException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
         ImmunizationRecommendationClient irc = new ImmunizationRecommendationClient();
         Routing routing = new Routing();
-        routing.setFhirAdapterUrl("http://localhost:8080/forecast/ImmunizationRecommendations");
+        routing.setFhirAdapterUrl("https://localhost:8443/forecast/ImmunizationRecommendations");
         routing.setForecastType("TCH");
         routing.setForecastUrl("http://tchforecasttester.org/fv/forecast");
 
@@ -394,13 +428,52 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
 
         sendingConfig.setImmunizationData(imms);
 
-        try {
-			irc.getImmunizationRecommendation(routing, sendingConfig);
-		} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+        Bundle bundle = irc.getImmunizationRecommendation(routing, sendingConfig);
+     //   Serialize ser = new Serialize();
+        
+        // System.out.println(ser.it(bundle,"*.xml"));
+        
+        
+        org.hl7.fhir.ImmunizationRecommendation ir = FhirFactory.eINSTANCE.createImmunizationRecommendation();
+        Id id = FhirFactory.eINSTANCE.createId();
+        id.setValue(UUID.randomUUID().toString());
+        ir.setId(id);
+        
+        Parameters params = FhirFactory.eINSTANCE.createParameters();        
+        ParametersParameter param = FhirFactory.eINSTANCE.createParametersParameter();
+        params.getParameter().add(param);        
+        ParametersParameter param2 = params.getParameter().get(0);
+        param.setId("HERE");
+        org.hl7.fhir.String name = FhirFactory.eINSTANCE.createString();
+        name.setValue("name");
+        param.setName(name);
+        param.setValueId(id);
+        ResourceContainer rc = FhirFactory.eINSTANCE.createResourceContainer();
+        rc.setImmunizationRecommendation(ir);
+        param.setResource(rc);
+        
+        
+        Serialize ser = new Serialize();
+        String irString = ser.it(ir, "*.xml");
+        String paramsString = ser.it(params,"*.xml");
+     //   String paramsString;
+        //try {
+            paramsString = ser.it(params,"*.xml"); //ser.xmlFromParameter(params);
+        String paramString = ser.it(param, "*.xml");
+        String param2String = ser.it(param2, "*.xml");
+        
+        
+       // XMLHelperImpl.saveString(options, contents, irString, helper)
+        
+        //System.out.println(irString);
+        System.out.println(paramsString);
+        System.out.println(paramString);
+        System.out.println(param2String);
+        //} catch (ParserConfigurationException ex) {
+//            Logger.getLogger(ImmunizationRecommendationClient.class.getName()).log(Level.SEVERE, null, ex);
+  //      }
+        
+        
     }
 
 }
