@@ -1,6 +1,7 @@
 package gov.nist.healthcare.cds.domain;
 
 import gov.nist.healthcare.cds.domain.wrapper.MetaData;
+import gov.nist.healthcare.cds.enumeration.DateType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class TestCase implements Serializable {
 	private String name;
 	private String uid;
 	private String description;
+	private DateType dateType;
 	@NotNull
 	@Valid
 	private Patient patient;
@@ -113,6 +115,9 @@ public class TestCase implements Serializable {
 		events.add(e);
 	}
 	public Set<ExpectedForecast> getForecast() {
+		if(forecast == null){
+			return new HashSet<ExpectedForecast>();
+		}
 		return forecast;
 	}
 	public void setForecast(Set<ExpectedForecast> forecast) {
@@ -150,6 +155,12 @@ public class TestCase implements Serializable {
     public int hashCode() {
         return id == null ? 0 : id.hashCode();
     }
+	public DateType getDateType() {
+		return dateType;
+	}
+	public void setDateType(DateType dateType) {
+		this.dateType = dateType;
+	}
 	
 	
 	

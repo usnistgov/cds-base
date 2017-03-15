@@ -25,7 +25,14 @@ public class VaccinationEvent extends Event {
 	@Valid
 	private Injection administred;
 	private Set<ExpectedEvaluation> evaluations;
+	private int id;
 	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public int getDoseNumber() {
 		return doseNumber;
 	}

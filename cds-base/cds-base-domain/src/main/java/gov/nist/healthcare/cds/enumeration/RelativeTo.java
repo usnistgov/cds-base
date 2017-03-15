@@ -1,7 +1,7 @@
 package gov.nist.healthcare.cds.enumeration;
 
 public enum RelativeTo {
-	DOB("Date Of Birth"), EVALDATE("Assessment Date"), TODAY("Today");
+	DOB("Birth"), EVALDATE("Assessment Date"), VACCINATION("Vaccination Event");
 	private String details;
 	private RelativeTo(String x){
 		this.details = x;

@@ -38,6 +38,7 @@ import gov.nist.healthcare.cds.domain.wrapper.CDCImport;
 import gov.nist.healthcare.cds.domain.wrapper.CDCImportConfig;
 import gov.nist.healthcare.cds.domain.wrapper.MetaData;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
+import gov.nist.healthcare.cds.enumeration.DateType;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.EventType;
 import gov.nist.healthcare.cds.enumeration.Gender;
@@ -115,6 +116,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					Date dateAdded  = r.getCell(57).getDateCellValue();
 					Date dateUpdate = r.getCell(58).getDateCellValue();
 					TestCase tc = new TestCase();
+					tc.setDateType(DateType.FIXED);
 					tc.setName(tcName);
 					tc.setUid(uid);
 					tc.setDescription(tcName);

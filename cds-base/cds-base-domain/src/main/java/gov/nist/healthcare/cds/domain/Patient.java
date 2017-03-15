@@ -15,7 +15,6 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
 
 public class Patient implements Serializable {
 	/**

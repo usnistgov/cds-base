@@ -205,13 +205,13 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			dt.setFixed(fdt);
 		}
 		else if(d instanceof RelativeDate){
-			RelativeDate rd = (RelativeDate) d;
-			RelativeDateType rdt = new RelativeDateType();
-			rdt.setRelativeTo(rd.getRelativeTo().toString());
-			rdt.setDay(rd.getDay());
-			rdt.setMonth(rd.getMonth());
-			rdt.setYear(rd.getYear());
-			dt.setRelative(rdt);
+//			RelativeDate rd = (RelativeDate) d;
+//			RelativeDateType rdt = new RelativeDateType();
+//			rdt.setRelativeTo(rd.getRelativeTo().toString());
+//			rdt.setDay(rd.getDay());
+//			rdt.setMonth(rd.getMonth());
+//			rdt.setYear(rd.getYear());
+//			dt.setRelative(rdt);
 		}
 		return dt;
 	}
@@ -225,10 +225,10 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 		else if(d.getRelative() != null){
 			RelativeDateType rdt = d.getRelative();
 			RelativeDate rd = new RelativeDate();
-			rd.setRelativeTo(RelativeTo.valueOf(rdt.getRelativeTo()));
-			rd.setDay(rdt.getDay());
-			rd.setMonth(rdt.getMonth());
-			rd.setYear(rdt.getYear());
+//			rd.setRelativeTo(RelativeTo.valueOf(rdt.getRelativeTo()));
+//			rd.setDay(rdt.getDay());
+//			rd.setMonth(rdt.getMonth());
+//			rd.setYear(rdt.getYear());
 			return rd;
 		}
 		return null;
