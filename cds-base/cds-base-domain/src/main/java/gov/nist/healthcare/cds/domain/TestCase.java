@@ -43,12 +43,14 @@ public class TestCase implements Serializable {
 	private String name;
 	private String uid;
 	private String description;
+	@NotNull
 	private DateType dateType;
 	@NotNull
 	@Valid
 	private Patient patient;
 	private MetaData metaData;
 	@NotNull
+	@Valid
 	private Date evalDate;
 	@Valid
 	private Set<Event> events;

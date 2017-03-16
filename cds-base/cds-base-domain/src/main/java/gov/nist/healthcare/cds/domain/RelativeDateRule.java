@@ -2,16 +2,21 @@ package gov.nist.healthcare.cds.domain;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import gov.nist.healthcare.cds.enumeration.DatePosition;
 
 public class RelativeDateRule {
 	
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private DatePosition position;
 	private int year;
 	private int month;
 	private int day;
+	@NotNull
+	@Valid
 	private DateReference relativeTo;
 	
 	public RelativeDateRule(){

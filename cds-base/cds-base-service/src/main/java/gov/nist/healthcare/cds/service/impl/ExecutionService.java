@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
-import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.domain.Injection;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
@@ -19,10 +18,10 @@ import gov.nist.healthcare.cds.domain.exception.UnresolvableDate;
 import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
 import gov.nist.healthcare.cds.domain.wrapper.ForecastRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.Report;
+import gov.nist.healthcare.cds.domain.wrapper.ResolvedDates;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
-import gov.nist.healthcare.cds.enumeration.FHIRAdapter;
 import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.TestCaseExecutionService;
 import gov.nist.healthcare.cds.service.TestRunnerService;
@@ -39,30 +38,38 @@ public class ExecutionService implements TestCaseExecutionService {
 	private TestRunnerService runner;
 	
 	@Override
-	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date dt) throws UnresolvableDate {
-		java.util.Date today = dt;
-		TestCasePayLoad tcP = this.payLoad(tc, today);
+	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date today) throws UnresolvableDate {
+		
+		// Fix Eval, DOB, Events
+		ResolvedDates rds = dates.resolveDates(tc, today);
+		
+		// Create PayLoad and Send request
+		TestCasePayLoad tcP = this.payLoad(tc, rds);
 		EngineResponse response = runner.run(conf, tcP);
-		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, today, tcP.getEvaluationDate(), tcP.getDateOfBirth());
-		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, today,tcP.getEvaluationDate(), tcP.getDateOfBirth());
+		
+		// Compute Requirements
+		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
+		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);
+		
+		// Validate 
 		Report rp = validation.validate(response, veRequirements, fcRequirements);
+		
+		// Set Report Properties
 		rp.setEvaluationDate(tcP.getEvaluationDate());
 		rp.setDob(tcP.getDateOfBirth());
 		rp.setTc(tc);
 		rp.setResponse(response.getResponse());
-		System.out.println("[HTDEB]"+tcP);
+		
 		return rp;
 	}
 	
 	
-	public List<VaccinationEventRequirement> veRequirements(TestCase tc, java.util.Date today, java.util.Date evalR, java.util.Date dobR){
-		FixedDate eval = new FixedDate(evalR);
-		FixedDate dob = new FixedDate(dobR);
+	public List<VaccinationEventRequirement> veRequirements(TestCase tc, ResolvedDates rds){
 		List<VaccinationEventRequirement> veRequirements = new ArrayList<VaccinationEventRequirement>();
 		for(Event e : tc.getEvents()){
 			if(e instanceof VaccinationEvent){
 				VaccinationEvent ve = (VaccinationEvent) e;
-				java.util.Date dA = dates.fix(ve.getDate(), dob, eval, today).getDate();
+				java.util.Date dA = rds.getEvents().get(ve.getPosition());
 				VaccinationEventRequirement vReq = new VaccinationEventRequirement();
 				vReq.setDateAdministred(dA);
 				vReq.setvEvent(ve);
@@ -72,46 +79,35 @@ public class ExecutionService implements TestCaseExecutionService {
 		return veRequirements;
 	}
 	
-	public List<ForecastRequirement> fcRequirements(TestCase tc, java.util.Date today, java.util.Date evalR, java.util.Date dobR){
-		FixedDate eval = new FixedDate(evalR);
-		FixedDate dob = new FixedDate(dobR);
+	public List<ForecastRequirement> fcRequirements(TestCase tc, ResolvedDates rds){
 		List<ForecastRequirement> fcRequirements = new ArrayList<ForecastRequirement>();
 		for(ExpectedForecast fc : tc.getForecast()){
-			ForecastRequirement fcReq = new ForecastRequirement();
-			
-			FixedDate earliest = dates.fix(fc.getEarliest(), dob, eval, today);
-			FixedDate rec = dates.fix(fc.getRecommended(), dob, eval, today);
-			FixedDate pastDue = dates.fix(fc.getPastDue(), dob, eval, today);
-			FixedDate complete = dates.fix(fc.getComplete(), dob, eval, today);
-			
+			ForecastRequirement fcReq = new ForecastRequirement();		
 			fcReq.setExpForecast(fc);
-			if(earliest != null)
-				fcReq.setEarliest(earliest.getDate());
-			if(rec != null)
-				fcReq.setRecommended(rec.getDate());
-			if(pastDue != null)
-				fcReq.setPastDue(pastDue.getDate());
-			if(complete != null)
-				fcReq.setComplete(complete.getDate());
+			if(fc.getEarliest() != null)
+				fcReq.setEarliest(dates.fix(rds, fc.getEarliest()));
+			if(fc.getRecommended() != null)
+				fcReq.setRecommended(dates.fix(rds, fc.getRecommended()));
+			if(fc.getPastDue() != null)
+				fcReq.setPastDue(dates.fix(rds, fc.getPastDue()));
+			if(fc.getComplete() != null)
+				fcReq.setComplete(dates.fix(rds, fc.getComplete()));
 			
 			fcRequirements.add(fcReq);
 		}
 		return fcRequirements;
 	}
 	
-	public TestCasePayLoad payLoad(TestCase tc, java.util.Date today) throws UnresolvableDate{
-		FixedDate eval = dates.evaluationDate(tc, today);
-		FixedDate dob = dates.fix(tc.getPatient().getDob(), null, eval, today);
-		
+	public TestCasePayLoad payLoad(TestCase tc, ResolvedDates rds) throws UnresolvableDate{
 		TestCasePayLoad tcP = new TestCasePayLoad();
 		tcP.setGender(tc.getPatient().getGender());
-		tcP.setEvaluationDate(eval.getDate());
-		tcP.setDateOfBirth(dob.getDate());
+		tcP.setEvaluationDate(rds.getEval());
+		tcP.setDateOfBirth(rds.getDob());
 		for(Event e : tc.getEvents()){
 			if(e instanceof VaccinationEvent){
 				VaccinationEvent ve = (VaccinationEvent) e;
 				VaccineRef vr = this.vaccineRef(ve.getAdministred());
-				java.util.Date dA = dates.fix(ve.getDate(), dob, eval, today).getDate();
+				java.util.Date dA = rds.getEvents().get(ve.getPosition());
 				tcP.addImmunization(vr, dA);
 			}
 		}

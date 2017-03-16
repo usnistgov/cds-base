@@ -4,7 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -14,6 +19,9 @@ public class RelativeDate extends Date implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	@NotNull
+	@Valid
+	@Size(min=1)
 	private List<RelativeDateRule> rules;
 
 	

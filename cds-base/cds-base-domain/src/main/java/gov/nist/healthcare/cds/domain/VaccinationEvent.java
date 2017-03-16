@@ -25,13 +25,13 @@ public class VaccinationEvent extends Event {
 	@Valid
 	private Injection administred;
 	private Set<ExpectedEvaluation> evaluations;
-	private int id;
+	private int position;
 	
-	public int getId() {
-		return id;
+	public int getPosition() {
+		return position;
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setPosition(int position) {
+		this.position = position;
 	}
 	public int getDoseNumber() {
 		return doseNumber;
