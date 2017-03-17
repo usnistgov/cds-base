@@ -40,14 +40,18 @@ import gov.nist.healthcare.cds.domain.Injection;
 import gov.nist.healthcare.cds.domain.Patient;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.RelativeDate;
+import gov.nist.healthcare.cds.domain.RelativeDateRule;
+import gov.nist.healthcare.cds.domain.StaticDateReference;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
+import gov.nist.healthcare.cds.domain.VaccineDateReference;
 import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
 import gov.nist.healthcare.cds.domain.wrapper.MetaData;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 import gov.nist.healthcare.cds.domain.xml.beans.*;
+import gov.nist.healthcare.cds.enumeration.DatePosition;
 import gov.nist.healthcare.cds.enumeration.EvaluationReason;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.Gender;
@@ -75,13 +79,18 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			tcp.setName(tc.getName());
 			tcp.setDescription(tc.getDescription());
 			tcp.setEvaluationDate(date(tc.getEvalDate()));
+			tcp.setDateType(tc.getDateType().toString());
+			if(tc.getGroupTag() != null && !tc.getGroupTag().isEmpty())
+				tcp.setGroup(tc.getGroupTag());
+			if(tc.getUid() != null && !tc.getGroupTag().isEmpty())
+				tcp.setUID(tc.getUid());
 			
 			MetaDataType mdt = new MetaDataType();
 			if(tc.getMetaData() != null){
 				MetaData md = tc.getMetaData();
 				mdt.setVersion(md.getVersion());
-//				mdt.setDateCreated(date(md.getDateCreated()).getFixed().getDate());
-//				mdt.setDateLastUpdated(date(md.getDateLastUpdated()).getFixed().getDate());
+				mdt.setDateCreated(date(md.getDateCreated()));
+				mdt.setDateLastUpdated(date(md.getDateLastUpdated()));
 			}
 			
 			PatientType pt = new PatientType();
@@ -96,7 +105,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				pt.setDateOfBirth(date(p.getDob()));
 			}
 			
-			Set<Event> evts = tc.getEvents();
+			List<Event> evts = tc.getEvents();
 			EventsType evtst = new EventsType();
 			if(evts != null){
 				for(Event e : evts){
@@ -104,6 +113,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					evt.setType(e.getType().toString());
 					evt.setEventDate(date(e.getDate()));
 					VaccinationEvent vev = (VaccinationEvent) e;
+					evt.setID(vev.getPosition());
 					
 					VaccineType vt = new VaccineType();
 					Injection inject = vev.getAdministred();
@@ -149,7 +159,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				}
 			}
 			
-			Set<ExpectedForecast> efs = tc.getForecast();
+			List<ExpectedForecast> efs = tc.getForecast();
 			ForecastsType fts = new ForecastsType();
 			if(efs != null){
 				for(ExpectedForecast ef : efs){
@@ -190,6 +200,15 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 		return null;
 	}
 	
+	public XMLGregorianCalendar date(java.util.Date d) throws DatatypeConfigurationException{
+		GregorianCalendar gregory = new GregorianCalendar();
+		gregory.setTime(d);
+		XMLGregorianCalendar calendar = DatatypeFactory.newInstance()
+		        .newXMLGregorianCalendar(
+		            gregory);
+		return calendar;
+	}
+	
 	public DateType date(Date d) throws DatatypeConfigurationException{
 		DateType dt = new DateType();
 		
@@ -205,13 +224,25 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			dt.setFixed(fdt);
 		}
 		else if(d instanceof RelativeDate){
-//			RelativeDate rd = (RelativeDate) d;
-//			RelativeDateType rdt = new RelativeDateType();
-//			rdt.setRelativeTo(rd.getRelativeTo().toString());
-//			rdt.setDay(rd.getDay());
-//			rdt.setMonth(rd.getMonth());
-//			rdt.setYear(rd.getYear());
-//			dt.setRelative(rdt);
+			RelativeDateType rdt = new RelativeDateType();
+			for(RelativeDateRule r : ((RelativeDate) d).getRules()){
+				RuleType rt = new RuleType();
+				rt.setDays(r.getDay());
+				rt.setMonths(r.getMonth());
+				rt.setYears(r.getYear());
+				RelativeToType rtt = new RelativeToType();
+				rtt.setPosition(r.getPosition().toString());
+				if(r.getRelativeTo() instanceof StaticDateReference){
+					rtt.setReference(((StaticDateReference)r.getRelativeTo()).getId().toString());
+				}
+				else if (r.getRelativeTo() instanceof VaccineDateReference){
+					rtt.setId(((VaccineDateReference)r.getRelativeTo()).getId());
+					rtt.setReference("VACCINATION");
+				}
+				rt.setRelativeTo(rtt);
+				rdt.getRule().add(rt);
+			}
+			dt.setRelative(rdt);
 		}
 		return dt;
 	}
@@ -225,10 +256,22 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 		else if(d.getRelative() != null){
 			RelativeDateType rdt = d.getRelative();
 			RelativeDate rd = new RelativeDate();
-//			rd.setRelativeTo(RelativeTo.valueOf(rdt.getRelativeTo()));
-//			rd.setDay(rdt.getDay());
-//			rd.setMonth(rdt.getMonth());
-//			rd.setYear(rdt.getYear());
+			for(RuleType rt : rdt.getRule()){
+				RelativeDateRule rdr = new RelativeDateRule();
+				rdr.setDay(rt.getDays());
+				rdr.setMonth(rt.getMonths());
+				rdr.setYear(rt.getYears());
+				rdr.setPosition(DatePosition.valueOf(rt.getRelativeTo().getPosition()));
+				if(rt.getRelativeTo() != null){
+					if(rt.getRelativeTo().getReference() == "VACCINATION"){
+						rdr.setRelativeTo(new VaccineDateReference(rt.getRelativeTo().getId()));
+					}
+					else{
+						rdr.setRelativeTo(new StaticDateReference(RelativeTo.valueOf(rt.getRelativeTo().getReference())));
+					}
+				}
+				rd.add(rdr);
+			}
 			return rd;
 		}
 		return null;
@@ -266,7 +309,14 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			TestCase tc = new TestCase();
 			tc.setName(tcp.getName());
 			tc.setDescription(tcp.getDescription());
+			tc.setDateType(gov.nist.healthcare.cds.enumeration.DateType.valueOf(tcp.getDateType()));
 			tc.setEvalDate(date(tcp.getEvaluationDate()));
+			if(tcp.getGroup() != null && !tcp.getGroup().isEmpty()){
+				tc.setGroupTag(tcp.getGroup());
+			}
+			if(tcp.getUID() != null && !tcp.getUID().isEmpty()){
+				tc.setUid(tcp.getUID());
+			}
 			
 			MetaData md = new MetaData();
 			if(tcp.getMetaData() != null){
@@ -274,6 +324,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				md.setVersion(mdt.getVersion());
 				md.setDateCreated(mdt.getDateCreated().toGregorianCalendar().getTime());
 				md.setDateLastUpdated(mdt.getDateLastUpdated().toGregorianCalendar().getTime());
+				md.setImported(true);
 			}
 			
 			Patient p = new Patient();
@@ -289,7 +340,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			}
 			
 			EventsType evts = tcp.getEvents();
-			Set<Event> evs = new HashSet<Event>();
+			List<Event> evs = new ArrayList<Event>();
 			
 			if(evts != null){
 				List<EventType> etl = evts.getEvent();
@@ -348,7 +399,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				}
 			}
 			
-			Set<ExpectedForecast> efs = new HashSet<ExpectedForecast>();
+			List<ExpectedForecast> efs = new ArrayList<ExpectedForecast>();
 			ForecastsType fts = tcp.getForecasts();
 			if(fts != null){
 				for(ForecastType ft : fts.getForecast()){

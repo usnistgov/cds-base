@@ -19,9 +19,9 @@ public class RelativeDate extends Date implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	@NotNull
+	@NotNull(message = "Relative Date must is required")
 	@Valid
-	@Size(min=1)
+	@Size(min=1,message = "Relative Date must have at least one rule")
 	private List<RelativeDateRule> rules;
 
 	

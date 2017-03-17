@@ -68,6 +68,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 	
 	@Override
 	public CDCImport _import(InputStream in, CDCImportConfig config) {
+		
 		CDCImport ret = new CDCImport();
 		transform = new Hashtable<String, String>();
 		transform.put("POL", "POLIO");
@@ -169,8 +170,8 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					
 					tc.setPatient(p);
 					tc.setMetaData(md);
-					tc.setForecast(new HashSet<ExpectedForecast>(Arrays.asList(fc)));
-					tc.setEvents(new HashSet<Event>());
+					tc.setForecast(new ArrayList<ExpectedForecast>(Arrays.asList(fc)));
+					tc.setEvents(new ArrayList<Event>());
 					
 					int d = 0;
 					for(int j = 8; j < 8 + (6 * 7); j += 6){

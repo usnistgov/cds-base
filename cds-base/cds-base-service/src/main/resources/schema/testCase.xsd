@@ -10,26 +10,38 @@
 	    		<element name="Description" type="string" minOccurs="1"
 	    			maxOccurs="1">
 	    		</element>
-	            <element name="EvaluationDate" type="tns:DateType" minOccurs="1" maxOccurs="1"></element>
-	            <element name="MetaData" type="tns:MetaDataType"
+	    		<element name="EvaluationDate" type="tns:DateType"
 	    			minOccurs="1" maxOccurs="1">
 	    		</element>
-	    		<element name="Patient" type="tns:PatientType" minOccurs="1"
-	    			maxOccurs="1">
+	    		<element name="MetaData" type="tns:MetaDataType"
+	    			minOccurs="1" maxOccurs="1">
 	    		</element>
-	    		<element name="Events" type="tns:EventsType" minOccurs="0"
-	    			maxOccurs="1">
+	    		<element name="Patient" type="tns:PatientType"
+	    			minOccurs="1" maxOccurs="1">
+	    		</element>
+	    		<element name="Events" type="tns:EventsType"
+	    			minOccurs="0" maxOccurs="1">
 	    		</element>
 	    		<element name="Forecasts" type="tns:ForecastsType"
-	    			minOccurs="1" maxOccurs="1">
+	    			minOccurs="0" maxOccurs="1">
 	    		</element>
+	    		<element name="DateType" minOccurs="1" maxOccurs="1">
+	    			<simpleType>
+	    				<restriction base="string">
+	    					<enumeration value="RELATIVE"></enumeration>
+	    					<enumeration value="FIXED"></enumeration>
+	    				</restriction>
+	    			</simpleType>
+	    		</element>
+	    		<element name="Group" type="string" minOccurs="0" maxOccurs="1"></element>
 	    	</sequence>
+	    	<attribute name="UID" type="string" use="optional"></attribute>
 	    </complexType>
-    </element>
+	</element>
 
     <complexType name="MetaDataType">
     	<sequence>
-    		<element name="version" type="int" minOccurs="1" maxOccurs="1"></element>
+    		<element name="version" type="string" minOccurs="1" maxOccurs="1"></element>
     		<element name="dateCreated" type="date" minOccurs="1" maxOccurs="1"></element>
     		<element name="dateLastUpdated" type="date" minOccurs="1" maxOccurs="1"></element>
     	</sequence>
@@ -57,11 +69,18 @@
 
     <complexType name="EventType">
     	<sequence>
-    		<element name="EventDate" type="tns:DateType" minOccurs="1" maxOccurs="1"></element>
-    		<element name="Administred" type="tns:VaccineType" minOccurs="1" maxOccurs="1"></element>
-    		<element name="Evaluations" type="tns:EvaluationsType" minOccurs="1" maxOccurs="1"></element>
+    		<element name="EventDate" type="tns:DateType" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="Administred" type="tns:VaccineType"
+    			minOccurs="1" maxOccurs="1">
+    		</element>
+    		<element name="Evaluations" type="tns:EvaluationsType"
+    			minOccurs="1" maxOccurs="1">
+    		</element>
     	</sequence>
     	<attribute name="type" type="string" use="required"></attribute>
+    	<attribute name="ID" type="int"></attribute>
     </complexType>
 
     <complexType name="VaccineType">
@@ -126,10 +145,9 @@
     </complexType>
 
     <complexType name="RelativeDateType">
-    	<attribute name="relativeTo" type="string"></attribute>
-    	<attribute name="year" type="int"></attribute>
-    	<attribute name="month" type="int"></attribute>
-    	<attribute name="day" type="int"></attribute>
+    	<sequence>
+    		<element name="Rule" type="tns:RuleType" minOccurs="1" maxOccurs="unbounded"></element>
+    	</sequence>
     </complexType>
 
     <complexType name="ForecastsType">
@@ -146,5 +164,35 @@
     <complexType name="EvaluationReasonType">
     	<attribute name="code" type="string" use="required"></attribute>
     	<attribute name="value" type="string" use="required"></attribute>
+    </complexType>
+
+    <complexType name="RuleType">
+    	<sequence>
+    		<element name="RelativeTo" type="tns:RelativeToType"></element>
+    	</sequence>
+    	<attribute name="years" type="int"></attribute>
+    	<attribute name="months" type="int"></attribute>
+    	<attribute name="days" type="int"></attribute>
+    </complexType>
+
+    <complexType name="RelativeToType">
+    	<attribute name="position" use="required">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="BEFORE"></enumeration>
+    				<enumeration value="AFTER"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="reference" use="required">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="DOB"></enumeration>
+    				<enumeration value="EVALDATE"></enumeration>
+    				<enumeration value="VACCINATION"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="id" type="int" use="optional"></attribute>
     </complexType>
 </schema>

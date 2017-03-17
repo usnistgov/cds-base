@@ -39,23 +39,23 @@ public class TestCase implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String id;
-	@NotBlank
+	@NotBlank(message = "TestCase name is required and can't be empty")
 	private String name;
 	private String uid;
 	private String description;
-	@NotNull
+	@NotNull(message = "Dates Type is required and can't be empty")
 	private DateType dateType;
-	@NotNull
+	@NotNull(message = "Patient information are required")
 	@Valid
 	private Patient patient;
 	private MetaData metaData;
-	@NotNull
+	@NotNull(message = "Assessment Date is required")
 	@Valid
 	private Date evalDate;
 	@Valid
-	private Set<Event> events;
+	private List<Event> events;
 	@Valid
-	private Set<ExpectedForecast> forecast;
+	private List<ExpectedForecast> forecast;
 	private String testPlan;
 	@JsonProperty("group")
 	private String groupTag;
@@ -104,25 +104,25 @@ public class TestCase implements Serializable {
 	public void setEvalDate(Date evalDate) {
 		this.evalDate = evalDate;
 	}
-	public Set<Event> getEvents() {
+	public List<Event> getEvents() {
 		return events;
 	}
-	public void setEvents(Set<Event> events) {
+	public void setEvents(List<Event> events) {
 		this.events = events;
 	}
 	
 	public void addEvent(Event e){
 		if(events == null)
-			events = new HashSet<Event>();
+			events = new ArrayList<Event>();
 		events.add(e);
 	}
-	public Set<ExpectedForecast> getForecast() {
+	public List<ExpectedForecast> getForecast() {
 		if(forecast == null){
-			return new HashSet<ExpectedForecast>();
+			return new ArrayList<ExpectedForecast>();
 		}
 		return forecast;
 	}
-	public void setForecast(Set<ExpectedForecast> forecast) {
+	public void setForecast(List<ExpectedForecast> forecast) {
 		this.forecast = forecast;
 	}
 	public String getUid() {

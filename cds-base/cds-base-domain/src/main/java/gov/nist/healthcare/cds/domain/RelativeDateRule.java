@@ -9,13 +9,13 @@ import gov.nist.healthcare.cds.enumeration.DatePosition;
 
 public class RelativeDateRule {
 	
-	@NotNull
+	@NotNull(message = "Relative Date Rule's position is required")
 	@Enumerated(EnumType.STRING)
 	private DatePosition position;
 	private int year;
 	private int month;
 	private int day;
-	@NotNull
+	@NotNull(message = "Relative Date Rule's reference (Relative To) is required")
 	@Valid
 	private DateReference relativeTo;
 	

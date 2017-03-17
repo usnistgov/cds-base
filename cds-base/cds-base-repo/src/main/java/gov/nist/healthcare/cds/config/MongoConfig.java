@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
 
 @Configuration
 @EnableMongoRepositories(value="gov.nist.healthcare.cds")
@@ -18,7 +19,8 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
 	@Override
 	public Mongo mongo() throws Exception {
-		return new MongoClient("127.0.0.1", 27017);
+		//MongoClientOptions o = MongoClientOptions.builder().socketFactory().build();
+		return new MongoClient(new ServerAddress("127.0.0.1",27017));
 	}
 
 	@Override

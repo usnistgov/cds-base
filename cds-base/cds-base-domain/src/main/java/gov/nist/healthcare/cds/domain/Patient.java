@@ -22,9 +22,9 @@ public class Patient implements Serializable {
 	 */
 	private static final long serialVersionUID = 3581693775619531483L;
 	
-	@NotNull
+	@NotNull(message = "Patient Date of Birth is required")
 	private Date dob;
-	@NotNull
+	@NotNull(message = "Patient Gender is required")
 	private Gender gender;
 	
 	public Date getDob() {

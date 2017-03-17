@@ -14,7 +14,7 @@ import gov.nist.healthcare.cds.enumeration.RelativeTo;
 @JsonTypeName("static")
 public class StaticDateReference extends DateReference {
 	
-	@NotNull
+	@NotNull(message = "Relative Date Rule must have a reference (Relative To)")
 	@Enumerated(EnumType.STRING)
 	private RelativeTo id;
 

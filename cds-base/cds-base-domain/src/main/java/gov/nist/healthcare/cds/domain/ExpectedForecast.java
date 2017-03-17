@@ -28,18 +28,18 @@ public class ExpectedForecast extends Forecast implements Serializable {
 	private static final long serialVersionUID = 7808535673936520763L;
 
 	protected Long id;
-	@NotNull
+	@NotNull(message = "Forecast must have a target Vaccine")
 	@Valid
 	private Vaccine target;
-	@NotNull
+	@NotNull(message = "Earliest date is required")
 	@Valid
 	protected Date earliest;
-	@NotNull
+	@NotNull(message = "Recommended date is required")
 	@Valid
 	protected Date recommended;
 	protected Date pastDue;
 	protected Date complete;
-	@NotNull
+	@NotNull(message = "Serie Status is required")
 	@Enumerated(EnumType.STRING)
 	protected SerieStatus serieStatus;
 	

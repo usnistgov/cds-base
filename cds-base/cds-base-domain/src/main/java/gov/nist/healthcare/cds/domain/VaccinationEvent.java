@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class VaccinationEvent extends Event {
 
 	private int doseNumber = 1;
-	@NotNull
+	@NotNull(message = "Administred Vaccine is required")
 	@Valid
 	private Injection administred;
 	private Set<ExpectedEvaluation> evaluations;

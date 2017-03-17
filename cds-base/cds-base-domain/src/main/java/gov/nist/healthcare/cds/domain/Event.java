@@ -20,7 +20,7 @@ import gov.nist.healthcare.cds.enumeration.EventType;
 })
 public abstract class Event {
 	
-	@NotNull
+	@NotNull(message = "Administred Date is required")
 	@Valid
 	private Date date;
 	@Enumerated

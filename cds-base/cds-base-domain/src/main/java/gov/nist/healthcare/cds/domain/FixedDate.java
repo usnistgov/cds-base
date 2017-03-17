@@ -8,6 +8,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,7 +22,7 @@ public class FixedDate extends Date implements Serializable {
 	 */
 	private static final long serialVersionUID = -8561218443824434426L;
 	
-	@NotNull
+	@NotNull(message = "Fixed Date is required")
 	@Temporal(TemporalType.TIMESTAMP)
 	private java.util.Date date;
 
