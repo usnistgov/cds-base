@@ -2,6 +2,8 @@ package gov.nist.healthcare.cds.domain;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
+
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,6 +26,7 @@ public abstract class Injection {
 	private String type;
 	
 	@Id
+	@Indexed
 	protected String id;
 
 	public String getType() {

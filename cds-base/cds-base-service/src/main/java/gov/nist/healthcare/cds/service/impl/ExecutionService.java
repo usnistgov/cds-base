@@ -57,9 +57,13 @@ public class ExecutionService implements TestCaseExecutionService {
 		// Set Report Properties
 		rp.setEvaluationDate(tcP.getEvaluationDate());
 		rp.setDob(tcP.getDateOfBirth());
-		rp.setTc(tc);
+		rp.setTc(tc.getId());
+		rp.setSoftwareConfig(conf);
+		rp.setGender(tcP.getGender());
+		rp.setTcName(tc.getName());
+		rp.setTcLastUpdated(tc.getMetaData().getDateLastUpdated());
 		rp.setResponse(response.getResponse());
-		
+		rp.setExecutionDate(today);
 		return rp;
 	}
 	

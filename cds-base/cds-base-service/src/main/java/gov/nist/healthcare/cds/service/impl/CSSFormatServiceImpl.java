@@ -49,12 +49,11 @@ import gov.nist.healthcare.cds.repositories.VaccineGroupRepository;
 import gov.nist.healthcare.cds.repositories.VaccineMappingRepository;
 import gov.nist.healthcare.cds.repositories.VaccineRepository;
 import gov.nist.healthcare.cds.service.CDCSpreadSheetFormatService;
+import gov.nist.healthcare.cds.service.MetaDataService;
 
 @Service
 public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 
-	@Autowired
-	private TestCaseRepository testCaseRepository;
 	@Autowired
 	private VaccineRepository vaccineRepository;
 	@Autowired
@@ -62,7 +61,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 	@Autowired
 	private VaccineMappingRepository vaccineMpRepository;
 	@Autowired
-	private ProductRepository productRepository;
+	private MetaDataService mdService;
 	
 	private Hashtable<String,String> transform;
 	
@@ -114,8 +113,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					Date pastDue     = r.getCell(53).getDateCellValue();
 					String target = r.getCell(54).getStringCellValue();
 					Date evalDate   = r.getCell(55).getDateCellValue();
-					Date dateAdded  = r.getCell(57).getDateCellValue();
-					Date dateUpdate = r.getCell(58).getDateCellValue();
+
 					TestCase tc = new TestCase();
 					tc.setDateType(DateType.FIXED);
 					tc.setName(tcName);
@@ -128,11 +126,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					p.setDob(new FixedDate(dob));
 					p.setGender(Gender.valueOf(gender));
 					
-					MetaData md = new MetaData();
-					md.setImported(true);
-					md.setVersion("1");
-					md.setDateCreated(dateAdded);
-					md.setDateLastUpdated(dateUpdate);
+					MetaData md = mdService.create(true);
 					
 					ExpectedForecast fc = new ExpectedForecast();
 					if(serieStatus != null && !serieStatus.isEmpty()){

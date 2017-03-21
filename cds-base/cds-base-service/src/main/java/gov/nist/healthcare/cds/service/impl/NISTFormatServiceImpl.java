@@ -59,6 +59,7 @@ import gov.nist.healthcare.cds.enumeration.RelativeTo;
 import gov.nist.healthcare.cds.enumeration.SerieStatus;
 import gov.nist.healthcare.cds.repositories.ProductRepository;
 import gov.nist.healthcare.cds.repositories.VaccineRepository;
+import gov.nist.healthcare.cds.service.MetaDataService;
 import gov.nist.healthcare.cds.service.NISTFormatService;
 
 @Service
@@ -69,6 +70,9 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 	
 	@Autowired
 	private ProductRepository productRepository;
+	
+	@Autowired
+	private MetaDataService mdService;
 	
 	final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	
@@ -106,8 +110,8 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			}
 			
 			List<Event> evts = tc.getEvents();
-			EventsType evtst = new EventsType();
-			if(evts != null){
+			if(evts != null && evts.size() > 0){
+				EventsType evtst = new EventsType();
 				for(Event e : evts){
 					EventType evt = new EventType();
 					evt.setType(e.getType().toString());
@@ -157,11 +161,12 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					evt.setEvaluations(evalst);
 					evtst.getEvent().add(evt);
 				}
+				tcp.setEvents(evtst);
 			}
 			
 			List<ExpectedForecast> efs = tc.getForecast();
-			ForecastsType fts = new ForecastsType();
-			if(efs != null){
+			if(efs != null && efs.size() > 0){
+				ForecastsType fts = new ForecastsType();				
 				for(ExpectedForecast ef : efs){
 					ForecastType ft = new ForecastType();
 					ft.setEarliest(date(ef.getEarliest()));
@@ -183,13 +188,15 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					
 					ft.setTarget(vt);
 					fts.getForecast().add(ft);
-				}
+				}			
+				tcp.setForecasts(fts);
 			}
+
 			
 			tcp.setPatient(pt);
 			tcp.setMetaData(mdt);
-			tcp.setForecasts(fts);
-			tcp.setEvents(evtst);
+			
+			
 			
 			return this.objToString(tcp);
 		}
@@ -318,13 +325,13 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				tc.setUid(tcp.getUID());
 			}
 			
-			MetaData md = new MetaData();
+			MetaData md;
 			if(tcp.getMetaData() != null){
 				MetaDataType mdt = tcp.getMetaData();
-				md.setVersion(mdt.getVersion());
-				md.setDateCreated(mdt.getDateCreated().toGregorianCalendar().getTime());
-				md.setDateLastUpdated(mdt.getDateLastUpdated().toGregorianCalendar().getTime());
-				md.setImported(true);
+				md = mdService.create(true,mdt.getVersion());
+			}
+			else {
+				md = mdService.create(true);
 			}
 			
 			Patient p = new Patient();

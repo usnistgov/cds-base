@@ -17,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -33,6 +34,7 @@ public class TestPlan implements Serializable {
 	private String description;
 	private MetaData metaData;
 	@JsonIgnore
+	@Indexed
 	private String user;
 	@DBRef
 	private List<TestCase> testCases;

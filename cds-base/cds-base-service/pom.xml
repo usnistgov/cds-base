@@ -57,5 +57,15 @@
 			<version>2.8.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>gov.nist</groupId>
+			<artifactId>fhirForecast</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist</groupId>
+			<artifactId>fhirModel</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

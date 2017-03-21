@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String>{
 
-	@Query("{ 'mx.$id' : ?0 , 'vx.$id' : ?1 }}")
+	@Query("{ 'mx.$id' : ?0 , 'vx.$id' : ?1 }")
 	public Product getProduct(String mvx,String cvx);
 }
