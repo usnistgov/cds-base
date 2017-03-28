@@ -1,6 +1,7 @@
 package gov.nist.healthcare.cds.service.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +39,10 @@ public class ExecutionService implements TestCaseExecutionService {
 	private TestRunnerService runner;
 	
 	@Override
-	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date today) throws UnresolvableDate {
-		
+	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date reference) throws UnresolvableDate {
+		java.util.Date today = Calendar.getInstance().getTime();
 		// Fix Eval, DOB, Events
-		ResolvedDates rds = dates.resolveDates(tc, today);
+		ResolvedDates rds = dates.resolveDates(tc, reference);
 		
 		// Create PayLoad and Send request
 		TestCasePayLoad tcP = this.payLoad(tc, rds);

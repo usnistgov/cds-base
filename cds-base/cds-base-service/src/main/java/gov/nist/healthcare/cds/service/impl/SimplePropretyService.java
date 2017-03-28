@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
+import gov.nist.healthcare.cds.domain.TestCaseGroup;
 import gov.nist.healthcare.cds.domain.TestPlan;
 import gov.nist.healthcare.cds.domain.wrapper.Report;
 import gov.nist.healthcare.cds.repositories.ReportRepository;
@@ -63,6 +64,15 @@ public class SimplePropretyService implements PropertyService {
 		SoftwareConfig config = configRepository.findOne(configId);
 		if(config != null && config.getUser().equals(user)){
 			return config;
+		}
+		return null;
+	}
+
+	@Override
+	public TestPlan tgBelongsTo(String tgId, String user) {
+		TestPlan tp = testPlanRepository.testCaseGroup(tgId);
+		if(tp != null && tp.getUser().equals(user)){
+			return tp;
 		}
 		return null;
 	}

@@ -155,7 +155,7 @@ public class ValidationServiceImpl implements ValidationService {
 			dose = new StringCriterion(ValidationStatus.U);
 		}
 		else if(ef.getDoseNumber().equals(af.getDoseNumber())) {
-			dose = new StringCriterion(ValidationStatus.P);
+			dose = new StringCriterion(ValidationStatus.P, af.getDoseNumber());
 		}
 		else {
 			dose = new StringCriterion(config.failed(ValidationCriterion.DoseNumber), af.getDoseNumber());
@@ -172,7 +172,7 @@ public class ValidationServiceImpl implements ValidationService {
 			earliest = new DateCriterion(ValidationStatus.U);
 		}
 		else if(dates.same(fr.getEarliest(),af.getEarliest())){
-			earliest = new DateCriterion(ValidationStatus.P);
+			earliest = new DateCriterion(ValidationStatus.P, af.getEarliest());
 		}
 		else {
 			earliest = new DateCriterion(config.failed(ValidationCriterion.EarliestDate), af.getEarliest());
@@ -190,7 +190,7 @@ public class ValidationServiceImpl implements ValidationService {
 			recommended = new DateCriterion(ValidationStatus.U);
 		}
 		else if(dates.same(fr.getRecommended(),af.getRecommended())){
-			recommended = new DateCriterion(ValidationStatus.P);
+			recommended = new DateCriterion(ValidationStatus.P, af.getRecommended());
 		}
 		else {
 			recommended = new DateCriterion(config.failed(ValidationCriterion.RecommendedDate), af.getRecommended());
@@ -207,7 +207,7 @@ public class ValidationServiceImpl implements ValidationService {
 			pastDue = new DateCriterion(ValidationStatus.U);
 		}
 		else if(dates.same(fr.getPastDue(),af.getPastDue())){
-			pastDue = new DateCriterion(ValidationStatus.P);
+			pastDue = new DateCriterion(ValidationStatus.P, af.getPastDue());
 		}
 		else {
 			pastDue = new DateCriterion(config.failed(ValidationCriterion.PastDueDate), af.getPastDue());
@@ -224,7 +224,7 @@ public class ValidationServiceImpl implements ValidationService {
 			complete = new DateCriterion(ValidationStatus.U);
 		}
 		else if(dates.same(fr.getComplete(),af.getComplete())){
-			complete = new DateCriterion(ValidationStatus.P);
+			complete = new DateCriterion(ValidationStatus.P, af.getComplete());
 		}
 		else {
 			complete =  new DateCriterion(config.failed(ValidationCriterion.CompleteDate), af.getComplete());

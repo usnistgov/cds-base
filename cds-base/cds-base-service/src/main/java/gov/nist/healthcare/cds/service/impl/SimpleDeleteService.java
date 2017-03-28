@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import gov.nist.healthcare.cds.domain.TestCase;
+import gov.nist.healthcare.cds.domain.TestCaseGroup;
 import gov.nist.healthcare.cds.domain.TestPlan;
 import gov.nist.healthcare.cds.domain.wrapper.Report;
 import gov.nist.healthcare.cds.repositories.ReportRepository;
@@ -14,7 +15,6 @@ import gov.nist.healthcare.cds.repositories.TestCaseRepository;
 import gov.nist.healthcare.cds.repositories.TestPlanRepository;
 import gov.nist.healthcare.cds.service.DeleteTestObjectService;
 import gov.nist.healthcare.cds.service.MetaDataService;
-import gov.nist.healthcare.cds.service.PropertyService;
 
 @Service
 public class SimpleDeleteService implements DeleteTestObjectService {
@@ -37,20 +37,67 @@ public class SimpleDeleteService implements DeleteTestObjectService {
 		List<Report> reports = reportRepository.reportsForTestCase(tc.getId());
 		reportRepository.delete(reports);
 		TestPlan tp = testPlanRepository.findOne(tc.getTestPlan());
-		tp.getTestCases().remove(tc);
-		mdService.update(tp.getMetaData());
-		testPlanRepository.save(tp);
-		testCaseRepository.delete(tc);	
-		return true;
+		List<TestCase> list = findTC(tp,tc.getId());
+		if(list != null){
+			list.remove(tc);
+			mdService.update(tp.getMetaData());
+			testPlanRepository.save(tp);
+			testCaseRepository.delete(tc);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public void deleteReportsForTC(TestCase tc){
+		List<Report> reports = reportRepository.reportsForTestCase(tc.getId());
+		reportRepository.delete(reports);
 	}
 
 	@Override
 	@Transactional
 	public boolean deleteTestPlan(TestPlan tp) {
 		for(TestCase tc : tp.getTestCases()){
-			this.deleteTestCase(tc);
+			this.deleteReportsForTC(tc);
+		}
+		testCaseRepository.delete(tp.getTestCases());
+		for(TestCaseGroup tcg : tp.getTestCaseGroups()){
+			for(TestCase tc : tcg.getTestCases()){
+				this.deleteReportsForTC(tc);
+			}
+			testCaseRepository.delete(tcg.getTestCases());
 		}
 		testPlanRepository.delete(tp);
+		return true;
+	}
+	
+	public List<TestCase> findTC(TestPlan tp, String id){
+		for(TestCaseGroup tcg : tp.getTestCaseGroups()){
+			for(TestCase tc : tcg.getTestCases()){
+				if(tc.getId().equals(id)){
+					return tcg.getTestCases();
+				}
+			}
+		}
+		for(TestCase tc : tp.getTestCases()){
+			if(tc.getId().equals(id)){
+				return tp.getTestCases();
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public boolean deleteTestCaseGroup(TestCaseGroup tcg) {
+		TestPlan tp = testPlanRepository.testCaseGroup(tcg.getId());
+		tp.getTestCaseGroups().remove(tcg);
+		for(TestCase tc : tcg.getTestCases()){
+			this.deleteReportsForTC(tc);
+		}
+		testCaseRepository.delete(tcg.getTestCases());
+		mdService.update(tp.getMetaData());
+		testPlanRepository.save(tp);
 		return true;
 	}
 	

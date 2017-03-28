@@ -1,22 +1,23 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
 import gov.nist.healthcare.cds.domain.TestCase;
+import gov.nist.healthcare.cds.domain.TestCaseGroup;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CDCImport {
-	private List<TestCase> testcases;
+	private List<TestCaseGroup> testcases;
 	private List<ErrorModel> exceptions;
 	
-	public List<TestCase> getTestcases() {
+	public List<TestCaseGroup> getTestcases() {
 		if(testcases == null){
-			testcases = new ArrayList<TestCase>();
+			testcases = new ArrayList<TestCaseGroup>();
 		}
 		return testcases;
 	}
-	public void setTestcases(List<TestCase> testcases) {
+	public void setTestcases(List<TestCaseGroup> testcases) {
 		this.testcases = testcases;
 	}
 	public List<ErrorModel> getExceptions() {

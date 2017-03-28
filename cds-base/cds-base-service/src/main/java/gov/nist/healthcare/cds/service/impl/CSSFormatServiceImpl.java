@@ -3,6 +3,7 @@ package gov.nist.healthcare.cds.service.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -28,6 +30,7 @@ import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.domain.Patient;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.TestCase;
+import gov.nist.healthcare.cds.domain.TestCaseGroup;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.VaccineGroup;
@@ -76,7 +79,7 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 		transform.put("MCV", "MeningB");
 		transform.put("VAR", "VARICELLA");
 		
-		List<TestCase> tcs = new ArrayList<TestCase>();
+		List<TestCaseGroup> tcs = new ArrayList<TestCaseGroup>();
 		try {
 			Workbook workbook = WorkbookFactory.create(in);
 			Sheet sheet = workbook.getSheetAt(0);
@@ -249,7 +252,9 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 						tc.getEvents().add(ve);
 					}
 					i++;
-					tcs.add(tc);
+					TestCaseGroup tcg = this.getGroup(tcs, target);
+					tc.setGroupTag(tcg.getId());
+					tcg.getTestCases().add(tc);
 				}
 				catch(VaccineNotFoundException v){
 					ret.getExceptions().add(new ErrorModel(i,col,"Vaccine Not Found CVX="+v.getCvx()));
@@ -277,6 +282,19 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 	public OutputStream _export(List<TestCase> tcs) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public TestCaseGroup getGroup(List<TestCaseGroup> groups, String name){
+		for(TestCaseGroup gr : groups){
+			if(gr.getName().equals(name)){
+				return gr;
+			}
+		}
+		TestCaseGroup tcg = new TestCaseGroup();
+		tcg.setId(UUID.randomUUID().toString());
+		tcg.setName(name);
+		groups.add(tcg);
+		return tcg;
 	}
 
 	@Override

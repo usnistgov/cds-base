@@ -5,6 +5,7 @@ import gov.nist.healthcare.cds.domain.wrapper.MetaData;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -38,6 +39,12 @@ public class TestPlan implements Serializable {
 	private String user;
 	@DBRef
 	private List<TestCase> testCases;
+	private List<TestCaseGroup> testCaseGroups;
+	
+	public TestPlan(){
+//		testCaseGroups = new ArrayList<>();
+//		testCases = new ArrayList<>();
+	}
 	
 	public String getId() {
 		return id;
@@ -69,6 +76,14 @@ public class TestPlan implements Serializable {
 		}
 		return testCases;
 	}
+	public List<TestCaseGroup> getTestCaseGroups() {
+		if(this.testCaseGroups == null)
+			this.testCaseGroups = new ArrayList<>();
+		return testCaseGroups;
+	}
+	public void setTestCaseGroups(List<TestCaseGroup> testCaseGroups) {
+		this.testCaseGroups = testCaseGroups;
+	}
 	public void setTestCases(List<TestCase> testCases) {
 		this.testCases = testCases;
 	}
@@ -78,6 +93,59 @@ public class TestPlan implements Serializable {
 		tc.setTestPlan(this.getId());
 		this.testCases.add(tc);
 	}
+	
+	public TestCaseGroup getOrCreateGroup(String id,String name){
+		if(testCaseGroups != null){
+			for(TestCaseGroup gr : testCaseGroups){
+				if(gr.getId().equals(id)){
+					return gr;
+				}
+			}
+		}
+		TestCaseGroup tcg = new TestCaseGroup();
+		tcg.setId(id);
+		tcg.setName(name);
+		tcg.setTestPlan(this.getId());
+		this.getTestCaseGroups().add(tcg);
+		return tcg;
+	}
+	
+	public TestCaseGroup createGroup(String name){
+		TestCaseGroup tcg = new TestCaseGroup();
+		tcg.setId(UUID.randomUUID().toString());
+		tcg.setName(name);
+		tcg.setTestPlan(this.getId());
+		this.getTestCaseGroups().add(tcg);
+		return tcg;
+	}
+	
+	public TestCaseGroup getByNameOrCreateGroup(String name){
+		if(testCaseGroups != null){
+			for(TestCaseGroup gr : testCaseGroups){
+				if(gr.getName().equals(name)){
+					return gr;
+				}
+			}
+		}
+		TestCaseGroup tcg = new TestCaseGroup();
+		tcg.setId(UUID.randomUUID().toString());
+		tcg.setName(name);
+		tcg.setTestPlan(this.getId());
+		this.getTestCaseGroups().add(tcg);
+		return tcg;
+	}
+	
+	public TestCaseGroup getGroup(String id){
+		if(testCaseGroups == null)
+			return null;
+		for(TestCaseGroup gr : testCaseGroups){
+			if(gr.getId().equals(id)){
+				return gr;
+			}
+		}
+		return null;
+	}
+	
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
