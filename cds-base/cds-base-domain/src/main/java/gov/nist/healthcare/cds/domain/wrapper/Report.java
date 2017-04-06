@@ -4,10 +4,13 @@ package gov.nist.healthcare.cds.domain.wrapper;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.enumeration.Gender;
+import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,8 +19,7 @@ public class Report implements Serializable {
 
 	private String id;
 	private String tc;
-	private java.util.Date tcLastUpdated;
-	private String tcName;
+	private TestCaseInformation tcInfo;
 	private Gender gender;
 	private java.util.Date executionDate;
 	private SoftwareConfig softwareConfig;
@@ -25,10 +27,20 @@ public class Report implements Serializable {
 	private java.util.Date dob;
 	private List<VaccinationEventValidation> veValidation;
 	private List<ForecastValidation> fcValidation;
+	private Map<ValidationCriterion,Boolean> failures;
 	private String response;
 	private ResultCounts events;
 	private ResultCounts forecasts;
 	
+	
+	
+	public Report() {
+		super();
+		failures = new HashMap<ValidationCriterion,Boolean>();
+	}
+
+
+
 	public List<ForecastValidation> getFcValidation() {
 		if(fcValidation == null){
 			fcValidation = new ArrayList<>();
@@ -37,6 +49,25 @@ public class Report implements Serializable {
 	}
 	
 	
+	
+	public Boolean put(ValidationCriterion key, Boolean value) {
+		return failures.put(key, value);
+	}
+
+
+
+	public Map<ValidationCriterion, Boolean> getFailures() {
+		return failures;
+	}
+
+
+
+	public void setFailures(Map<ValidationCriterion, Boolean> failures) {
+		this.failures = failures;
+	}
+
+
+
 	public String getId() {
 		return id;
 	}
@@ -90,13 +121,7 @@ public class Report implements Serializable {
 	}
 	public void setTc(String tc) {
 		this.tc = tc;
-	}
-	public java.util.Date getTcLastUpdated() {
-		return tcLastUpdated;
-	}
-	public void setTcLastUpdated(java.util.Date tcLastUpdated) {
-		this.tcLastUpdated = tcLastUpdated;
-	}
+	}	
 	public java.util.Date getExecutionDate() {
 		return executionDate;
 	}
@@ -109,27 +134,19 @@ public class Report implements Serializable {
 	public void setSoftwareConfig(SoftwareConfig softwareConfig) {
 		this.softwareConfig = softwareConfig;
 	}
-
-
-	public String getTcName() {
-		return tcName;
-	}
-
-
-	public void setTcName(String tcName) {
-		this.tcName = tcName;
-	}
-
-
 	public Gender getGender() {
 		return gender;
 	}
-
-
 	public void setGender(Gender gender) {
 		this.gender = gender;
 	}
-	
-	
-	
+
+	public TestCaseInformation getTcInfo() {
+		return tcInfo;
+	}
+
+	public void setTcInfo(TestCaseInformation tcInfo) {
+		this.tcInfo = tcInfo;
+	}
+
 }

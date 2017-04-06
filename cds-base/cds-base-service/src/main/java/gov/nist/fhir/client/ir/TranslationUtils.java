@@ -12,16 +12,21 @@ import gov.nist.healthcare.cds.domain.wrapper.ResponseVaccinationEvent;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.SerieStatus;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.hl7.fhir.Immunization;
 import org.hl7.fhir.ImmunizationRecommendation;
 import org.hl7.fhir.ImmunizationRecommendationDateCriterion;
 import org.hl7.fhir.ImmunizationRecommendationRecommendation;
 import org.hl7.fhir.ImmunizationVaccinationProtocol;
+import org.hl7.fhir.dstu3.model.Immunization.ImmunizationVaccinationProtocolComponent;
+import org.hl7.fhir.dstu3.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationDateCriterionComponent;
 
 /**
  *
@@ -29,218 +34,340 @@ import org.hl7.fhir.ImmunizationVaccinationProtocol;
  */
 public class TranslationUtils {
 
-	// TODO: Surely this must already exist somewhere else???
-	public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE = "due";
-	public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST = "earliest";
-	public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE = "overdue";
-	public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST = "latest";
+    // TODO: Surely this must already exist somewhere else???
+    public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE = "due";
+    public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST = "earliest";
+    public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE = "overdue";
+    public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST = "latest";
+    public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_RECOMMENDED = "recommended";
 
-	public static String translateCsdiDateToFhirDate(FixedDate date) {
-		SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
-		return print.format(date.getDate());
-	}
+    public static String translateCsdiDateToFhirDate(FixedDate date) {
+        SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
+        return print.format(date.getDate());
+    }
 
-	public static String translateJavaDateToFhirDate(Date date) {
-		SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
-		return print.format(date);
-	}
+    public static Date translateHl7DateToJavaDate(String date) throws ParseException {
 
-	public static FixedDate translateTchDateToFhirDate(String date) {
+        DateFormat df = new SimpleDateFormat("yyy-MM-dd");
+        return df.parse(date);
+    }
 
-		String year = date.substring(0, 4);
-		String month = date.substring(5, 7);
-		String day = date.substring(8, 10);
+    public static String translateJavaDateToFhirDate(Date date) {
+        SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
+        return print.format(date);
+    }
 
-		return new FixedDate(month + '/' + day + '/' + year);
+            
+    
+    public static FixedDate translateTchDateToFhirDate(String date) {
 
-	}
+        String year = date.substring(0, 4);
+        String month = date.substring(5, 7);
+        String day = date.substring(8, 10);
 
-	public static ResponseVaccinationEvent translateImmunizationToResponseVaccinationEvent(Immunization imm) {
+        return new FixedDate(month + '/' + day + '/' + year);
 
-		ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
-		VaccineRef vaccineRef = new VaccineRef();
+    }
 
-		if (imm.getVaccineCode() != null && imm.getVaccineCode().getCoding() != null
-				&& imm.getVaccineCode().getCoding().get(0) != null
-				&& imm.getVaccineCode().getCoding().get(0).getCode() != null) {
-			vaccineRef.setCvx(imm.getVaccineCode().getCoding().get(0).getCode().getValue());
-		}
-		rve.setAdministred(vaccineRef);
+    public static ResponseVaccinationEvent translateImmunizationToResponseVaccinationEvent(Immunization imm) {
 
-		rve.setDate(TranslationUtils.translateTchDateToFhirDate(imm.getDate().getValue().toString()));
-		rve.setEvaluations(new HashSet<ActualEvaluation>());
-		EList<ImmunizationVaccinationProtocol> vaccinationProtocols = imm.getVaccinationProtocol();
-		Iterator<ImmunizationVaccinationProtocol> it = vaccinationProtocols.iterator();
-		while (it.hasNext()) {
-			ImmunizationVaccinationProtocol ivp = it.next();
-			ActualEvaluation ae = new ActualEvaluation();
-			String status = "";
-			if (ivp.getDoseStatus() != null && ivp.getDoseStatus().getCoding() != null
-					&& ivp.getDoseStatus().getCoding().get(0) != null
-					&& ivp.getDoseStatus().getCoding().get(0).getCode() != null) {
-				status = ivp.getDoseStatus().getCoding().get(0).getCode().getValue();
-			}
-			if ("Y".equalsIgnoreCase(status)) {
-				ae.setStatus(EvaluationStatus.VALID);
-			} else {
-				ae.setStatus(EvaluationStatus.INVALID);
-			}
-			VaccineRef vr = new VaccineRef();
-			if (ivp.getSeries() != null) {
-				vr.setCvx(ivp.getSeries().getValue());
-			}
-			ae.setVaccine(vr);
-			rve.getEvaluations().add(ae);
-		}
-		return rve;
-	}
+        ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
+        VaccineRef vaccineRef = new VaccineRef();
 
-	public static ResponseVaccinationEvent translateImmunizationRecommendationRecommendationToResponseVaccinationEvent(
-			ImmunizationRecommendationRecommendation irr) {
-		ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
-		VaccineRef vaccineRef = new VaccineRef();
-		// TODO: Error checking
-		vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode().getValue());
-		rve.setAdministred(vaccineRef);
-		// TODO: Error checking
-		rve.setDate(TranslationUtils.translateTchDateToFhirDate(irr.getDate().getValue().toString()));
-		ActualEvaluation ae = new ActualEvaluation();
-		String status = "";
-		// TODO: Error checking
-		status = irr.getForecastStatus().getCoding().get(0).getCode().getValue();
-		// EvaluationStatus.
+        if (imm.getVaccineCode() != null && imm.getVaccineCode().getCoding() != null
+                && imm.getVaccineCode().getCoding().get(0) != null
+                && imm.getVaccineCode().getCoding().get(0).getCode() != null) {
+            vaccineRef.setCvx(imm.getVaccineCode().getCoding().get(0).getCode().getValue());
+        }
+        rve.setAdministred(vaccineRef);
 
-		return rve;
-	}
+        rve.setDate(TranslationUtils.translateTchDateToFhirDate(imm.getDate().getValue().toString()));
+        rve.setEvaluations(new HashSet<ActualEvaluation>());
+        EList<ImmunizationVaccinationProtocol> vaccinationProtocols = imm.getVaccinationProtocol();
+        Iterator<ImmunizationVaccinationProtocol> it = vaccinationProtocols.iterator();
+        while (it.hasNext()) {
+            ImmunizationVaccinationProtocol ivp = it.next();
+            ActualEvaluation ae = new ActualEvaluation();
+            String status = "";
+            if (ivp.getDoseStatus() != null && ivp.getDoseStatus().getCoding() != null
+                    && ivp.getDoseStatus().getCoding().get(0) != null
+                    && ivp.getDoseStatus().getCoding().get(0).getCode() != null) {
+                status = ivp.getDoseStatus().getCoding().get(0).getCode().getValue();
+            }
+            if ("Y".equalsIgnoreCase(status)) {
+                ae.setStatus(EvaluationStatus.VALID);
+            } else {
+                ae.setStatus(EvaluationStatus.INVALID);
+            }
+            VaccineRef vr = new VaccineRef();
+            if (ivp.getSeries() != null) {
+                vr.setCvx(ivp.getSeries().getValue());
+            }
+            ae.setVaccine(vr);
+            rve.getEvaluations().add(ae);
+        }
+        return rve;
+    }
 
-	public static ActualForecast translateImmunizationRecommendationToActualForecast(ImmunizationRecommendation ir) {
-		ActualForecast forecast = new ActualForecast();
-		if (ir.getRecommendation() == null || ir.getRecommendation().get(0) == null) {
-			return forecast;
-		}
-		ImmunizationRecommendationRecommendation irr = ir.getRecommendation().get(0);
-		if (irr.getDoseNumber() != null && irr.getDoseNumber().getValue() != null) {
-			forecast.setDoseNumber(irr.getDoseNumber().getValue().toString());
-		}
-		VaccineRef vaccineRef = new VaccineRef();
-		if (irr.getVaccineCode() != null && irr.getVaccineCode().getCoding() != null
-				&& irr.getVaccineCode().getCoding().get(0) != null
-				&& irr.getVaccineCode().getCoding().get(0).getCode() != null) {
-			vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode().getValue());
-		}
-		forecast.setVaccine(vaccineRef);
-		EList<ImmunizationRecommendationDateCriterion> dateCriterions = irr.getDateCriterion();
-		Iterator<ImmunizationRecommendationDateCriterion> it = dateCriterions.iterator();
-		while (it.hasNext()) {
-			ImmunizationRecommendationDateCriterion dateCriterion = it.next();
-			if (dateCriterion.getValue() != null && dateCriterion.getValue().getValue() != null) {
-				FixedDate date = TranslationUtils
-						.translateTchDateToFhirDate(dateCriterion.getValue().getValue().toString());
+    public static ResponseVaccinationEvent translateImmunizationToResponseVaccinationEvent(org.hl7.fhir.dstu3.model.Immunization imm) {
 
-				// TODO: Error checking
-				String status = "";
-				if (dateCriterion.getCode() != null && dateCriterion.getCode().getCoding() != null
-						&& dateCriterion.getCode().getCoding().get(0) != null
-						&& dateCriterion.getCode().getCoding().get(0).getCode() != null) {
-					status = dateCriterion.getCode().getCoding().get(0).getCode().getValue();
-				}
-				switch (status) {
-				case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE:
-					forecast.setRecommended(date.getDate());
-					break;
-				case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST:
-					forecast.setEarliest(date.getDate());
-					break;
-				case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE:
-					forecast.setPastDue(date.getDate());
-					break;
-				case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST:
-					forecast.setComplete(date.getDate());
-					break;
-				}
+        ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
+        VaccineRef vaccineRef = new VaccineRef();
 
-			}
-		}
-		if (irr.getForecastStatus() != null && irr.getForecastStatus().getCoding() != null
-				&& irr.getForecastStatus().getCoding().get(0) != null
-				&& irr.getForecastStatus().getCoding().get(0).getCode() != null) {
-			forecast.setSerieStatus(
-					SerieStatus.valueOf(irr.getForecastStatus().getCoding().get(0).getCode().getValue()));
-		}
-		return forecast;
-	}
+        if (imm.getVaccineCode() != null && imm.getVaccineCode().getCoding() != null
+                && imm.getVaccineCode().getCoding().get(0) != null
+                && imm.getVaccineCode().getCoding().get(0).getCode() != null) {
+            vaccineRef.setCvx(imm.getVaccineCode().getCoding().get(0).getCode());
+        }
+        rve.setAdministred(vaccineRef);
 
-	public static ActualForecast translateImmunizationRecommendationRecommendationToActualForecast(
-			ImmunizationRecommendationRecommendation irr) {
-		ActualForecast af = new ActualForecast();
-		if (irr.getDoseNumber() != null && irr.getDoseNumber().getValue() != null) {
-			af.setDoseNumber(irr.getDoseNumber().getValue().toString());
-		}
-		VaccineRef vaccineRef = new VaccineRef();
-		if (irr.getVaccineCode() != null && irr.getVaccineCode().getCoding() != null
-				&& irr.getVaccineCode().getCoding().get(0) != null
-				&& irr.getVaccineCode().getCoding().get(0).getCode() != null) {
-			vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode().getValue());
-		}
-		af.setVaccine(vaccineRef);
-		EList<ImmunizationRecommendationDateCriterion> dateCriterions = irr.getDateCriterion();
-		Iterator<ImmunizationRecommendationDateCriterion> it = dateCriterions.iterator();
-		while (it.hasNext()) {
-			ImmunizationRecommendationDateCriterion dateCriterion = it.next();
-			if (dateCriterion.getValue() != null && dateCriterion.getValue().getValue() != null) {
-				FixedDate date = TranslationUtils
-						.translateTchDateToFhirDate(dateCriterion.getValue().getValue().toString());
+        rve.setDate(new FixedDate(imm.getDate()));
+        rve.setEvaluations(new HashSet<ActualEvaluation>());
+        
+        List<ImmunizationVaccinationProtocolComponent> vaccinationProtocols = imm.getVaccinationProtocol();
+        Iterator<ImmunizationVaccinationProtocolComponent> it = vaccinationProtocols.iterator();
+        while (it.hasNext()) {
+            ImmunizationVaccinationProtocolComponent ivp = it.next();
+            ActualEvaluation ae = new ActualEvaluation();
+            String status = "";
+            if (ivp.getDoseStatus() != null && ivp.getDoseStatus().getCoding() != null
+                    && ivp.getDoseStatus().getCoding().get(0) != null
+                    && ivp.getDoseStatus().getCoding().get(0).getCode() != null) {
+                status = ivp.getDoseStatus().getCoding().get(0).getCode();
+            }
+            if ("Y".equalsIgnoreCase(status)) {
+                ae.setStatus(EvaluationStatus.VALID);
+            } else {
+                ae.setStatus(EvaluationStatus.INVALID);
+            }
+            VaccineRef vr = new VaccineRef();
+            if (ivp.getSeries() != null) {
+                vr.setCvx(ivp.getSeries());
+            }
+            ae.setVaccine(vr);
+            rve.getEvaluations().add(ae);
+        }
+        return rve;
+    }
 
-				// TODO: Error checking
-				String status = "";
-				if (dateCriterion.getCode() != null && dateCriterion.getCode().getCoding() != null
-						&& dateCriterion.getCode().getCoding().get(0) != null
-						&& dateCriterion.getCode().getCoding().get(0).getCode() != null) {
-					status = dateCriterion.getCode().getCoding().get(0).getCode().getValue();
-				}
-				switch (status) {
-				case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE:
-					af.setRecommended(date.getDate());
-					break;
-				case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST:
-					af.setEarliest(date.getDate());
-					break;
-				case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE:
-					af.setPastDue(date.getDate());
-					break;
-				case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST:
-					af.setComplete(date.getDate());
-					break;
-				}
-			}
-		}
-		if (irr.getForecastStatus() != null && irr.getForecastStatus().getCoding() != null
-				&& irr.getForecastStatus().getCoding().get(0) != null
-				&& irr.getForecastStatus().getCoding().get(0).getCode() != null) {
-			String status = irr.getForecastStatus().getCoding().get(0).getCode().getValue();
+    
+    
+    
+    public static ResponseVaccinationEvent translateImmunizationRecommendationRecommendationToResponseVaccinationEvent(
+            ImmunizationRecommendationRecommendation irr) {
+        ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
+        VaccineRef vaccineRef = new VaccineRef();
+        // TODO: Error checking
+        vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode().getValue());
+        rve.setAdministred(vaccineRef);
+        // TODO: Error checking
+        rve.setDate(TranslationUtils.translateTchDateToFhirDate(irr.getDate().getValue().toString()));
+        ActualEvaluation ae = new ActualEvaluation();
+        String status = "";
+        // TODO: Error checking
+        status = irr.getForecastStatus().getCoding().get(0).getCode().getValue();
+        // EvaluationStatus.
 
-			// TODO: Is this work around needed? Or is one just wrong?
-			if (status.equals("Not Complete"))
-				af.setSerieStatus(SerieStatus.E);
-			else if (status.equals("Aged Out"))
-				af.setSerieStatus(SerieStatus.G);
-			else
-				af.setSerieStatus(SerieStatus.valueOf(status));
-		}
-		return af;
+        return rve;
+    }
 
-	}
+    public static ActualForecast translateImmunizationRecommendationToActualForecast(ImmunizationRecommendation ir) {
+        ActualForecast forecast = new ActualForecast();
+        if (ir.getRecommendation() == null || ir.getRecommendation().get(0) == null) {
+            return forecast;
+        }
+        ImmunizationRecommendationRecommendation irr = ir.getRecommendation().get(0);
+        if (irr.getDoseNumber() != null && irr.getDoseNumber().getValue() != null) {
+            forecast.setDoseNumber(irr.getDoseNumber().getValue().toString());
+        }
+        VaccineRef vaccineRef = new VaccineRef();
+        if (irr.getVaccineCode() != null && irr.getVaccineCode().getCoding() != null
+                && irr.getVaccineCode().getCoding().get(0) != null
+                && irr.getVaccineCode().getCoding().get(0).getCode() != null) {
+            vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode().getValue());
+        }
+        forecast.setVaccine(vaccineRef);
+        EList<ImmunizationRecommendationDateCriterion> dateCriterions = irr.getDateCriterion();
+        Iterator<ImmunizationRecommendationDateCriterion> it = dateCriterions.iterator();
+        while (it.hasNext()) {
+            ImmunizationRecommendationDateCriterion dateCriterion = it.next();
+            if (dateCriterion.getValue() != null && dateCriterion.getValue().getValue() != null) {
+                FixedDate date = TranslationUtils
+                        .translateTchDateToFhirDate(dateCriterion.getValue().getValue().toString());
 
-	public static boolean doesRecommendationHaveDateCriterion(ImmunizationRecommendationRecommendation irr) {
+                // TODO: Error checking
+                String status = "";
+                if (dateCriterion.getCode() != null && dateCriterion.getCode().getCoding() != null
+                        && dateCriterion.getCode().getCoding().get(0) != null
+                        && dateCriterion.getCode().getCoding().get(0).getCode() != null) {
+                    status = dateCriterion.getCode().getCoding().get(0).getCode().getValue();
+                }                
+                switch (status) {
+                    // TODO: Some systems are using "due", others "recommended". This will probably be fixed to just one.
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_RECOMMENDED:
+                        forecast.setRecommended(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE:
+                        forecast.setRecommended(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST:
+                        forecast.setEarliest(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE:
+                        forecast.setPastDue(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST:
+                        forecast.setComplete(date.getDate());
+                        break;
+                }
 
-		if (irr.getDateCriterion() == null) {
-			return false;
-		}
-		if (irr.getDateCriterion().isEmpty()) {
-			return false;
-		}
-		return true;
+            }
+        }
+        if (irr.getForecastStatus() != null && irr.getForecastStatus().getCoding() != null
+                && irr.getForecastStatus().getCoding().get(0) != null
+                && irr.getForecastStatus().getCoding().get(0).getCode() != null) {
+            forecast.setSerieStatus(
+                    SerieStatus.valueOf(irr.getForecastStatus().getCoding().get(0).getCode().getValue()));
+        }
+        return forecast;
+    }
 
-	}
+    public static ActualForecast translateImmunizationRecommendationRecommendationToActualForecast(
+            ImmunizationRecommendationRecommendation irr) {
+        ActualForecast af = new ActualForecast();
+        if (irr.getDoseNumber() != null && irr.getDoseNumber().getValue() != null) {
+            af.setDoseNumber(irr.getDoseNumber().getValue().toString());
+        }
+        VaccineRef vaccineRef = new VaccineRef();
+        if (irr.getVaccineCode() != null && irr.getVaccineCode().getCoding() != null
+                && irr.getVaccineCode().getCoding().get(0) != null
+                && irr.getVaccineCode().getCoding().get(0).getCode() != null) {
+            vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode().getValue());
+        }
+        af.setVaccine(vaccineRef);
+        EList<ImmunizationRecommendationDateCriterion> dateCriterions = irr.getDateCriterion();
+        Iterator<ImmunizationRecommendationDateCriterion> it = dateCriterions.iterator();
+        while (it.hasNext()) {
+            ImmunizationRecommendationDateCriterion dateCriterion = it.next();
+            if (dateCriterion.getValue() != null && dateCriterion.getValue().getValue() != null) {
+                FixedDate date = TranslationUtils
+                        .translateTchDateToFhirDate(dateCriterion.getValue().getValue().toString());
+
+                // TODO: Error checking
+                String status = "";
+                if (dateCriterion.getCode() != null && dateCriterion.getCode().getCoding() != null
+                        && dateCriterion.getCode().getCoding().get(0) != null
+                        && dateCriterion.getCode().getCoding().get(0).getCode() != null) {
+                    status = dateCriterion.getCode().getCoding().get(0).getCode().getValue();
+                }
+                switch (status) {
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE:
+                        af.setRecommended(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST:
+                        af.setEarliest(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE:
+                        af.setPastDue(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST:
+                        af.setComplete(date.getDate());
+                        break;
+                }
+            }
+        }
+        if (irr.getForecastStatus() != null && irr.getForecastStatus().getCoding() != null
+                && irr.getForecastStatus().getCoding().get(0) != null
+                && irr.getForecastStatus().getCoding().get(0).getCode() != null) {
+            String status = irr.getForecastStatus().getCoding().get(0).getCode().getValue();
+
+            // TODO: Is this work around needed? Or is one just wrong?
+            if (status.equals("Not Complete")) {
+                af.setSerieStatus(SerieStatus.N);
+            } else if (status.equals("Aged Out")) {
+                af.setSerieStatus(SerieStatus.G);
+            } else {
+                af.setSerieStatus(SerieStatus.valueOf(status));
+            }
+        }
+        return af;
+
+    }
+
+    public static ActualForecast translateImmunizationRecommendationRecommendationToActualForecast(
+            org.hl7.fhir.dstu3.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent irr) {
+        ActualForecast af = new ActualForecast();        
+        //TODO: Error checking
+        af.setDoseNumber(Integer.toString(irr.getDoseNumber()));        
+        VaccineRef vaccineRef = new VaccineRef();
+        if (irr.getVaccineCode() != null && irr.getVaccineCode().getCoding() != null
+                && irr.getVaccineCode().getCoding().get(0) != null
+                && irr.getVaccineCode().getCoding().get(0).getCode() != null) {
+            vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode());
+        }
+        af.setVaccine(vaccineRef);
+        
+        List<ImmunizationRecommendationRecommendationDateCriterionComponent> dateCriterions = irr.getDateCriterion();
+        
+        Iterator<ImmunizationRecommendationRecommendationDateCriterionComponent> it = dateCriterions.iterator();
+        while (it.hasNext()) {
+            
+            ImmunizationRecommendationRecommendationDateCriterionComponent dateCriterion = it.next();
+            
+            if (dateCriterion.getValue() != null && dateCriterion.getValue() != null) {
+                FixedDate date = new FixedDate(dateCriterion.getValue());
+
+                // TODO: Error checking
+                String status = "";
+                if (dateCriterion.getCode() != null && dateCriterion.getCode().getCoding() != null
+                        && dateCriterion.getCode().getCoding().get(0) != null
+                        && dateCriterion.getCode().getCoding().get(0).getCode() != null) {
+                    status = dateCriterion.getCode().getCoding().get(0).getCode();
+                }
+                switch (status) {
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE:
+                        af.setRecommended(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST:
+                        af.setEarliest(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE:
+                        af.setPastDue(date.getDate());
+                        break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST:
+                        af.setComplete(date.getDate());
+                        break;
+                }
+            }
+        }
+        if (irr.getForecastStatus() != null && irr.getForecastStatus().getCoding() != null
+                && irr.getForecastStatus().getCoding().get(0) != null
+                && irr.getForecastStatus().getCoding().get(0).getCode() != null) {
+            String status = irr.getForecastStatus().getCoding().get(0).getCode();
+
+            // TODO: Is this work around needed? Or is one just wrong?
+            if (status.equals("Not Complete")) {
+                af.setSerieStatus(SerieStatus.N);
+            } else if (status.equals("Aged Out")) {
+                af.setSerieStatus(SerieStatus.G);
+            } else {
+                af.setSerieStatus(SerieStatus.valueOf(status));
+            }
+        }
+        return af;
+
+    }
+
+    public static boolean doesRecommendationHaveDateCriterion(ImmunizationRecommendationRecommendation irr) {
+
+        if (irr.getDateCriterion() == null) {
+            return false;
+        }
+        if (irr.getDateCriterion().isEmpty()) {
+            return false;
+        }
+        return true;
+
+    }
 
 }

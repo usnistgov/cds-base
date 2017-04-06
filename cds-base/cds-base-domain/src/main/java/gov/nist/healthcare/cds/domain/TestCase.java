@@ -1,6 +1,7 @@
 package gov.nist.healthcare.cds.domain;
 
 import gov.nist.healthcare.cds.domain.wrapper.MetaData;
+import gov.nist.healthcare.cds.domain.wrapper.ModelError;
 import gov.nist.healthcare.cds.enumeration.DateType;
 
 import java.io.Serializable;
@@ -59,9 +60,21 @@ public class TestCase implements Serializable {
 	private String testPlan;
 	@JsonProperty("group")
 	private String groupTag;
+	private boolean runnable;
+	private List<ModelError> errors;
 	
-	
-
+	public List<ModelError> getErrors() {
+		return errors;
+	}
+	public void setErrors(List<ModelError> errors) {
+		this.errors = errors;
+	}
+	public boolean isRunnable() {
+		return runnable;
+	}
+	public void setRunnable(boolean runnable) {
+		this.runnable = runnable;
+	}
 	public String getGroupTag() {
 		return groupTag;
 	}

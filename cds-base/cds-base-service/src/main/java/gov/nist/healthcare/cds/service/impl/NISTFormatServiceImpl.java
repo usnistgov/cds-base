@@ -86,7 +86,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			tcp.setDateType(tc.getDateType().toString());
 			if(tc.getGroupTag() != null && !tc.getGroupTag().isEmpty())
 				tcp.setGroup(tc.getGroupTag());
-			if(tc.getUid() != null && !tc.getGroupTag().isEmpty())
+			if(tc.getUid() != null && !tc.getUid().isEmpty())
 				tcp.setUID(tc.getUid());
 			
 			MetaDataType mdt = new MetaDataType();
@@ -353,6 +353,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				List<EventType> etl = evts.getEvent();
 				for(EventType e : etl){
 					VaccinationEvent vev = new VaccinationEvent();
+					vev.setPosition(e.getID());
 					vev.setType(gov.nist.healthcare.cds.enumeration.EventType.valueOf(e.getType()));
 					vev.setDate(date(e.getEventDate()));
 					

@@ -21,6 +21,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 	public Mongo mongo() throws Exception {
 		//MongoClientOptions o = MongoClientOptions.builder().socketFactory().build();
 		return new MongoClient(new ServerAddress("127.0.0.1",27017));
+//		return new MongoClient(new ServerAddress("127.0.0.1",7777));
 	}
 
 	@Override

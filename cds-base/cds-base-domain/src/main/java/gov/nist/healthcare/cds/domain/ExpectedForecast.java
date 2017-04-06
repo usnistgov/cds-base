@@ -31,10 +31,10 @@ public class ExpectedForecast extends Forecast implements Serializable {
 	@NotNull(message = "Forecast must have a target Vaccine")
 	@Valid
 	private Vaccine target;
-	@NotNull(message = "Earliest date is required")
+//	@NotNull(message = "Earliest date is required")
 	@Valid
 	protected Date earliest;
-	@NotNull(message = "Recommended date is required")
+//	@NotNull(message = "Recommended date is required")
 	@Valid
 	protected Date recommended;
 	protected Date pastDue;

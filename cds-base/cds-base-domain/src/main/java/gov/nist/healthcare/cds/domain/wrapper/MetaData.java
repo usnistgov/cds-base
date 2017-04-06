@@ -19,7 +19,7 @@ public class MetaData implements Serializable {
 	private java.util.Date dateCreated;
 	@Temporal(TemporalType.TIMESTAMP)
 	private java.util.Date dateLastUpdated;
-	
+	private String changeLog;
 
 	public String getVersion() {
 		return version;
@@ -33,7 +33,12 @@ public class MetaData implements Serializable {
 	public void setImported(boolean imported) {
 		this.imported = imported;
 	}
-	
+	public String getChangeLog() {
+		return changeLog;
+	}
+	public void setChangeLog(String changeLog) {
+		this.changeLog = changeLog;
+	}
 	public java.util.Date getDateCreated() {
 		return dateCreated;
 	}

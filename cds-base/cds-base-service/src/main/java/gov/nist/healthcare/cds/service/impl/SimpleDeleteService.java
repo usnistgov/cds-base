@@ -89,13 +89,13 @@ public class SimpleDeleteService implements DeleteTestObjectService {
 	}
 
 	@Override
-	public boolean deleteTestCaseGroup(TestCaseGroup tcg) {
-		TestPlan tp = testPlanRepository.testCaseGroup(tcg.getId());
-		tp.getTestCaseGroups().remove(tcg);
+	public boolean deleteTestCaseGroup(TestPlan tp, String tcgId) {
+		TestCaseGroup tcg = tp.getGroup(tcgId);
 		for(TestCase tc : tcg.getTestCases()){
 			this.deleteReportsForTC(tc);
 		}
 		testCaseRepository.delete(tcg.getTestCases());
+		tp.getTestCaseGroups().remove(tcg);
 		mdService.update(tp.getMetaData());
 		testPlanRepository.save(tp);
 		return true;

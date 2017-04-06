@@ -89,12 +89,13 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 			int col = 0;
 			if(!config.isAll()){
 				for(int j = 1; j < config.getFrom(); j++){
-					rowIterator.next();
+					if(rowIterator.hasNext())
+						rowIterator.next();
 				}
 				i = config.getFrom();
 			}
 			while(rowIterator.hasNext()){
-				if(!config.isAll() && config.getTo() == i)
+				if(!config.isAll() && config.getTo()+1 == i)
 					break;
 				
 				try {
@@ -111,12 +112,15 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					else {
 						doseNumber = (int) r.getCell(50).getNumericCellValue() + "";
 					}
+				
 					Date earliest    = r.getCell(51).getDateCellValue();
 					Date recommended = r.getCell(52).getDateCellValue();
 					Date pastDue     = r.getCell(53).getDateCellValue();
 					String target = r.getCell(54).getStringCellValue();
 					Date evalDate   = r.getCell(55).getDateCellValue();
-
+					//String changeLog   = r.getCell(60).getStringCellValue();
+					//String version   = r.getCell(61).getStringCellValue();
+					
 					TestCase tc = new TestCase();
 					tc.setDateType(DateType.FIXED);
 					tc.setName(tcName);
@@ -130,6 +134,8 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					p.setGender(Gender.valueOf(gender));
 					
 					MetaData md = mdService.create(true);
+					//md.setChangeLog(changeLog);
+					//md.setVersion(version);
 					
 					ExpectedForecast fc = new ExpectedForecast();
 					if(serieStatus != null && !serieStatus.isEmpty()){
@@ -140,9 +146,16 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 					}
 					
 					fc.setDoseNumber(doseNumber);
-					fc.setEarliest(new FixedDate(earliest));
-					fc.setRecommended(new FixedDate(recommended));
-					fc.setPastDue(new FixedDate(pastDue));
+					if(earliest != null){
+						fc.setEarliest(new FixedDate(earliest));
+					}
+					if(recommended != null){
+						fc.setRecommended(new FixedDate(recommended));
+					}
+					if(pastDue != null){
+						fc.setPastDue(new FixedDate(pastDue));
+					}
+		
 					Vaccine v = vaccineRepository.findByNameIgnoreCase(target);
 					if(v == null){
 						col = 54;
@@ -264,14 +277,14 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return ret;
 		} catch (EncryptedDocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return ret;
 		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return ret;
+		}
+		catch (Exception e) {
+			return ret;
 		}
 		ret.setTestcases(tcs);
 		

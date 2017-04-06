@@ -45,14 +45,14 @@ public class ValidationServiceImpl implements ValidationService {
 		Report vr = new Report();
 		List<VaccinationEventValidation> veValidation = vr.getVeValidation();
 		List<ForecastValidation> fValidation = vr.getFcValidation();
-		ResultCounts fCounts = this.validateForecasts(response.getForecasts(), expForecast, fValidation);
-		ResultCounts eCounts = this.validateEvents(response.getEvents(), events, veValidation);
+		ResultCounts fCounts = this.validateForecasts(response.getForecasts(), expForecast, fValidation,vr);
+		ResultCounts eCounts = this.validateEvents(response.getEvents(), events, veValidation,vr);
 		vr.setEvents(eCounts);
 		vr.setForecasts(fCounts);
 		return vr;
 	}
 	
-	public ResultCounts validateForecasts(List<ActualForecast> afL, List<ForecastRequirement> efL, List<ForecastValidation> fValidation){
+	public ResultCounts validateForecasts(List<ActualForecast> afL, List<ForecastRequirement> efL, List<ForecastValidation> fValidation,Report vr){
 		ResultCounts counts = new ResultCounts();
 		ForecastValidation tmp;
 		
@@ -62,7 +62,7 @@ public class ValidationServiceImpl implements ValidationService {
 				tmp = ForecastValidation.unMatched(ef);
 			}
 			else {
-				tmp = this.validate(ef, af);	
+				tmp = this.validate(ef, af, vr);	
 			}
 			fValidation.add(tmp);	
 			counts.addCounts(tmp.getCounts());
@@ -70,7 +70,7 @@ public class ValidationServiceImpl implements ValidationService {
 		return counts;
 	}
 	
-	public ResultCounts validateEvents(List<ResponseVaccinationEvent> rveL, List<VaccinationEventRequirement> evL, List<VaccinationEventValidation> veValidation){
+	public ResultCounts validateEvents(List<ResponseVaccinationEvent> rveL, List<VaccinationEventRequirement> evL, List<VaccinationEventValidation> veValidation,Report vr){
 		ResultCounts counts = new ResultCounts();
 		VaccinationEventValidation tmp;
 		
@@ -80,7 +80,7 @@ public class ValidationServiceImpl implements ValidationService {
 				tmp = VaccinationEventValidation.unMatched(ev);
 			}
 			else {
-				tmp = this.validate(ev, rve);
+				tmp = this.validate(ev, rve, vr);
 			}
 			veValidation.add(tmp);	
 			counts.addCounts(tmp.getCounts());
@@ -88,7 +88,7 @@ public class ValidationServiceImpl implements ValidationService {
 		return counts;
 	}
 	
-	private VaccinationEventValidation validate(VaccinationEventRequirement ve, ResponseVaccinationEvent rve) {
+	private VaccinationEventValidation validate(VaccinationEventRequirement ve, ResponseVaccinationEvent rve,Report vr) {
 		VaccinationEventValidation vev = new VaccinationEventValidation();
 		ResultCounts counts = new ResultCounts();
 		vev.setCounts(counts);
@@ -100,10 +100,11 @@ public class ValidationServiceImpl implements ValidationService {
 				cr = new EvaluationCriterion(ValidationStatus.U);
 			}
 			else if (ae.getStatus().equals(ee.getStatus())){
-				cr = new EvaluationCriterion(ValidationStatus.P);
+				cr = new EvaluationCriterion(ValidationStatus.P,ae.getStatus());
 			}
 			else {
 				cr = new EvaluationCriterion(config.failed(ValidationCriterion.EvaluationStatus), ae.getStatus());
+				vr.put(ValidationCriterion.EvaluationStatus, true);
 			}
 			vev.geteValidation().add(new EvaluationValidation(ee, cr));
 			counts.consider(cr);
@@ -139,7 +140,7 @@ public class ValidationServiceImpl implements ValidationService {
 	}
 	
 	
-	public ForecastValidation validate(ForecastRequirement fr, ActualForecast af){
+	public ForecastValidation validate(ForecastRequirement fr, ActualForecast af, Report vr){
 		ForecastValidation fv = new ForecastValidation();
 		ResultCounts counts = new ResultCounts();
 		ExpectedForecast ef = fr.getExpForecast();
@@ -158,7 +159,9 @@ public class ValidationServiceImpl implements ValidationService {
 			dose = new StringCriterion(ValidationStatus.P, af.getDoseNumber());
 		}
 		else {
+			
 			dose = new StringCriterion(config.failed(ValidationCriterion.DoseNumber), af.getDoseNumber());
+			vr.put(ValidationCriterion.DoseNumber, true);
 		}
 		fv.setDose(dose);
 		counts.consider(dose);
@@ -176,6 +179,7 @@ public class ValidationServiceImpl implements ValidationService {
 		}
 		else {
 			earliest = new DateCriterion(config.failed(ValidationCriterion.EarliestDate), af.getEarliest());
+			vr.put(ValidationCriterion.EarliestDate, true);
 		}
 		fv.setEarliest(earliest);
 		counts.consider(earliest);
@@ -194,6 +198,7 @@ public class ValidationServiceImpl implements ValidationService {
 		}
 		else {
 			recommended = new DateCriterion(config.failed(ValidationCriterion.RecommendedDate), af.getRecommended());
+			vr.put(ValidationCriterion.RecommendedDate, true);
 		}
 		fv.setRecommended(recommended);
 		counts.consider(recommended);
@@ -211,6 +216,7 @@ public class ValidationServiceImpl implements ValidationService {
 		}
 		else {
 			pastDue = new DateCriterion(config.failed(ValidationCriterion.PastDueDate), af.getPastDue());
+			vr.put(ValidationCriterion.PastDueDate, true);
 		}
 		fv.setPastDue(pastDue);
 		counts.consider(pastDue);
@@ -228,6 +234,7 @@ public class ValidationServiceImpl implements ValidationService {
 		}
 		else {
 			complete =  new DateCriterion(config.failed(ValidationCriterion.CompleteDate), af.getComplete());
+			vr.put(ValidationCriterion.CompleteDate,true);
 		}
 		fv.setComplete(complete);
 		counts.consider(complete);

@@ -51,7 +51,7 @@ public class SimplePropretyService implements PropertyService {
 	public Report reportBelongsTo(String reportId, String user) {
 		Report r = reportRepository.findOne(reportId);
 		if(r != null){
-			TestPlan tp = testPlanRepository.tcUser(r.getId());
+			TestPlan tp = testPlanRepository.tcUser(r.getTc());
 			if(tp != null && tp.getUser().equals(user)){
 				return r;
 			}

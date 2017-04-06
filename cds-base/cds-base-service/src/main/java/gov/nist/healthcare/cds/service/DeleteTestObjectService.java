@@ -8,6 +8,6 @@ public interface DeleteTestObjectService {
 
 	public boolean deleteTestCase(TestCase tc);
 	public boolean deleteTestPlan(TestPlan tp);
-	public boolean deleteTestCaseGroup(TestCaseGroup tcg);
+	public boolean deleteTestCaseGroup(TestPlan tp, String tcg);
 	
 }

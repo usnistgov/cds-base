@@ -62,7 +62,6 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 		ByteArrayInputStream ba_products = new ByteArrayInputStream(products);
 		ByteArrayInputStream ba_manufacturer = new ByteArrayInputStream(manufacturer);
 		
-		ba_manufacturer.reset();
 		manufacturer(ba_manufacturer);
 		
 		Set<VaccineMapping> l_vxm = new HashSet<VaccineMapping>();

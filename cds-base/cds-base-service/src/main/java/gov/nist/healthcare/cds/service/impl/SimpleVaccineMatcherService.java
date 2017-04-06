@@ -51,5 +51,6 @@ public class SimpleVaccineMatcherService implements VaccineMatcherService {
 		vg.setCvx(cvx);
 		return mp.getGroups() != null && mp.getGroups().contains(vg);
 	}
+	
 
 }

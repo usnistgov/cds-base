@@ -15,20 +15,22 @@ import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
+import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 import gov.nist.healthcare.cds.domain.exception.UnresolvableDate;
 import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
 import gov.nist.healthcare.cds.domain.wrapper.ForecastRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.Report;
 import gov.nist.healthcare.cds.domain.wrapper.ResolvedDates;
+import gov.nist.healthcare.cds.domain.wrapper.TestCaseInformation;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
+import gov.nist.healthcare.cds.repositories.TestPlanRepository;
 import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.TestCaseExecutionService;
 import gov.nist.healthcare.cds.service.TestRunnerService;
 import gov.nist.healthcare.cds.service.ValidationService;
 
-@Service
 public class ExecutionService implements TestCaseExecutionService {
 
 	@Autowired
@@ -37,9 +39,9 @@ public class ExecutionService implements TestCaseExecutionService {
 	private DateService dates;
 	@Autowired
 	private TestRunnerService runner;
-	
+
 	@Override
-	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date reference) throws UnresolvableDate {
+	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date reference) throws UnresolvableDate, ConnectionException {
 		java.util.Date today = Calendar.getInstance().getTime();
 		// Fix Eval, DOB, Events
 		ResolvedDates rds = dates.resolveDates(tc, reference);
@@ -56,13 +58,18 @@ public class ExecutionService implements TestCaseExecutionService {
 		Report rp = validation.validate(response, veRequirements, fcRequirements);
 		
 		// Set Report Properties
+		TestCaseInformation tcInfo = new TestCaseInformation();
+		tcInfo.setMetaData(tc.getMetaData());
+		tcInfo.setName(tc.getName());
+		tcInfo.setUID(tc.getUid());
+		tcInfo.setDescription(tc.getDescription());
+		
+		rp.setTcInfo(tcInfo);
 		rp.setEvaluationDate(tcP.getEvaluationDate());
 		rp.setDob(tcP.getDateOfBirth());
 		rp.setTc(tc.getId());
 		rp.setSoftwareConfig(conf);
 		rp.setGender(tcP.getGender());
-		rp.setTcName(tc.getName());
-		rp.setTcLastUpdated(tc.getMetaData().getDateLastUpdated());
 		rp.setResponse(response.getResponse());
 		rp.setExecutionDate(today);
 		return rp;

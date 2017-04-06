@@ -8,7 +8,10 @@ import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 public class AggregateReport {
 
 	private Map<ValidationCriterion, ResultCounts> counts;
-
+	private int total;
+	private int errors;
+	private int correct;
+	
 	public AggregateReport() {
 		super();
 		counts = new HashMap<>();
@@ -33,6 +36,31 @@ public class AggregateReport {
 		c.consider(ctr);
 		counts.put(criterion, c);
 	}
+
+	public int getTotal() {
+		return total;
+	}
+
+	public void setTotal(int total) {
+		this.total = total;
+	}
+
+	public int getErrors() {
+		return errors;
+	}
+
+	public void setErrors(int errors) {
+		this.errors = errors;
+	}
+
+	public int getCorrect() {
+		return correct;
+	}
+
+	public void setCorrect(int correct) {
+		this.correct = correct;
+	}
+	
 	
 	
 }
