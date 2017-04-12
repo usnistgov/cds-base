@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@DiscriminatorValue("VACCINATION")
 @JsonTypeName("vaccination")
 public class VaccinationEvent extends Event {
 
@@ -24,6 +23,7 @@ public class VaccinationEvent extends Event {
 	@NotNull(message = "Administred Vaccine is required")
 	@Valid
 	private Injection administred;
+	@Valid
 	private Set<ExpectedEvaluation> evaluations;
 	private int position;
 	

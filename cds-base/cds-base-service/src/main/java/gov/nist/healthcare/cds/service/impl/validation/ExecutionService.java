@@ -1,15 +1,12 @@
-package gov.nist.healthcare.cds.service.impl;
+package gov.nist.healthcare.cds.service.impl.validation;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gov.nist.fhir.client.ir.FHIRParse;
-import gov.nist.fhir.client.ir.TestRunnerServiceFhirImpl;
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.Injection;
@@ -24,38 +21,34 @@ import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
 import gov.nist.healthcare.cds.domain.wrapper.ForecastRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.Report;
 import gov.nist.healthcare.cds.domain.wrapper.ResolvedDates;
-import gov.nist.healthcare.cds.domain.wrapper.SimulationMap;
 import gov.nist.healthcare.cds.domain.wrapper.TestCaseInformation;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
+import gov.nist.healthcare.cds.repositories.TestPlanRepository;
 import gov.nist.healthcare.cds.service.DateService;
-import gov.nist.healthcare.cds.service.FHIRParser;
 import gov.nist.healthcare.cds.service.TestCaseExecutionService;
+import gov.nist.healthcare.cds.service.TestRunnerService;
 import gov.nist.healthcare.cds.service.ValidationService;
 
-public class TestExecutionSimulation implements TestCaseExecutionService {
+public class ExecutionService implements TestCaseExecutionService {
 
 	@Autowired
-	private SimulationMap simulationMap;
-	
-	@Autowired
 	private ValidationService validation;
-	
 	@Autowired
 	private DateService dates;
-	
+	@Autowired
+	private TestRunnerService runner;
+
 	@Override
-	public Report execute(SoftwareConfig conf, TestCase tc, Date reference) throws UnresolvableDate, ConnectionException {
+	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date reference) throws UnresolvableDate, ConnectionException {
 		java.util.Date today = Calendar.getInstance().getTime();
 		// Fix Eval, DOB, Events
 		ResolvedDates rds = dates.resolveDates(tc, reference);
 		
 		// Create PayLoad and Send request
 		TestCasePayLoad tcP = this.payLoad(tc, rds);
-		
-		System.out.println(simulationMap.getResult(tc.getUid()));
-		EngineResponse response = FHIRParse.parseResponseFromXml(simulationMap.getResult(tc.getUid()));
+		EngineResponse response = runner.run(conf, tcP);
 		
 		// Compute Requirements
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
@@ -81,6 +74,7 @@ public class TestExecutionSimulation implements TestCaseExecutionService {
 		rp.setExecutionDate(today);
 		return rp;
 	}
+	
 	
 	public List<VaccinationEventRequirement> veRequirements(TestCase tc, ResolvedDates rds){
 		List<VaccinationEventRequirement> veRequirements = new ArrayList<VaccinationEventRequirement>();
@@ -142,7 +136,7 @@ public class TestExecutionSimulation implements TestCaseExecutionService {
 			return new VaccineRef(v.getCvx(), "");
 		}
 	}
-
+	
 
 
 }

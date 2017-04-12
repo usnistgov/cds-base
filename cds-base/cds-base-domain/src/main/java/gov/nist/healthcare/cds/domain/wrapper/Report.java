@@ -1,6 +1,7 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
 
+import gov.nist.healthcare.cds.domain.Entity;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.enumeration.Gender;
@@ -15,9 +16,8 @@ import java.util.Map;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Report implements Serializable {
+public class Report extends Entity implements Serializable {
 
-	private String id;
 	private String tc;
 	private TestCaseInformation tcInfo;
 	private Gender gender;
@@ -66,14 +66,6 @@ public class Report implements Serializable {
 		this.failures = failures;
 	}
 
-
-
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
 	public void setFcValidation(List<ForecastValidation> fValidation) {
 		this.fcValidation = fValidation;
 	}

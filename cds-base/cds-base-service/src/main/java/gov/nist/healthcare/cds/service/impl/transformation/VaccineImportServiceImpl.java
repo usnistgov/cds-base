@@ -1,4 +1,4 @@
-package gov.nist.healthcare.cds.service.impl;
+package gov.nist.healthcare.cds.service.impl.transformation;
 
 
 import gov.nist.healthcare.cds.domain.Manufacturer;
@@ -102,9 +102,10 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 				Set<Product> s_pr = products(CVX, ba_products);
 				for(Product p : s_pr){
 					p.setVx(vx_s);
-					UUID uuid = UUID.randomUUID();
-					System.out.println("[UUID]"+uuid);
-					p.setCode(uuid.toString());
+					//UUID uuid = UUID.randomUUID();
+					//System.out.println("[UUID]"+uuid);
+					String code = p.getVx().getCvx()+":"+p.getMx().getMvx()+":"+p.getName();
+					p.setCode(code);
 				}
 				List<Product> s_pr_s = productRepository.save(s_pr);
 				

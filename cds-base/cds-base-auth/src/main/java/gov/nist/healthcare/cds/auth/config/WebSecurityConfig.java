@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -17,10 +18,10 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @ComponentScan("gov.nist.healthcare.cds.auth")
@@ -34,8 +35,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private AuthenticationEntryPoint authenticationEntryPoint;
 	
 	@Autowired
+	private PasswordEncoder encoder;
+	
+	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             auth.userDetailsService(authenticationService).passwordEncoder(encoder);
 	}
 	
@@ -78,15 +81,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						        }
 						 
 							 response.setStatus(HttpServletResponse.SC_OK);
-							 response.sendRedirect("/");
+							 response.sendRedirect("/fits");
 						}
-					})
+					}).deleteCookies("JSESSIONID").invalidateHttpSession(true)
 			.and()
 				.sessionManagement()
 					.maximumSessions(1);
 		http
 			.csrf()
 				.disable();
+	}
+	
+	@Bean
+	public HttpSessionEventPublisher httpSessionEventPublisher() {
+	    return new HttpSessionEventPublisher();
 	}
 	
 	

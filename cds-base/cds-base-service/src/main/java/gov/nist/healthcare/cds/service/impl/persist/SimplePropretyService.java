@@ -1,8 +1,9 @@
-package gov.nist.healthcare.cds.service.impl;
+package gov.nist.healthcare.cds.service.impl.persist;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gov.nist.healthcare.cds.domain.Entity;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.TestCaseGroup;
@@ -69,12 +70,30 @@ public class SimplePropretyService implements PropertyService {
 	}
 
 	@Override
-	public TestPlan tgBelongsTo(String tgId, String user) {
+	public TestCaseGroup tgBelongsTo(String tgId, String user) {
 		TestPlan tp = testPlanRepository.testCaseGroup(tgId);
 		if(tp != null && tp.getUser().equals(user)){
-			return tp;
+			return tp.getGroup(tgId);
 		}
 		return null;
 	}
+
+	@Override
+	public <T extends Entity> T belongsTo(String id, String user, Class<T> type) {
+		if(type.equals(TestCase.class)){
+			return (T) this.tcBelongsTo(id, user);
+		}
+		else if(type.equals(TestCaseGroup.class)){
+			return (T) this.tgBelongsTo(id, user);
+		}
+		else if(type.equals(TestPlan.class)){
+			return (T) this.tpBelongsTo(id, user);
+		}
+		else if(type.equals(Report.class)){
+			return (T) this.reportBelongsTo(id, user);
+		}
+		return null;
+	}
+
 
 }

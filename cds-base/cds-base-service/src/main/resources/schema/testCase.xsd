@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.example.org/testCase/" targetNamespace="http://www.example.org/testCase/">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="https://fits.nist.gov/xml/" targetNamespace="https://fits.nist.gov/xml/">
 
 <!-- GENERAL TEST CASE MODEL -->
 	<element name="TestCase">
@@ -8,25 +8,11 @@
 	    		<element name="Name" type="string" minOccurs="1"
 	    			maxOccurs="1">
 	    		</element>
-	    		<element name="Description" type="string" minOccurs="1"
+	    		<element name="Description" type="string" minOccurs="0"
 	    			maxOccurs="1">
 	    		</element>
-	    		<element name="EvaluationDate" type="tns:DateType"
-	    			minOccurs="1" maxOccurs="1">
-	    		</element>
-	    		<element name="MetaData" type="tns:MetaDataType"
-	    			minOccurs="1" maxOccurs="1">
-	    		</element>
-	    		<element name="Patient" type="tns:PatientType"
-	    			minOccurs="1" maxOccurs="1">
-	    		</element>
-	    		<element name="Events" type="tns:EventsType"
-	    			minOccurs="0" maxOccurs="1">
-	    		</element>
-	    		<element name="Forecasts" type="tns:ForecastsType"
-	    			minOccurs="0" maxOccurs="1">
-	    		</element>
-	    		<element name="DateType" minOccurs="1" maxOccurs="1">
+                <element name="Group" type="string" minOccurs="0" maxOccurs="1"></element>
+                <element name="DateType" minOccurs="1" maxOccurs="1">
 	    			<simpleType>
 	    				<restriction base="string">
 	    					<enumeration value="RELATIVE"></enumeration>
@@ -34,7 +20,20 @@
 	    				</restriction>
 	    			</simpleType>
 	    		</element>
-	    		<element name="Group" type="string" minOccurs="0" maxOccurs="1"></element>
+                <element name="MetaData" type="tns:MetaDataType" minOccurs="1" maxOccurs="1">
+	    		</element>
+                <element name="AssessmentDate" type="tns:DateType"
+	    			minOccurs="1" maxOccurs="1">
+	    		</element>
+	    		<element name="Patient" type="tns:PatientType"
+	    			minOccurs="1" maxOccurs="1">
+	    		</element>
+                <element name="Events" type="tns:EventsType"
+	    			minOccurs="0" maxOccurs="1">
+	    		</element>
+	    		<element name="Forecasts" type="tns:ForecastsType"
+	    			minOccurs="0" maxOccurs="1">
+	    		</element>
 	    	</sequence>
 	    	<attribute name="UID" type="string" use="optional"></attribute>
 	    </complexType>
@@ -84,10 +83,16 @@
     			minOccurs="1" maxOccurs="1">
     		</element>
     		<element name="Evaluations" type="tns:EvaluationsType"
-    			minOccurs="1" maxOccurs="1">
+    			minOccurs="0" maxOccurs="1">
     		</element>
     	</sequence>
-    	<attribute name="type" type="string" use="required"></attribute>
+    	<attribute name="type" use="required">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="VACCINATION"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
     	<attribute name="ID" type="int"></attribute>
     </complexType>
 
@@ -99,7 +104,7 @@
 
     <complexType name="EvaluationsType">
     	<sequence>
-    		<element name="Evaluation" type="tns:EvaluationType" minOccurs="1" maxOccurs="unbounded"></element>
+    		<element name="Evaluation" type="tns:EvaluationType" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 
@@ -127,18 +132,22 @@
     		<element name="target" type="tns:VaccineType" minOccurs="1"
     			maxOccurs="1">
     		</element>
-    		<element name="SerieStatus" type="tns:SerieStatusType" minOccurs="0"
+    		<element name="SerieStatus" type="tns:SerieStatusType"
+    			minOccurs="0" maxOccurs="1">
+    		</element>
+    		<element name="ForecastReason" type="string" minOccurs="0"
     			maxOccurs="1">
     		</element>
-            <element name="ForecastReason" type="string" minOccurs="0" maxOccurs="1"></element>
-            <element name="Earliest" type="tns:DateType" minOccurs="1"
+    		<element name="Earliest" type="tns:DateType" minOccurs="0"
     			maxOccurs="1">
     		</element>
     		<element name="Recommended" type="tns:DateType"
-    			minOccurs="1" maxOccurs="1">
+    			minOccurs="0" maxOccurs="1">
     		</element>
-    		<element name="PastDue" type="tns:DateType" minOccurs="1"
+    		<element name="PastDue" type="tns:DateType" minOccurs="0"
     			maxOccurs="1">
+    		</element>
+    		<element name="Latest" type="tns:DateType" maxOccurs="1" minOccurs="0">
     		</element>
     	</sequence>
     </complexType>
@@ -162,12 +171,31 @@
 
     <complexType name="ForecastsType">
     	<sequence>
-    		<element name="Forecast" type="tns:ForecastType" minOccurs="1" maxOccurs="unbounded"></element>
+    		<element name="Forecast" type="tns:ForecastType" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 
     <complexType name="SerieStatusType">
-    	<attribute name="code" type="string" use="required"></attribute>
+    	<attribute name="code" use="required">
+    		<simpleType>
+    			<restriction base="string">
+    				<enumeration value="A"></enumeration>
+    				<enumeration value="C"></enumeration>
+    				<enumeration value="D"></enumeration>
+    				<enumeration value="F"></enumeration>
+    				<enumeration value="G"></enumeration>
+    				<enumeration value="I"></enumeration>
+    				<enumeration value="L"></enumeration>
+    				<enumeration value="N"></enumeration>
+    				<enumeration value="O"></enumeration>
+    				<enumeration value="S"></enumeration>
+    				<enumeration value="V"></enumeration>
+    				<enumeration value="W"></enumeration>
+    			    <enumeration value="X"></enumeration>
+    			    <enumeration value="Z"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
     	<attribute name="details" type="string" use="optional"></attribute>
     </complexType>
 

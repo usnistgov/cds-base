@@ -1,4 +1,4 @@
-package gov.nist.healthcare.cds.service.impl;
+package gov.nist.healthcare.cds.service.impl.persist;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -26,8 +26,10 @@ public class SimpleMetaDataService implements MetaDataService {
 
 	@Override
 	public void update(MetaData md) {
-		Date dateUpdated = Calendar.getInstance().getTime();
-		md.setDateLastUpdated(dateUpdated);
+		if(md != null){
+			Date dateUpdated = Calendar.getInstance().getTime();
+			md.setDateLastUpdated(dateUpdated);
+		}
 	}
 
 	@Override

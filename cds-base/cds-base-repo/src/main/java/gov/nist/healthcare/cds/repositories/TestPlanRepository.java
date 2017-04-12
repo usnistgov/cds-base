@@ -13,9 +13,10 @@ public interface TestPlanRepository extends MongoRepository<TestPlan, String>{
 	
 	public List<TestPlan> findByUser(String user);
 	
+	//@Query(value="{ $or : [ {'testCases' : { $elemMatch: { 'id' :  ?0 } } }, { 'testCaseGroups' : { $elemMatch: { 'testCases' :  { $elemMatch : { 'id' : ?0 } } } } } ] }",fields="{ 'user' : 1 }")
 	@Query(value="{ $or : [ {'testCases.id' : ?0}, { 'testCaseGroups.testCases.id' : ?0 } ] }",fields="{ 'user' : 1 }")
 	public TestPlan tcUser(String testId);
 	
-	@Query(value="{'testCaseGroups.id' : ?0}")
+	@Query(value="{'testCaseGroups' : { $elemMatch: { 'id' :  ?0 } } }")
 	public TestPlan testCaseGroup(String groupId);
 }

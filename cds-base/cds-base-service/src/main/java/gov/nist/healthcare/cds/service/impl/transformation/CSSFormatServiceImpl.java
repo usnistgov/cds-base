@@ -1,4 +1,4 @@
-package gov.nist.healthcare.cds.service.impl;
+package gov.nist.healthcare.cds.service.impl.transformation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -190,7 +190,6 @@ public class CSSFormatServiceImpl implements CDCSpreadSheetFormatService {
 						ve.setPosition(d);
 						d++;
 						ve.setDoseNumber(0);
-						ve.setType(EventType.VACCINATION);
 						Date dateA = r.getCell(j).getDateCellValue();
 						if(dateA == null)
 							break;

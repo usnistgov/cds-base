@@ -1,45 +1,24 @@
 package gov.nist.healthcare.cds.domain;
 
-import gov.nist.healthcare.cds.domain.wrapper.MetaData;
 import gov.nist.healthcare.cds.domain.wrapper.ModelError;
 import gov.nist.healthcare.cds.enumeration.DateType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document
-public class TestCase implements Serializable {
+public class TestCase extends Entity implements Serializable {
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String id;
 	@NotBlank(message = "TestCase name is required and can't be empty")
 	private String name;
 	private String uid;
@@ -49,7 +28,6 @@ public class TestCase implements Serializable {
 	@NotNull(message = "Patient information are required")
 	@Valid
 	private Patient patient;
-	private MetaData metaData;
 	@NotNull(message = "Assessment Date is required")
 	@Valid
 	private Date evalDate;
@@ -62,6 +40,10 @@ public class TestCase implements Serializable {
 	private String groupTag;
 	private boolean runnable;
 	private List<ModelError> errors;
+	
+	public TestCase(){
+		this.runnable = true;
+	}
 	
 	public List<ModelError> getErrors() {
 		return errors;
@@ -93,23 +75,11 @@ public class TestCase implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
 	public Patient getPatient() {
 		return patient;
 	}
 	public void setPatient(Patient patient) {
 		this.patient = patient;
-	}
-	public MetaData getMetaData() {
-		return metaData;
-	}
-	public void setMetaData(MetaData metaData) {
-		this.metaData = metaData;
 	}
 	public Date getEvalDate() {
 		return evalDate;

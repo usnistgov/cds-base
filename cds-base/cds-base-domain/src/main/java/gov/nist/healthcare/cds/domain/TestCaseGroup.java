@@ -1,28 +1,15 @@
 package gov.nist.healthcare.cds.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class TestCaseGroup {
+public class TestCaseGroup extends ContainingEntity {
 
-	@Id
-	private String id;
-	@DBRef
-	private List<TestCase> testCases;
 	private String testPlan;
 	private String name;
+	private String description;
 	
-	public List<TestCase> getTestCases() {
-		if(testCases == null){
-			testCases = new ArrayList<>();
-		}
-		return testCases;
-	}
 	
 	public String getTestPlan() {
 		return testPlan;
@@ -31,10 +18,6 @@ public class TestCaseGroup {
 	public void setTestPlan(String testPlan) {
 		this.testPlan = testPlan;
 	}
-
-	public void setTestCases(List<TestCase> testCases) {
-		this.testCases = testCases;
-	}
 	public String getName() {
 		return name;
 	}
@@ -42,13 +25,29 @@ public class TestCaseGroup {
 		this.name = name;
 	}
 
-	public String getId() {
-		return id;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setDescription(String description) {
+		this.description = description;
 	}
+	
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (id == null || obj == null || getClass() != obj.getClass())
+            return false;
+        TestCaseGroup that = (TestCaseGroup) obj;
+        return id.equals(that.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return id == null ? 0 : id.hashCode();
+    }
 	
 	
 }
+//{ $elemMatch: { 'refund.id' :  ?0 } } 

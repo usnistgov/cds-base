@@ -1,4 +1,4 @@
-package gov.nist.healthcare.cds.service.impl;
+package gov.nist.healthcare.cds.service.impl.persist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,15 +8,20 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.wrapper.ModelError;
+import gov.nist.healthcare.cds.service.ErrorPathCleaner;
 import gov.nist.healthcare.cds.service.ValidateTestCase;
 
 @Service
-public class SimpleTestCaseValidator implements ValidateTestCase {
+public class SimpleTestCaseModelValidator implements ValidateTestCase {
 
+	@Autowired
+	private ErrorPathCleaner pathClean;
+	
 	@Override
 	public void validate(TestCase tc) {
 		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -31,7 +36,7 @@ public class SimpleTestCaseValidator implements ValidateTestCase {
 			tc.setRunnable(false);
 			List<ModelError> errors = new ArrayList<ModelError>();
 			for(ConstraintViolation<TestCase> v : violations){
-				errors.add(new ModelError(v.getPropertyPath().toString(), v.getMessage()));
+				errors.add(new ModelError(pathClean.errorPath(v.getPropertyPath().toString()), v.getMessage()));
 			}
 			tc.setErrors(errors);
 		}		

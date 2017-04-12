@@ -5,20 +5,12 @@ import gov.nist.healthcare.cds.enumeration.SerieStatus;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 public class ExpectedForecast extends Forecast implements Serializable {
 	
@@ -31,13 +23,15 @@ public class ExpectedForecast extends Forecast implements Serializable {
 	@NotNull(message = "Forecast must have a target Vaccine")
 	@Valid
 	private Vaccine target;
-//	@NotNull(message = "Earliest date is required")
+	//@NotNull(message = "Earliest date is required")
 	@Valid
 	protected Date earliest;
-//	@NotNull(message = "Recommended date is required")
+	//@NotNull(message = "Recommended date is required")
 	@Valid
 	protected Date recommended;
+	@Valid
 	protected Date pastDue;
+	@Valid
 	protected Date complete;
 	@NotNull(message = "Serie Status is required")
 	@Enumerated(EnumType.STRING)

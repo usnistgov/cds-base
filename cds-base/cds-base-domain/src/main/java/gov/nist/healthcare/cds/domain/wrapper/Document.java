@@ -1,23 +1,22 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
-import java.util.Date;
 
 public class Document {
 	
 	private String name;
 	private String fileName;
 	private String location;
-	private Date date;
+	private String date;
 	
 	public String getName() {
 		return name;
 	}
 	
-	public Date getDate() {
+	public String getDate() {
 		return date;
 	}
 
-	public void setDate(Date d) {
+	public void setDate(String d) {
 		this.date = d;
 	}
 

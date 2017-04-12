@@ -13,12 +13,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class Evaluation implements Serializable {
 
 	protected String evaluationReason;
+	@NotNull(message = "Evaluation must have an expected status")
+	@Valid
 	@Enumerated(EnumType.STRING)
 	protected EvaluationStatus status;
 	@Enumerated(EnumType.STRING)

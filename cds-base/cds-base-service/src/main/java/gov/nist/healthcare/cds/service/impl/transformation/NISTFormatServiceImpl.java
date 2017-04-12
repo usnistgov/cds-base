@@ -1,4 +1,4 @@
-package gov.nist.healthcare.cds.service.impl;
+package gov.nist.healthcare.cds.service.impl.transformation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -82,7 +81,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			gov.nist.healthcare.cds.domain.xml.beans.TestCase tcp = new gov.nist.healthcare.cds.domain.xml.beans.TestCase();
 			tcp.setName(tc.getName());
 			tcp.setDescription(tc.getDescription());
-			tcp.setEvaluationDate(date(tc.getEvalDate()));
+			tcp.setAssessmentDate(date(tc.getEvalDate()));
 			tcp.setDateType(tc.getDateType().toString());
 			if(tc.getGroupTag() != null && !tc.getGroupTag().isEmpty())
 				tcp.setGroup(tc.getGroupTag());
@@ -114,7 +113,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				EventsType evtst = new EventsType();
 				for(Event e : evts){
 					EventType evt = new EventType();
-					evt.setType(e.getType().toString());
+					evt.setType(eventType(e));
 					evt.setEventDate(date(e.getDate()));
 					VaccinationEvent vev = (VaccinationEvent) e;
 					evt.setID(vev.getPosition());
@@ -139,18 +138,15 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					EvaluationsType evalst = new EvaluationsType();
 					for(ExpectedEvaluation exe : evals){
 						EvaluationType et = new EvaluationType();
-						if(exe.getStatus().equals(EvaluationStatus.VALID)){
-							et.setStatus(StatusType.VALID);
-						}
-						else {
-							et.setStatus(StatusType.INVALID);
-						}
+						et.setStatus(toXMLStatus(exe.getStatus()));
+						
 						if(exe.getReason() != null){
 							EvaluationReasonType evrt = new EvaluationReasonType();
 							evrt.setCode(exe.getReason().name());
 							evrt.setValue(exe.getReason().getDetails());
 							et.setEvaluationReason(evrt);
 						}
+						
 						VaccineType vte = new VaccineType();
 						vte.setCvx(exe.getRelatedTo().getCvx());
 						vte.setName(exe.getRelatedTo().getName());
@@ -172,6 +168,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					ft.setEarliest(date(ef.getEarliest()));
 					ft.setRecommended(date(ef.getRecommended()));
 					ft.setPastDue(date(ef.getPastDue()));
+					ft.setLatest(date(ef.getComplete()));
 					ft.setForecastReason(ef.getForecastReason());
 					
 					if(ef.getSerieStatus() != null){
@@ -207,6 +204,13 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 		return null;
 	}
 	
+	private String eventType(Event e) {
+		if(e instanceof VaccinationEvent)
+			return "VACCINATION";
+		else
+			return "";
+	}
+
 	public XMLGregorianCalendar date(java.util.Date d) throws DatatypeConfigurationException{
 		GregorianCalendar gregory = new GregorianCalendar();
 		gregory.setTime(d);
@@ -270,7 +274,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				rdr.setYear(rt.getYears());
 				rdr.setPosition(DatePosition.valueOf(rt.getRelativeTo().getPosition()));
 				if(rt.getRelativeTo() != null){
-					if(rt.getRelativeTo().getReference() == "VACCINATION"){
+					if(rt.getRelativeTo().getReference().equals("VACCINATION")){
 						rdr.setRelativeTo(new VaccineDateReference(rt.getRelativeTo().getId()));
 					}
 					else{
@@ -317,12 +321,15 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			tc.setName(tcp.getName());
 			tc.setDescription(tcp.getDescription());
 			tc.setDateType(gov.nist.healthcare.cds.enumeration.DateType.valueOf(tcp.getDateType()));
-			tc.setEvalDate(date(tcp.getEvaluationDate()));
+			tc.setEvalDate(date(tcp.getAssessmentDate()));
 			if(tcp.getGroup() != null && !tcp.getGroup().isEmpty()){
 				tc.setGroupTag(tcp.getGroup());
 			}
 			if(tcp.getUID() != null && !tcp.getUID().isEmpty()){
 				tc.setUid(tcp.getUID());
+			}
+			else {
+				tc.setUid("");
 			}
 			
 			MetaData md;
@@ -354,7 +361,6 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 				for(EventType e : etl){
 					VaccinationEvent vev = new VaccinationEvent();
 					vev.setPosition(e.getID());
-					vev.setType(gov.nist.healthcare.cds.enumeration.EventType.valueOf(e.getType()));
 					vev.setDate(date(e.getEventDate()));
 					
 					if(e.getAdministred().getMvx() != null && !e.getAdministred().getMvx().isEmpty()){
@@ -380,12 +386,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 						List<EvaluationType> evtl = evalst.getEvaluation();
 						for(EvaluationType exe : evtl){
 							ExpectedEvaluation expe = new ExpectedEvaluation();
-							if(exe.getStatus().equals(StatusType.VALID)){
-								expe.setStatus(EvaluationStatus.VALID);
-							}
-							else {
-								expe.setStatus(EvaluationStatus.INVALID);
-							}
+							expe.setStatus(fromXMLStatus(exe.getStatus()));
 							
 							if(exe.getEvaluationReason() != null){
 								expe.setReason(EvaluationReason.valueOf(exe.getEvaluationReason().getCode()));
@@ -415,6 +416,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					ef.setEarliest(date(ft.getEarliest()));
 					ef.setRecommended(date(ft.getRecommended()));
 					ef.setPastDue(date(ft.getPastDue()));
+					ef.setComplete(date(ft.getLatest()));
 					ef.setForecastReason(ft.getForecastReason());
 					if(ft.getSerieStatus() != null){
 						ef.setSerieStatus(SerieStatus.valueOf(ft.getSerieStatus().getCode()));
@@ -445,6 +447,26 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 		}
 		
 		return null;
+	}
+	
+	public StatusType toXMLStatus(EvaluationStatus es){
+		switch(es){
+		case VALID : return StatusType.VALID;
+		case INVALID : return StatusType.INVALID;
+		case SUBSTANDARD : return StatusType.SUBSTANDARD;
+		case EXTRANEOUS : return StatusType.EXTRANEOUS;
+		default : return null;
+		}
+	}
+	
+	public EvaluationStatus fromXMLStatus(StatusType es){
+		switch(es){
+		case VALID : return EvaluationStatus.VALID;
+		case INVALID : return EvaluationStatus.INVALID;
+		case SUBSTANDARD : return EvaluationStatus.SUBSTANDARD;
+		case EXTRANEOUS : return EvaluationStatus.EXTRANEOUS;
+		default : return null;
+		}
 	}
 
 	@Override
