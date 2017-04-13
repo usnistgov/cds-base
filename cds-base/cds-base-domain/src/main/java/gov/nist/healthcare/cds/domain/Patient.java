@@ -12,53 +12,21 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@Entity
 public class Patient implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3581693775619531483L;
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String id;
-	private String firstName;
-	private String lastName;
-	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+	@NotNull(message = "Patient Date of Birth is required")
 	private Date dob;
-	@Enumerated(EnumType.STRING)
+	@NotNull(message = "Patient Gender is required")
 	private Gender gender;
-	@OneToOne
-	private TestCase testCase;
 	
-	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	public TestCase getTestCase() {
-		return testCase;
-	}
-	public void setTestCase(TestCase testCase) {
-		this.testCase = testCase;
-	}
 	public Date getDob() {
 		return dob;
 	}
@@ -76,21 +44,6 @@ public class Patient implements Serializable {
 	{ 
 	    return ToStringBuilder.reflectionToString(this); 
 	}
-	
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (id == null || obj == null || getClass() != obj.getClass())
-            return false;
-        Patient that = (Patient) obj;
-        return id.equals(that.id);
-    }
-    
-    @Override
-    public int hashCode() {
-        return id == null ? 0 : id.hashCode();
-    }
 	
 	
 }

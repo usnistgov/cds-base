@@ -1,52 +1,110 @@
 package gov.nist.healthcare.cds.auth.domain;
 
 import java.util.Set;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity
+
+@Document
 public class Account {
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
-	private Long id;
-	@Column(nullable=false)
+	private String id;
+//	@Column(nullable=false)
 	private String username;
-	@Column(nullable=false)
+//	@Column(nullable=false)
 	private String password;
 //	@Column(nullable=false)
+
 	private String email;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-	@JoinTable(name = "AccountRole",
-			   joinColumns = @JoinColumn(
-					   name = "accountId",
-					   referencedColumnName = "id"),
-				inverseJoinColumns = @JoinColumn(
-						name = "roleId",
-						referencedColumnName = "id"))
+	private boolean pending = false;
+
+	private String accountType;
+
+	private String fullName;
+
+	private String organization;
+	
+	private Boolean signedConfidentialityAgreement = false;
+
+	@DBRef
 	private Set<Privilege> privileges;
 	
 	public Account(){
 		
 	}
 	
-	
-	public Long getId() {
+	public String getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+
+	public boolean isPending() {
+		return pending;
+	}
+
+
+
+	public void setPending(boolean pending) {
+		this.pending = pending;
+	}
+
+
+
+	public String getAccountType() {
+		return accountType;
+	}
+
+
+
+	public void setAccountType(String accountType) {
+		this.accountType = accountType;
+	}
+
+
+
+	public String getFullName() {
+		return fullName;
+	}
+
+
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+
+	public Boolean getSignedConfidentialityAgreement() {
+		return signedConfidentialityAgreement;
+	}
+
+
+
+	public void setSignedConfidentialityAgreement(Boolean signedConfidentialityAgreement) {
+		this.signedConfidentialityAgreement = signedConfidentialityAgreement;
+	}
+
+
+
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+
+
+
+	public void setId(String id) {
 		this.id = id;
 	}
+
+
+
 	public String getUsername() {
 		return username;
 	}

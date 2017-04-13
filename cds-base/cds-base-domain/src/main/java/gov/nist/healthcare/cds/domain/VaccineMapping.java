@@ -14,27 +14,25 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-@Entity
+@Document
 public class VaccineMapping implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5456108710476579961L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
 
-	@OneToOne
+	@Id
+	private String id;
+
+	@DBRef
 	private Vaccine vx;
 	
-	@ManyToMany(cascade={CascadeType.REFRESH}, fetch = FetchType.EAGER)
+	@DBRef
 	private Set<VaccineGroup> groups;
 	
 	@JsonManagedReference
-	@OneToMany(cascade={CascadeType.REFRESH}, fetch = FetchType.EAGER,  orphanRemoval = true)
+	@DBRef
 	private Set<Product> products;
 	
 	private boolean isGroup;
@@ -91,5 +89,11 @@ public class VaccineMapping implements Serializable {
     public int hashCode() {
         return vx == null ? 0 : vx.hashCode();
     }
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	
 }

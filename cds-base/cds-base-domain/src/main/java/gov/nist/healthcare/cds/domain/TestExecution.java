@@ -1,18 +1,12 @@
 package gov.nist.healthcare.cds.domain;
 
+import gov.nist.healthcare.cds.domain.wrapper.Report;
+
 import java.io.Serializable;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
-@Entity
 public class TestExecution implements Serializable {
 
 	/**
@@ -20,64 +14,31 @@ public class TestExecution implements Serializable {
 	 */
 	private static final long serialVersionUID = 7707759373751607645L;
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-	@OneToOne(cascade = CascadeType.ALL, optional = false)
-	private TestCase testCase;
-	@OneToOne(cascade = CascadeType.ALL, optional = false)
-	private FixedDate executionDate;
-	@OneToOne(cascade = CascadeType.ALL, optional = false)
-	private FixedDate evalDate;
-	@OneToOne(cascade = CascadeType.ALL, optional = false)
-	private FixedDate patientDOB;
-	@OneToOne(cascade = CascadeType.ALL, optional = false)
+	private java.util.Date executionDate;
 	private SoftwareConfig software;
-	private String textResponse;
-	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-	private Set<ActualForecast> forecasts;
+	private List<Report> reports;
+
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public TestCase getTestCase() {
-		return testCase;
-	}
-	public void setTestCase(TestCase testCase) {
-		this.testCase = testCase;
-	}
-	public FixedDate getExecutionDate() {
-		return executionDate;
-	}
-	public void setExecutionDate(FixedDate executionDate) {
-		this.executionDate = executionDate;
-	}
-	public FixedDate getEvalDate() {
-		return evalDate;
-	}
-	public void setEvalDate(FixedDate evalDate) {
-		this.evalDate = evalDate;
-	}
-	public FixedDate getPatientDOB() {
-		return patientDOB;
-	}
-	public void setPatientDOB(FixedDate patientDOB) {
-		this.patientDOB = patientDOB;
-	}
 	public SoftwareConfig getSoftware() {
 		return software;
 	}
 	public void setSoftware(SoftwareConfig software) {
 		this.software = software;
 	}
-	public String getTextResponse() {
-		return textResponse;
+	public java.util.Date getExecutionDate() {
+		return executionDate;
 	}
-	public void setTextResponse(String textResponse) {
-		this.textResponse = textResponse;
+	public void setExecutionDate(java.util.Date executionDate) {
+		this.executionDate = executionDate;
+	}
+	public List<Report> getReports() {
+		if(reports == null){
+			reports = new ArrayList<Report>();
+		}
+		return reports;
+	}
+	public void setReports(List<Report> reports) {
+		this.reports = reports;
 	}
 	
 }

@@ -6,11 +6,14 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@Entity
-@DiscriminatorValue("SPECIFIC")
+@Document
 @JsonTypeName("specific")
 public class Product extends Injection implements Serializable {
 
@@ -18,10 +21,9 @@ public class Product extends Injection implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -4331540454494356651L;
-	@JsonBackReference
-	@ManyToOne
+	@DBRef
 	private Vaccine vx;
-	@ManyToOne
+	@DBRef
 	private Manufacturer mx;
 	private String name;
 

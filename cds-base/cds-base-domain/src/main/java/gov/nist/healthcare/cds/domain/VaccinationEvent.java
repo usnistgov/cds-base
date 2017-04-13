@@ -8,34 +8,36 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@Entity
-@DiscriminatorValue("VACCINATION")
 @JsonTypeName("vaccination")
 public class VaccinationEvent extends Event {
 
 	private int doseNumber = 1;
-	private String MVX;
-	@ManyToOne
+	@NotNull(message = "Administred Vaccine is required")
+	@Valid
 	private Injection administred;
-	@OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+	@Valid
 	private Set<ExpectedEvaluation> evaluations;
+	private int position;
 	
+	public int getPosition() {
+		return position;
+	}
+	public void setPosition(int position) {
+		this.position = position;
+	}
 	public int getDoseNumber() {
 		return doseNumber;
 	}
 	public void setDoseNumber(int doseNumber) {
 		this.doseNumber = doseNumber;
-	}
-	public String getMVX() {
-		return MVX;
-	}
-	public void setMVX(String mVX) {
-		MVX = mVX;
 	}
 	public Injection getAdministred() {
 		return administred;

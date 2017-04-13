@@ -2,10 +2,10 @@ package gov.nist.healthcare.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document
 public class Manufacturer implements Serializable {
 
 	@Id
@@ -24,7 +24,5 @@ public class Manufacturer implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
-	
+		
 }

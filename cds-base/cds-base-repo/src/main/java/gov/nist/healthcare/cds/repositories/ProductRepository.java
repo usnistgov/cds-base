@@ -2,14 +2,13 @@ package gov.nist.healthcare.cds.repositories;
 
 import gov.nist.healthcare.cds.domain.Product;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, String>{
+public interface ProductRepository extends MongoRepository<Product, String>{
 
-	@Query("select p from Product p where p.mx.mvx = :mvx and p.vx.id = :cvx")
-	public Product getProduct(@Param("mvx") String mvx,@Param("cvx") String cvx);
+	@Query("{ 'mx.$id' : ?0 , 'vx.$id' : ?1 }")
+	public Product getProduct(String mvx,String cvx);
 }

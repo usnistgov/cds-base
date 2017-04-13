@@ -1,25 +1,23 @@
 package gov.nist.healthcare.cds.auth.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
 
-@Entity
+@Document
 public class Privilege {
 
 	@Id
-	private Long Id;
-	@Column(nullable=false)
+	private String Id;
 	private String role;
 	
 	public Privilege(){
 		
 	}
 	
-	public Long getId() {
+	public String getId() {
 		return Id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		Id = id;
 	}
 	public String getRole() {

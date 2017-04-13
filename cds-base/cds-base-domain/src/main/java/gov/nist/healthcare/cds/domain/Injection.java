@@ -1,21 +1,16 @@
 package gov.nist.healthcare.cds.domain;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import javax.persistence.Transient;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@DiscriminatorColumn(name="INJECTION_TYPE")
+@Document
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -26,8 +21,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public abstract class Injection {
 
-	@JsonProperty(value = "discriminator") private String type;
+	@Transient
+	@JsonProperty(value = "discriminator") 
+	private String type;
+	
 	@Id
+	@Indexed
 	protected String id;
 
 	public String getType() {
