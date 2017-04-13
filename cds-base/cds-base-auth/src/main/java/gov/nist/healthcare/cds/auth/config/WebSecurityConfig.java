@@ -83,20 +83,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 							 response.setStatus(HttpServletResponse.SC_OK);
 							 response.sendRedirect("/fits");
 						}
-					}).deleteCookies("JSESSIONID").invalidateHttpSession(true)
+					})
 			.and()
 				.sessionManagement()
 					.maximumSessions(1);
 		http
 			.csrf()
 				.disable();
-	}
-	
-	@Bean
-	public HttpSessionEventPublisher httpSessionEventPublisher() {
-	    return new HttpSessionEventPublisher();
-	}
-	
-	
+	}	
 	
 }
