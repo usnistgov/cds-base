@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import gov.nist.healthcare.cds.domain.Date;
 import gov.nist.healthcare.cds.domain.Event;
+import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.domain.RelativeDate;
 import gov.nist.healthcare.cds.domain.RelativeDateRule;
@@ -170,6 +171,38 @@ public class SimpleDateService implements DateService {
 	@Override
 	public boolean same(java.util.Date d1, java.util.Date d2) {
 		return d1.compareTo(d2) == 0;
+	}
+
+	@Override
+	public void toFixed(TestCase tc, java.util.Date today) {
+		
+		ResolvedDates dates = this.resolveDates(tc, today);
+		tc.getPatient().setDob(fixed(dates.getDob()));
+		tc.setEvalDate(fixed(dates.getEval()));
+		
+		for(Event e : tc.getEvents()){
+			if(e instanceof VaccinationEvent){
+				VaccinationEvent ve = (VaccinationEvent) e;
+				java.util.Date dA = dates.getEvents().get(ve.getPosition());
+				ve.setDate(fixed(dA));
+			}
+		}
+		for(ExpectedForecast fc : tc.getForecast()){
+		
+			if(fc.getEarliest() != null)
+				fc.setEarliest(fixed(fix(dates, fc.getEarliest())));
+			if(fc.getRecommended() != null)
+				fc.setRecommended(fixed(fix(dates, fc.getRecommended())));
+			if(fc.getPastDue() != null)
+				fc.setPastDue(fixed(fix(dates, fc.getPastDue())));
+			if(fc.getComplete() != null)
+				fc.setComplete(fixed(fix(dates, fc.getComplete())));
+			
+		}
+	}
+	
+	public FixedDate fixed(java.util.Date date){
+		return new FixedDate(date);
 	}
 
 }

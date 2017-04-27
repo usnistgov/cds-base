@@ -1,9 +1,9 @@
 package gov.nist.healthcare.cds.service.impl.transformation;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +47,9 @@ import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.VaccineDateReference;
 import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
+import gov.nist.healthcare.cds.domain.wrapper.ImportConfig;
 import gov.nist.healthcare.cds.domain.wrapper.MetaData;
+import gov.nist.healthcare.cds.domain.wrapper.TransformResult;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 import gov.nist.healthcare.cds.domain.xml.beans.*;
 import gov.nist.healthcare.cds.enumeration.DatePosition;
@@ -58,11 +60,11 @@ import gov.nist.healthcare.cds.enumeration.RelativeTo;
 import gov.nist.healthcare.cds.enumeration.SerieStatus;
 import gov.nist.healthcare.cds.repositories.ProductRepository;
 import gov.nist.healthcare.cds.repositories.VaccineRepository;
+import gov.nist.healthcare.cds.service.FormatService;
 import gov.nist.healthcare.cds.service.MetaDataService;
-import gov.nist.healthcare.cds.service.NISTFormatService;
 
 @Service
-public class NISTFormatServiceImpl implements NISTFormatService {
+public class NISTFormatServiceImpl implements FormatService {
 
 	@Autowired
 	private VaccineRepository vaccineRepository;
@@ -76,7 +78,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 	final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	
 	@Override
-	public String _export(TestCase tc) {
+	public InputStream _exportOne(TestCase tc) {
 		try {
 			gov.nist.healthcare.cds.domain.xml.beans.TestCase tcp = new gov.nist.healthcare.cds.domain.xml.beans.TestCase();
 			tcp.setName(tc.getName());
@@ -288,7 +290,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 		return null;
 	}
 	
-	private String objToString(gov.nist.healthcare.cds.domain.xml.beans.TestCase r)
+	private ByteArrayInputStream objToString(gov.nist.healthcare.cds.domain.xml.beans.TestCase r)
 			throws JAXBException, UnsupportedEncodingException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		String context = "gov.nist.healthcare.cds.domain.xml.beans";
@@ -297,23 +299,23 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 		Marshaller m = jc.createMarshaller();
 		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		m.marshal(r, baos);
-		return new String(baos.toByteArray(), "UTF-8");
+		return new ByteArrayInputStream(baos.toByteArray());
 	}
 	
-	private gov.nist.healthcare.cds.domain.xml.beans.TestCase stringToObj(String r)
-			throws JAXBException, UnsupportedEncodingException {
+	private gov.nist.healthcare.cds.domain.xml.beans.TestCase stringToObj(InputStream r)
+			throws JAXBException {
 		JAXBContext jc = JAXBContext
 				.newInstance("gov.nist.healthcare.cds.domain.xml.beans");
 		Unmarshaller u = jc.createUnmarshaller();
-		StringReader reader = new StringReader(r);
-		gov.nist.healthcare.cds.domain.xml.beans.TestCase o = (gov.nist.healthcare.cds.domain.xml.beans.TestCase) u.unmarshal(reader);
+		gov.nist.healthcare.cds.domain.xml.beans.TestCase o = (gov.nist.healthcare.cds.domain.xml.beans.TestCase) u.unmarshal(r);
 		return o;
 	}
 
 	@Override
-	public TestCase _import(String file) throws VaccineNotFoundException {
+	public TransformResult _import(InputStream stream, ImportConfig config) {
+		TransformResult transform = new TransformResult();
 		try {
-			gov.nist.healthcare.cds.domain.xml.beans.TestCase tcp = this.stringToObj(file);
+			gov.nist.healthcare.cds.domain.xml.beans.TestCase tcp = this.stringToObj(stream);
 			if(tcp == null){
 				return null;
 			}
@@ -437,16 +439,23 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			tc.setForecast(efs);
 			tc.setEvents(evs);
 			
-			return tc;
+			 transform.add(tc);
 		}
-//		catch(VaccineNotFoundException vne){
-//			throw vne;
-//		}
-		catch(Exception e){
-			e.printStackTrace();
+		catch(VaccineNotFoundException v){
+			transform.add(new ErrorModel(0,0,"Vaccine", "CVX not found in database : "+v.getCvx()));
+		}
+		catch(ProductNotFoundException p){
+			transform.add(new ErrorModel(0,0,"Product", "Product not found in database cvx : "+p.getCvx()+" mvx : "+p.getMvx()));
+		} 
+		catch (DatatypeConfigurationException e) {
+			transform.add(new ErrorModel(0,0,"Date", "Invalid Date Format"));
+		} catch (JAXBException e1) {
+			transform.add(new ErrorModel(0,0,"File Format", "Invalid File Format"));
 		}
 		
-		return null;
+		transform.setTotalTC(1);
+		return transform;
+		
 	}
 	
 	public StatusType toXMLStatus(EvaluationStatus es){
@@ -470,11 +479,10 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 	}
 
 	@Override
-	public List<ErrorModel> _validate(String file) {
+	public List<ErrorModel> _validate(InputStream stream) {
 		try {
 			InputStream schu = NISTFormatServiceImpl.class.getResourceAsStream("/schema/testCase.xsd");
 			SchemaFactory factory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
-			StringReader reader = new StringReader(file);
 			Schema schema;
 			schema = factory.newSchema(new StreamSource(schu));
 			Validator validator = schema.newValidator();
@@ -499,7 +507,7 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 					errors.add(new ErrorModel(exception));
 				}
 			});
-			validator.validate(new StreamSource(reader));
+			validator.validate(new StreamSource(stream));
 			return errors;
 		} catch (SAXParseException e) {
 			return Arrays.asList(new ErrorModel(e));
@@ -510,6 +518,16 @@ public class NISTFormatServiceImpl implements NISTFormatService {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	public String formatName() {
+		return "nist";
+	}
+
+	@Override
+	public InputStream _exportAll(List<TestCase> tc) {
+		return null;
 	}
 
 }

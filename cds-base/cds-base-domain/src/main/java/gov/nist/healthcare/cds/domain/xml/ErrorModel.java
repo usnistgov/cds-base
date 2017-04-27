@@ -5,6 +5,7 @@ import org.xml.sax.SAXParseException;
 public class ErrorModel {
 	private int line;
 	private int column;
+	private String location;
 	private String message;
 	
 	
@@ -14,6 +15,13 @@ public class ErrorModel {
 		// TODO Auto-generated constructor stub
 	}
 	
+	public ErrorModel(int line, int column, String location, String message) {
+		super();
+		this.line = line;
+		this.column = column;
+		this.location = location;
+		this.message = message;
+	}
 	
 	public ErrorModel(int line, int column, String message) {
 		super();
@@ -28,6 +36,14 @@ public class ErrorModel {
 		this.column = e.getColumnNumber();
 		String msg = e.getMessage();
 		this.message = msg.substring(msg.indexOf(":") + 2);
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	public int getLine() {

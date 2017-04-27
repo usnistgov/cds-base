@@ -14,27 +14,26 @@ public class DefaultSaveService implements SaveService {
 
 	@Autowired
 	private TestCaseSaver tcSave;
-	
+
 	@Autowired
 	private TestPlanSaver tpSave;
-	
+
 	@Autowired
 	private TestCaseGroupSaver tgSave;
-	
-	
+
 	@Override
 	public TestCase saveTC(TestCase testCase, String user) throws IllegalSave {
 		return tcSave.saveEntity(testCase, user);
 	}
 
 	@Override
-	public TestPlan saveTP(TestPlan testPlan,String user) throws IllegalSave {
+	public TestPlan saveTP(TestPlan testPlan, String user) throws IllegalSave {
 		return tpSave.saveEntity(testPlan, user);
 	}
 
 	@Override
-	public TestCaseGroup saveTG(TestCaseGroup testCaseGroup,String user) throws IllegalSave {
+	public TestCaseGroup saveTG(TestCaseGroup testCaseGroup, String user) throws IllegalSave {
 		return tgSave.saveEntity(testCaseGroup, user);
 	}
-	
+
 }

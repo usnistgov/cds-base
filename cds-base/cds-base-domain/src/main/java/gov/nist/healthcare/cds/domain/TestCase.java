@@ -19,10 +19,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Document
 public class TestCase extends Entity implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3584107174102855533L;
+	
 	@NotBlank(message = "TestCase name is required and can't be empty")
 	private String name;
 	private String uid;
 	private String description;
+	private String evaluationType;
+	private String forecastType;
 	@NotNull(message = "Dates Type is required and can't be empty")
 	private DateType dateType;
 	@NotNull(message = "Patient information are required")
@@ -48,6 +55,23 @@ public class TestCase extends Entity implements Serializable {
 	public List<ModelError> getErrors() {
 		return errors;
 	}
+	
+	public String getEvaluationType() {
+		return evaluationType;
+	}
+
+	public void setEvaluationType(String evaluationType) {
+		this.evaluationType = evaluationType;
+	}
+
+	public String getForecastType() {
+		return forecastType;
+	}
+
+	public void setForecastType(String forecastType) {
+		this.forecastType = forecastType;
+	}
+
 	public void setErrors(List<ModelError> errors) {
 		this.errors = errors;
 	}
