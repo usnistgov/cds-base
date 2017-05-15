@@ -6,18 +6,12 @@
 package gov.nist.fhir.client.ir;
 
 import ca.uhn.fhir.context.FhirContext;
-import fhir.util.DeSerialize;
-import fhir.util.FHIRUtil;
-import fhir.util.Serialize;
+import gov.nist.fhir.Consts;
 import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
-import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -26,11 +20,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NoHttpResponseException;
@@ -40,81 +32,59 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.eclipse.emf.common.util.EList;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.xmi.impl.XMLHelperImpl;
-import org.emfjson.jackson.annotations.EcoreReferenceInfo;
-
-import org.hl7.fhir.Bundle;
-import org.hl7.fhir.Code;
-import org.hl7.fhir.CodeableConcept;
-import org.hl7.fhir.Coding;
-import org.hl7.fhir.Date;
-import org.hl7.fhir.DateTime;
-import org.hl7.fhir.FhirFactory;
-import org.hl7.fhir.Id;
-import org.hl7.fhir.Parameters;
-import org.hl7.fhir.ParametersParameter;
-import org.hl7.fhir.Patient;
-import org.hl7.fhir.Reference;
-import org.hl7.fhir.ResourceContainer;
 import org.hl7.fhir.dstu3.model.DateType;
 import org.hl7.fhir.dstu3.model.Enumerations;
-import org.hl7.fhir.dstu3.model.Type;
-import org.hl7.fhir.exceptions.FHIRException;
-import org.hl7.fhir.impl.BundleImpl;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
  *
  * @author mccaffrey
  */
 public class ImmunizationRecommendationClient {
-
+/*
     public static final String PARAMETER_NAME_GENDER = "gender";
-    public static final String PARAMETER_NAME_BIRTH_DATE = "birthDate";
-    public static final String PARAMETER_NAME_SERVICE_TYPE = "serviceType";
-    public static final String PARAMETER_NAME_SERVICE_URL = "serviceURL";
-    public static final String PARAMETER_NAME_ASSESSMENT_DATE = "assessmentDate";
-    public static final String PARAMETER_NAME_IMMUNIZATION = "Immunization";
-    public static final String PARAMETER_NAME_IMMUNIZATION_ADAPTER = "Immunizations";
-    public static final String PARAMETER_NAME_PATIENT = "patient";
-
+    public static final String Consts.PARAMETER_NAME_BIRTH_DATE = "birthDate";
+    public static final String Consts.PARAMETER_NAME_SERVICE_TYPE = "serviceType";
+    public static final String Consts.PARAMETER_NAME_SERVICE_URL = "serviceURL";
+    public static final String Consts.PARAMETER_NAME_ASSESSMENT_DATE = "assessmentDate";
+    public static final String Consts.PARAMETER_NAME_IMMUNIZATION = "Immunization";
+    public static final String Consts.PARAMETER_NAME_IMMUNIZATION_ADAPTER = "Immunizations";
+    public static final String Consts.PARAMETER_NAME_PATIENT = "patient";
+*/
     public static String generateXml(Routing routing, SendingConfig sendingConfig, boolean useAdapter) {
 
-        Parameters parameters = FhirFactory.eINSTANCE.createParameters();
-        Id id = FhirFactory.eINSTANCE.createId();
-        id.setValue(UUID.randomUUID().toString());
-        parameters.setId(id);
+       // Parameters parameters = FhirFactory.eINSTANCE.createParameters();
+        //Id id = FhirFactory.eINSTANCE.createId();
+        //id.setValue(UUID.randomUUID().toString());
+        //parameters.setId(id);
 
-        Date dobValue = FhirFactory.eINSTANCE.createDate();
-        dobValue.setValue(FHIRUtil.convert2XMLCalendar(sendingConfig.getBirthdate()));
-        Id patientId = FhirFactory.eINSTANCE.createId();
-        patientId.setValue(UUID.randomUUID().toString());
+        //Date dobValue = FhirFactory.eINSTANCE.createDate();
+        //dobValue.setValue(FHIRUtil.convert2XMLCalendar(sendingConfig.getBirthdate()));
+        String patientId = UUID.randomUUID().toString();
+        //patientId.setValue(UUID.randomUUID().toString());
 
         FhirContext ctx = FhirContext.forDstu3();
         org.hl7.fhir.dstu3.model.Parameters parametersFhir = new org.hl7.fhir.dstu3.model.Parameters();
-
+/*
         if (useAdapter) {
             ParametersParameter genderParameter = FhirFactory.eINSTANCE.createParametersParameter();
-            genderParameter.setName(FHIRUtil.convert(PARAMETER_NAME_GENDER));
+            genderParameter.setName(FHIRUtil.convert(Consts.PARAMETER_NAME_GENDER));
             Code genderValue = FhirFactory.eINSTANCE.createCode();
             genderValue.setValue(sendingConfig.getGender().toLowerCase());
             genderParameter.setValueCode(genderValue);
             parameters.getParameter().add(genderParameter);
 
             ParametersParameter dobParameter = FhirFactory.eINSTANCE.createParametersParameter();
-            dobParameter.setName(FHIRUtil.convert(PARAMETER_NAME_BIRTH_DATE));
+            dobParameter.setName(FHIRUtil.convert(Consts.PARAMETER_NAME_BIRTH_DATE));
 
             dobParameter.setValueDate(dobValue);
             parameters.getParameter().add(dobParameter);
         } else {
+        */
             /*
             ParametersParameter patientParameter = FhirFactory.eINSTANCE.createParametersParameter();
-            patientParameter.setName(FHIRUtil.convert(PARAMETER_NAME_PATIENT));
+            patientParameter.setName(FHIRUtil.convert(Consts.PARAMETER_NAME_PATIENT));
             Patient patient = FhirFactory.eINSTANCE.createPatient();
             patient.setId(patientId);
             Code genderCode = FhirFactory.eINSTANCE.createCode();
@@ -127,9 +97,9 @@ public class ImmunizationRecommendationClient {
             parameters.getParameter().add(patientParameter);
              */
             org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent patientParametersParameterFhir = new org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent();
-            patientParametersParameterFhir.setName(PARAMETER_NAME_PATIENT);
+            patientParametersParameterFhir.setName(Consts.PARAMETER_NAME_PATIENT);
             org.hl7.fhir.dstu3.model.Patient patientFhir = new org.hl7.fhir.dstu3.model.Patient();
-            patientFhir.setId(patientId.getValue());
+            patientFhir.setId(patientId);
             char gender = sendingConfig.getGender().toLowerCase().charAt(0);
             switch (gender) {
                 case 'm':
@@ -158,36 +128,55 @@ public class ImmunizationRecommendationClient {
             }                        
             patientParametersParameterFhir.setResource(patientFhir);            
             parametersFhir.addParameter(patientParametersParameterFhir);                                    
-        }
+      //  }
 
         if (useAdapter) {
+            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent serviceTypeParameterFhir = new org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent();
+            serviceTypeParameterFhir.setName(Consts.PARAMETER_NAME_SERVICE_TYPE);
+            
+            org.hl7.fhir.dstu3.model.StringType serviceTypeString = new org.hl7.fhir.dstu3.model.StringType();
+            serviceTypeString.setValue(routing.getForecastType());
+            serviceTypeParameterFhir.setValue(serviceTypeString);
+            parametersFhir.addParameter(serviceTypeParameterFhir);
+                    
+            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent serviceUrlParameterFhir = new org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent();        
+            serviceUrlParameterFhir.setName(Consts.PARAMETER_NAME_SERVICE_URL);
+            org.hl7.fhir.dstu3.model.StringType serviceUrlString = new org.hl7.fhir.dstu3.model.StringType();
+            serviceUrlString.setValue(routing.getForecastUrl());
+            serviceUrlParameterFhir.setValue(serviceUrlString);
+            parametersFhir.addParameter(serviceUrlParameterFhir);
+            
+            /*
+                    
             ParametersParameter serviceTypeParameter = FhirFactory.eINSTANCE.createParametersParameter();
-            serviceTypeParameter.setName(FHIRUtil.convert(PARAMETER_NAME_SERVICE_TYPE));
+            serviceTypeParameter.setName(FHIRUtil.convert(Consts.PARAMETER_NAME_SERVICE_TYPE));
             org.hl7.fhir.String serviceTypeString = FhirFactory.eINSTANCE.createString();
             serviceTypeString.setValue(routing.getForecastType());
             serviceTypeParameter.setValueString(serviceTypeString);
             parameters.getParameter().add(serviceTypeParameter);
 
             ParametersParameter serviceUrlParameter = FhirFactory.eINSTANCE.createParametersParameter();
-            serviceUrlParameter.setName(FHIRUtil.convert(PARAMETER_NAME_SERVICE_URL));
+            serviceUrlParameter.setName(FHIRUtil.convert(Consts.PARAMETER_NAME_SERVICE_URL));
             org.hl7.fhir.String serviceUrlString = FhirFactory.eINSTANCE.createString();
             serviceUrlString.setValue(routing.getForecastUrl());
             serviceUrlParameter.setValueString(serviceUrlString);
             parameters.getParameter().add(serviceUrlParameter);
+            */
         }
 
-        if(useAdapter) {
+       /* if(useAdapter) {
         
-        ParametersParameter assessmentDateParameter = FhirFactory.eINSTANCE.createParametersParameter();
-        assessmentDateParameter.setName(FHIRUtil.convert(PARAMETER_NAME_ASSESSMENT_DATE));
-        Date assessmentDateValue = FhirFactory.eINSTANCE.createDate();
-        assessmentDateValue.setValue(FHIRUtil.convert2XMLCalendar(sendingConfig.getAssessmentDate()));
-        assessmentDateParameter.setValueDate(assessmentDateValue);
-        parameters.getParameter().add(assessmentDateParameter);
+            ParametersParameter assessmentDateParameter = FhirFactory.eINSTANCE.createParametersParameter();
+            assessmentDateParameter.setName(FHIRUtil.convert(Consts.PARAMETER_NAME_ASSESSMENT_DATE));
+            Date assessmentDateValue = FhirFactory.eINSTANCE.createDate();
+            assessmentDateValue.setValue(FHIRUtil.convert2XMLCalendar(sendingConfig.getAssessmentDate()));
+            assessmentDateParameter.setValueDate(assessmentDateValue);
+            parameters.getParameter().add(assessmentDateParameter);
 
         } else {
+        */
             org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent assessmentDateParametersParameterFhir = new org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent();            
-            assessmentDateParametersParameterFhir.setName(PARAMETER_NAME_ASSESSMENT_DATE);
+            assessmentDateParametersParameterFhir.setName(Consts.PARAMETER_NAME_ASSESSMENT_DATE);
             DateType assessmentDateFhir = new DateType();
             
             
@@ -207,14 +196,14 @@ public class ImmunizationRecommendationClient {
             }
             parametersFhir.addParameter(assessmentDateParametersParameterFhir);    
             
-        }
-        
+     //   }
+        /*
         if (useAdapter) {
 
             Collection<Immunization> immunizations = sendingConfig.getImmunizationData();
             if (immunizations != null) {
                 ParametersParameter immunizationsParameter = FhirFactory.eINSTANCE.createParametersParameter();
-                immunizationsParameter.setName(FHIRUtil.convert(PARAMETER_NAME_IMMUNIZATION_ADAPTER));
+                immunizationsParameter.setName(FHIRUtil.convert(Consts.PARAMETER_NAME_IMMUNIZATION_ADAPTER));
                 Iterator<Immunization> iterator = immunizations.iterator();
                 int i = 0;
                 while (iterator.hasNext()) {
@@ -251,13 +240,14 @@ public class ImmunizationRecommendationClient {
                 parameters.getParameter().add(immunizationsParameter);
             }
         } else {
+     */
             Collection<Immunization> immunizations = sendingConfig.getImmunizationData();
             if (immunizations != null) {
                 Iterator<Immunization> it = immunizations.iterator();
                 while (it.hasNext()) {
                     Immunization immunization = it.next();
                     org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent immunizationParametersParameterFhir = new org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent();            
-                    immunizationParametersParameterFhir.setName(PARAMETER_NAME_IMMUNIZATION);
+                    immunizationParametersParameterFhir.setName(Consts.PARAMETER_NAME_IMMUNIZATION);
                     org.hl7.fhir.dstu3.model.Immunization immunizationFhir = new org.hl7.fhir.dstu3.model.Immunization();
                     immunizationFhir.setId(UUID.randomUUID().toString());
                     try {
@@ -275,7 +265,7 @@ public class ImmunizationRecommendationClient {
                     immunizationFhir.setVaccineCode(vaccineFhir);
                     immunizationFhir.setStatus(org.hl7.fhir.dstu3.model.Immunization.ImmunizationStatus.COMPLETED);
                     org.hl7.fhir.dstu3.model.Reference patientReference = new org.hl7.fhir.dstu3.model.Reference();
-                    patientReference.setReference(patientId.getValue());
+                    patientReference.setReference(patientId);
                     immunizationFhir.setPatient(patientReference);
                     immunizationFhir.setNotGiven(false);
                     immunizationParametersParameterFhir.setResource(immunizationFhir);
@@ -284,7 +274,7 @@ public class ImmunizationRecommendationClient {
                     //TODO: Reported???
                     
                     //ParametersParameter immParam = FhirFactory.eINSTANCE.createParametersParameter();
-                    //immParam.setName(FHIRUtil.convert(PARAMETER_NAME_IMMUNIZATION));
+                    //immParam.setName(FHIRUtil.convert(Consts.PARAMETER_NAME_IMMUNIZATION));
                     //ResourceContainer resource = FhirFactory.eINSTANCE.createResourceContainer();
                     //org.hl7.fhir.Immunization fhirImmunization = FhirFactory.eINSTANCE.createImmunization();
                     //Id immunizationId = FhirFactory.eINSTANCE.createId();
@@ -325,21 +315,21 @@ public class ImmunizationRecommendationClient {
             
           
             
-        }
+     //   }
 
         
         String xml = null;
         
-        if(useAdapter) {
-            Serialize seri = new Serialize();
-            xml = seri.it(parameters, "sut.xml");
-        } else {
+//        if(useAdapter) {
+  //          Serialize seri = new Serialize();
+    //        xml = seri.it(parameters, "sut.xml");
+      //  } else {
             xml = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(parametersFhir);
-        }
+//        }
         
 
         //       System.out.println(seri.it(patientParameter, "sut.xml"));
-        System.out.println("GENERATED OBJECT HERE ----->\n" + xml);
+        //System.out.println("GENERATED OBJECT HERE ----->\n" + xml);
         /*
         StringBuilder parameterXml = new StringBuilder();
         parameterXml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Parameters xmlns=\"http://hl7.org/fhir\">");
@@ -483,8 +473,7 @@ public class ImmunizationRecommendationClient {
         if (body.trim().isEmpty()) {
             throw new ConnectionException(null, "Empty message returned.");
         }
-        System.out.println(
-                "COMING BACK!!!! " + body);
+        //System.out.println("COMING BACK!!!! " + body);
 
         String xml = body.substring(body.indexOf("<"));
 
@@ -523,6 +512,7 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
         //TODO: This workaround is no longer needed.  Fix it.
         String xml = response.getPayload();
         Object s1 = null;
+        /*
         if(useAdapter) {
         DeSerialize deserial = new DeSerialize();
         s1 = deserial.it(new StringReader(xml), "*.xml");
@@ -586,13 +576,15 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
          */
         //   tempFile.delete();
         //return recommendations;
-        } else {
+       
+    //    } else {
+    
             FhirContext ctx = FhirContext.forDstu3();
             s1 = ctx.newXmlParser().parseResource(xml);
          //org.hl7.fhir.dstu3.model.Bundle bundle = new org.hl7.fhir.dstu3.model.Bundle();
          //bundle = (org.hl7.fhir.dstu3.model.Bundle) s2;
          //s1 = bundle;
-        }
+      //  }
         return s1;
         //return engineResponse;
 
@@ -628,7 +620,11 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
         imms.add(imm2);
 
         sendingConfig.setImmunizationData(imms);
-
+        
+         
+         
+        
+/*
         EObject bundle = (EObject) irc.getImmunizationRecommendation(routing, sendingConfig, false);
         //   Serialize ser = new Serialize();
 
@@ -651,24 +647,24 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
         rc.setImmunizationRecommendation(ir);
         param.setResource(rc);
 
-        Serialize ser = new Serialize();
-        String irString = ser.it(ir, "*.xml");
-        String paramsString = ser.it(params, "*.xml");
+      //  Serialize ser = new Serialize();
+//        String irString = ser.it(ir, "*.xml");
+  //      String paramsString = ser.it(params, "*.xml");
         //   String paramsString;
         //try {
-        paramsString = ser.it(params, "*.xml"); //ser.xmlFromParameter(params);
-        String paramString = ser.it(param, "*.xml");
-        String param2String = ser.it(param2, "*.xml");
+    //    paramsString = ser.it(params, "*.xml"); //ser.xmlFromParameter(params);
+      //  String paramString = ser.it(param, "*.xml");
+        //String param2String = ser.it(param2, "*.xml");
 
         // XMLHelperImpl.saveString(options, contents, irString, helper)
         //System.out.println(irString);
-        System.out.println(paramsString);
-        System.out.println(paramString);
-        System.out.println(param2String);
+        //System.out.println(paramsString);
+        //System.out.println(paramString);
+        //System.out.println(param2String);
         //} catch (ParserConfigurationException ex) {
 //            Logger.getLogger(ImmunizationRecommendationClient.class.getName()).log(Level.SEVERE, null, ex);
         //      }
-
+*/
     }
 
 }

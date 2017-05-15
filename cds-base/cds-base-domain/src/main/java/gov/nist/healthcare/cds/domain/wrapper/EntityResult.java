@@ -5,11 +5,18 @@ import java.util.List;
 
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 
-public class FileImportResult {
+public class EntityResult {
 
 	private String name;
 	private List<ErrorModel> errors;
 	
+	public EntityResult() {
+		super();
+	}
+	public EntityResult(String name) {
+		super();
+		this.name = name;
+	}
 	public String getName() {
 		return name;
 	}

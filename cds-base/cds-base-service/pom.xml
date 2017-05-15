@@ -30,6 +30,13 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+<!-- https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-pdf -->
+<dependency>
+    <groupId>org.xhtmlrenderer</groupId>
+    <artifactId>flying-saucer-pdf</artifactId>
+    <version>9.1.5</version>
+</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-oxm</artifactId>
@@ -62,11 +69,12 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.2</version>
         </dependency>
-<!-- <dependency>
+	<dependency>
             <groupId>gov.nist.fhir</groupId>
             <artifactId>fhirLib</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>  -->
+        </dependency>
+
         
         <!-- https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-base -->
 <dependency>

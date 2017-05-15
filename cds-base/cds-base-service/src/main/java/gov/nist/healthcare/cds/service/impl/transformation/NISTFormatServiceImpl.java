@@ -1,5 +1,6 @@
 package gov.nist.healthcare.cds.service.impl.transformation;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipOutputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -45,8 +47,12 @@ import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.VaccineDateReference;
+import gov.nist.healthcare.cds.domain.exception.ConfigurationException;
 import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
+import gov.nist.healthcare.cds.domain.wrapper.ExportConfig;
+import gov.nist.healthcare.cds.domain.wrapper.ExportResult;
+import gov.nist.healthcare.cds.domain.wrapper.ExportedFileStream;
 import gov.nist.healthcare.cds.domain.wrapper.ImportConfig;
 import gov.nist.healthcare.cds.domain.wrapper.MetaData;
 import gov.nist.healthcare.cds.domain.wrapper.TransformResult;
@@ -77,8 +83,7 @@ public class NISTFormatServiceImpl implements FormatService {
 	
 	final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	
-	@Override
-	public InputStream _exportOne(TestCase tc) {
+	public InputStream export(TestCase tc, ExportConfig config) {
 		try {
 			gov.nist.healthcare.cds.domain.xml.beans.TestCase tcp = new gov.nist.healthcare.cds.domain.xml.beans.TestCase();
 			tcp.setName(tc.getName());
@@ -196,7 +201,6 @@ public class NISTFormatServiceImpl implements FormatService {
 			tcp.setMetaData(mdt);
 			
 			
-			
 			return this.objToString(tcp);
 		}
 		catch(Exception e){
@@ -312,7 +316,7 @@ public class NISTFormatServiceImpl implements FormatService {
 	}
 
 	@Override
-	public TransformResult _import(InputStream stream, ImportConfig config) {
+	public TransformResult importFromFile(InputStream stream, ImportConfig config) throws ConfigurationException {
 		TransformResult transform = new TransformResult();
 		try {
 			gov.nist.healthcare.cds.domain.xml.beans.TestCase tcp = this.stringToObj(stream);
@@ -479,7 +483,7 @@ public class NISTFormatServiceImpl implements FormatService {
 	}
 
 	@Override
-	public List<ErrorModel> _validate(InputStream stream) {
+	public List<ErrorModel> preImport(InputStream stream) {
 		try {
 			InputStream schu = NISTFormatServiceImpl.class.getResourceAsStream("/schema/testCase.xsd");
 			SchemaFactory factory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
@@ -514,7 +518,6 @@ public class NISTFormatServiceImpl implements FormatService {
 		} catch (SAXException e) {
 			return null;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -526,8 +529,21 @@ public class NISTFormatServiceImpl implements FormatService {
 	}
 
 	@Override
-	public InputStream _exportAll(List<TestCase> tc) {
-		return null;
+	public List<ErrorModel> preExport(TestCase tc) {
+		List<ErrorModel> errors = new ArrayList<ErrorModel>();
+		if(!tc.isRunnable()){
+			errors.add(new ErrorModel(-1,-1,tc.getName()," TestCase is not complete"));
+		}
+		return errors;
+	}
+
+	@Override
+	public ExportResult exportToFile(List<TestCase> tcs, ExportConfig config) throws ConfigurationException {
+		ExportResult exportResult = new ExportResult();
+		for(TestCase tc : tcs){
+			exportResult.add(tc.getName().replaceAll(" ","-")+".xml",this.export(tc, config));
+		}
+		return exportResult;
 	}
 
 }

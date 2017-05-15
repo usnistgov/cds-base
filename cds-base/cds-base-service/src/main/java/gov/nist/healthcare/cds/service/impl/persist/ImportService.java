@@ -13,10 +13,8 @@ import gov.nist.healthcare.cds.domain.TestCaseGroup;
 import gov.nist.healthcare.cds.domain.TestPlan;
 import gov.nist.healthcare.cds.domain.exception.ConfigurationException;
 import gov.nist.healthcare.cds.domain.exception.UnsupportedFormat;
-import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
-import gov.nist.healthcare.cds.domain.wrapper.FileImportResult;
+import gov.nist.healthcare.cds.domain.wrapper.EntityResult;
 import gov.nist.healthcare.cds.domain.wrapper.ImportConfig;
-import gov.nist.healthcare.cds.domain.wrapper.ImportResult;
 import gov.nist.healthcare.cds.domain.wrapper.ImportSummary;
 import gov.nist.healthcare.cds.domain.wrapper.TransformResult;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
@@ -33,19 +31,14 @@ public class ImportService {
 	private TestCaseRepository testCaseRepo;
 	@Autowired
 	private TestPlanRepository testPlanRepo;
+	
 	@Autowired
 	private NISTFormatServiceImpl nistFormatProvider;
 	@Autowired
 	private CSSFormatServiceImpl cdcFormatProvider;
 	
-	private List<FormatService> formatters;
-	
 	public ImportService(){
 		
-	}
-
-	public boolean add(FormatService e) {
-		return formatters.add(e);
 	}
 
 	public FormatService getFormatterFor(String format) throws UnsupportedFormat{
@@ -63,9 +56,9 @@ public class ImportService {
 		
 		for(MultipartFile file : files){
 			if(!file.isEmpty()){
-				List<ErrorModel> validationErrors = formatter._validate(file.getInputStream());
+				List<ErrorModel> validationErrors = formatter.preImport(file.getInputStream());
 				if(validationErrors == null || validationErrors.isEmpty()){
-					TransformResult transformed = formatter._import(file.getInputStream(), config);
+					TransformResult transformed = formatter.importFromFile(file.getInputStream(), config);
 					tcs.addAll(transformed.getTestCases());
 					this.concatResults(transformed, results, file.getOriginalFilename());
 				}
@@ -112,7 +105,7 @@ public class ImportService {
 		sum.setImported(sum.getImported() + res.getTestCases().size());
 		sum.setAll(sum.getAll() + res.getTotalTC());
 		sum.setWerrors(sum.getWerrors() + (res.getTotalTC() - res.getTestCases().size()));
-		FileImportResult fir = sum.resultFor(file);
+		EntityResult fir = sum.resultFor(file);
 		fir.getErrors().addAll(res.getErrors());
 	}
 	

@@ -9,7 +9,7 @@ import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 
 public class ImportSummary {
 	
-	private List<FileImportResult> files;
+	private List<EntityResult> files;
 	private int all;
 	private int imported;
 	private int werrors;
@@ -33,12 +33,12 @@ public class ImportSummary {
 		return sum;
 	}
 	
-	public List<FileImportResult> getFiles() {
+	public List<EntityResult> getFiles() {
 		if(files == null)
 			files = new ArrayList<>();
 		return files;
 	}
-	public void setFiles(List<FileImportResult> files) {
+	public void setFiles(List<EntityResult> files) {
 		this.files = files;
 	}
 	public int getAll() {
@@ -60,12 +60,12 @@ public class ImportSummary {
 		this.werrors = werrors;
 	}
 	
-	public FileImportResult resultFor(String name){
-		for(FileImportResult r : this.getFiles()){
+	public EntityResult resultFor(String name){
+		for(EntityResult r : this.getFiles()){
 			if(r.getName().equals(name))
 				return r;
 		}
-		FileImportResult r = new FileImportResult();
+		EntityResult r = new EntityResult();
 		r.setName(name);
 		this.getFiles().add(r);
 		return r;

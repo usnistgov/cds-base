@@ -3,6 +3,8 @@ package gov.nist.healthcare.cds.domain.wrapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 public class EngineResponse {
 	
 	private String response;
@@ -39,6 +41,11 @@ public class EngineResponse {
 	}
 	public void setRequest(String request) {
 		this.request = request;
+	}
+	@Override
+	public String toString() 
+	{ 
+	    return ToStringBuilder.reflectionToString(this); 
 	}
 	
 	

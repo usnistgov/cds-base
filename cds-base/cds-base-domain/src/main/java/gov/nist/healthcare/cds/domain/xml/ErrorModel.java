@@ -23,6 +23,14 @@ public class ErrorModel {
 		this.message = message;
 	}
 	
+	public ErrorModel(String location, String message) {
+		super();
+		this.line = -1;
+		this.column = -1;
+		this.location = location;
+		this.message = message;
+	}
+	
 	public ErrorModel(int line, int column, String message) {
 		super();
 		this.line = line;

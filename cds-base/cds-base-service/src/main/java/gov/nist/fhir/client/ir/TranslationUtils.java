@@ -19,12 +19,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.emf.common.util.EList;
-import org.hl7.fhir.Immunization;
-import org.hl7.fhir.ImmunizationRecommendation;
-import org.hl7.fhir.ImmunizationRecommendationDateCriterion;
-import org.hl7.fhir.ImmunizationRecommendationRecommendation;
-import org.hl7.fhir.ImmunizationVaccinationProtocol;
 import org.hl7.fhir.dstu3.model.Immunization.ImmunizationVaccinationProtocolComponent;
 import org.hl7.fhir.dstu3.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationDateCriterionComponent;
 
@@ -57,8 +51,6 @@ public class TranslationUtils {
         return print.format(date);
     }
 
-            
-    
     public static FixedDate translateTchDateToFhirDate(String date) {
 
         String year = date.substring(0, 4);
@@ -69,6 +61,7 @@ public class TranslationUtils {
 
     }
 
+    /*
     public static ResponseVaccinationEvent translateImmunizationToResponseVaccinationEvent(Immunization imm) {
 
         ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
@@ -108,7 +101,7 @@ public class TranslationUtils {
         }
         return rve;
     }
-
+     */
     public static ResponseVaccinationEvent translateImmunizationToResponseVaccinationEvent(org.hl7.fhir.dstu3.model.Immunization imm) {
 
         ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
@@ -123,7 +116,7 @@ public class TranslationUtils {
 
         rve.setDate(new FixedDate(imm.getDate()));
         rve.setEvaluations(new HashSet<ActualEvaluation>());
-        
+
         List<ImmunizationVaccinationProtocolComponent> vaccinationProtocols = imm.getVaccinationProtocol();
         Iterator<ImmunizationVaccinationProtocolComponent> it = vaccinationProtocols.iterator();
         while (it.hasNext()) {
@@ -150,8 +143,7 @@ public class TranslationUtils {
         return rve;
     }
 
-    
-    
+    /*
     
     public static ResponseVaccinationEvent translateImmunizationRecommendationRecommendationToResponseVaccinationEvent(
             ImmunizationRecommendationRecommendation irr) {
@@ -170,7 +162,8 @@ public class TranslationUtils {
 
         return rve;
     }
-
+     */
+ /*
     public static ActualForecast translateImmunizationRecommendationToActualForecast(ImmunizationRecommendation ir) {
         ActualForecast forecast = new ActualForecast();
         if (ir.getRecommendation() == null || ir.getRecommendation().get(0) == null) {
@@ -231,7 +224,8 @@ public class TranslationUtils {
         }
         return forecast;
     }
-
+     */
+ /*
     public static ActualForecast translateImmunizationRecommendationRecommendationToActualForecast(
             ImmunizationRecommendationRecommendation irr) {
         ActualForecast af = new ActualForecast();
@@ -283,7 +277,7 @@ public class TranslationUtils {
 
             // TODO: Is this work around needed? Or is one just wrong?
             if (status.equals("Not Complete")) {
-                af.setSerieStatus(SerieStatus.N);
+                af.setSerieStatus(SerieStatus.E);
             } else if (status.equals("Aged Out")) {
                 af.setSerieStatus(SerieStatus.G);
             } else {
@@ -293,27 +287,34 @@ public class TranslationUtils {
         return af;
 
     }
-
+     */
     public static ActualForecast translateImmunizationRecommendationRecommendationToActualForecast(
             org.hl7.fhir.dstu3.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent irr) {
-        ActualForecast af = new ActualForecast();        
+        
+        if (irr.getDate() == null || "".equals(irr.getDate())) {
+            return null;
+        }
+
+        
+        ActualForecast af = new ActualForecast();
         //TODO: Error checking
-        af.setDoseNumber(Integer.toString(irr.getDoseNumber()));        
+        af.setDoseNumber(Integer.toString(irr.getDoseNumber()));
         VaccineRef vaccineRef = new VaccineRef();
         if (irr.getVaccineCode() != null && irr.getVaccineCode().getCoding() != null
+                && irr.getVaccineCode().getCoding().size() > 1
                 && irr.getVaccineCode().getCoding().get(0) != null
                 && irr.getVaccineCode().getCoding().get(0).getCode() != null) {
             vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode());
         }
         af.setVaccine(vaccineRef);
-        
+
         List<ImmunizationRecommendationRecommendationDateCriterionComponent> dateCriterions = irr.getDateCriterion();
-        
+
         Iterator<ImmunizationRecommendationRecommendationDateCriterionComponent> it = dateCriterions.iterator();
         while (it.hasNext()) {
-            
+
             ImmunizationRecommendationRecommendationDateCriterionComponent dateCriterion = it.next();
-            
+
             if (dateCriterion.getValue() != null && dateCriterion.getValue() != null) {
                 FixedDate date = new FixedDate(dateCriterion.getValue());
 
@@ -341,23 +342,35 @@ public class TranslationUtils {
             }
         }
         if (irr.getForecastStatus() != null && irr.getForecastStatus().getCoding() != null
+                && irr.getForecastStatus().getCoding().size() > 0
                 && irr.getForecastStatus().getCoding().get(0) != null
                 && irr.getForecastStatus().getCoding().get(0).getCode() != null) {
             String status = irr.getForecastStatus().getCoding().get(0).getCode();
 
             // TODO: Is this work around needed? Or is one just wrong?
-            if (status.equals("Not Complete")) {
-                af.setSerieStatus(SerieStatus.N);
-            } else if (status.equals("Aged Out")) {
-                af.setSerieStatus(SerieStatus.G);
-            } else {
-                af.setSerieStatus(SerieStatus.valueOf(status));
+            try {
+                if (status.equals("Not Complete")) {
+                    af.setSerieStatus(SerieStatus.N);
+                } else if (status.equals("Aged Out")) {
+                    af.setSerieStatus(SerieStatus.G);
+                } else if (status.startsWith("o")) {
+                    af.setSerieStatus(SerieStatus.O);
+                } else if (status.equalsIgnoreCase("d")) {
+                    af.setSerieStatus(SerieStatus.D);
+                } else if (status.startsWith("u")) {
+                    af.setSerieStatus(SerieStatus.X);
+                } else {
+                    af.setSerieStatus(SerieStatus.valueOf(status));
+                }
+            } catch (Exception e) {
+                //TODO better error checking
+                System.out.println("Unexpected dose status = " + status);
             }
         }
         return af;
 
     }
-
+    /*
     public static boolean doesRecommendationHaveDateCriterion(ImmunizationRecommendationRecommendation irr) {
 
         if (irr.getDateCriterion() == null) {
@@ -369,5 +382,5 @@ public class TranslationUtils {
         return true;
 
     }
-
+     */
 }

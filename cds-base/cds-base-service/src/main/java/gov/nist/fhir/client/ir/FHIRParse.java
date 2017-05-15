@@ -76,15 +76,15 @@ public class FHIRParse {
                 BundleEntry entry = it.next();
                 ResourceContainer resource = entry.getResource();
                 org.hl7.fhir.ImmunizationRecommendation ir = resource.getImmunizationRecommendation();
-                if (ir != null) {
-                    ActualForecast forecast = TranslationUtils.translateImmunizationRecommendationToActualForecast(ir);
-                    response.getForecasts().add(forecast);
-                }
-                org.hl7.fhir.Immunization imm = resource.getImmunization();
-                if (imm != null) {
-                    ResponseVaccinationEvent rve = TranslationUtils.translateImmunizationToResponseVaccinationEvent(imm);
-                    response.getEvents().add(rve);
-                }
+//                if (ir != null) {
+//                    ActualForecast forecast = TranslationUtils.translateImmunizationRecommendationToActualForecast(ir);
+//                    response.getForecasts().add(forecast);
+//                }
+//                org.hl7.fhir.Immunization imm = resource.getImmunization();
+//                if (imm != null) {
+//                    ResponseVaccinationEvent rve = TranslationUtils.translateImmunizationToResponseVaccinationEvent(imm);
+//                    response.getEvents().add(rve);
+//                }
 
             }
         

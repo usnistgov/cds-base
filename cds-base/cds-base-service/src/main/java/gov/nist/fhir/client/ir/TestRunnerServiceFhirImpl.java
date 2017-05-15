@@ -1,13 +1,8 @@
 package gov.nist.fhir.client.ir;
 
 import ca.uhn.fhir.context.FhirContext;
-import fhir.util.Serialize;
 import gov.nist.healthcare.cds.domain.wrapper.ActualForecast;
-import gov.nist.healthcare.cds.domain.Event;
-import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
-import gov.nist.healthcare.cds.domain.TestCase;
-import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
 import gov.nist.healthcare.cds.domain.wrapper.ResponseVaccinationEvent;
@@ -25,21 +20,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.eclipse.emf.common.util.EList;
-import org.emfjson.jackson.annotations.EcoreReferenceInfo;
-import org.hl7.fhir.Bundle;
-import org.hl7.fhir.BundleEntry;
-import org.hl7.fhir.ResourceContainer;
-import org.hl7.fhir.ImmunizationRecommendation;
-import org.hl7.fhir.ImmunizationRecommendationRecommendation;
-import org.hl7.fhir.Parameters;
-import org.hl7.fhir.ParametersParameter;
 import org.hl7.fhir.dstu3.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent;
 import org.hl7.fhir.dstu3.model.Resource;
 
@@ -108,6 +92,7 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
             }
         }
         sendingConfig.setImmunizationData(imms);
+        /*
         if (useAdapter) {
             Bundle result = null;
             try {
@@ -122,10 +107,10 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
                 Logger.getLogger(TestRunnerServiceFhirImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            response.setRequest(ImmunizationRecommendationClient.generateXml(routing, sendingConfig, useAdapter));
+           // response.setRequest(ImmunizationRecommendationClient.generateXml(routing, sendingConfig, useAdapter));
             Serialize serial = new Serialize();
             response.setResponse(serial.it(result, "sut.xml"));
-            
+
             EList<BundleEntry> entries = result.getEntry();
             Iterator<BundleEntry> it = entries.iterator();
             while (it.hasNext()) {
@@ -144,7 +129,7 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
 
             }
         } else {
-
+*/
             org.hl7.fhir.dstu3.model.Parameters parameters = null;
             try {
                 parameters = (org.hl7.fhir.dstu3.model.Parameters) irc.getImmunizationRecommendation(routing, sendingConfig, useAdapter);
@@ -170,20 +155,22 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
             while (it.hasNext()) {
                 ImmunizationRecommendationRecommendationComponent irr = it.next();
                 ActualForecast af = TranslationUtils.translateImmunizationRecommendationRecommendationToActualForecast(irr);
-                response.getForecasts().add(af);
+                if(af != null)
+                    response.getForecasts().add(af);
             }
-            
+
             List<Resource> containeds = ir.getContained();
             //TODO: Error checking
             Iterator<Resource> itRc = containeds.iterator();
-              while (itRc.hasNext()) {
+            while (itRc.hasNext()) {
 
                 Resource rc = itRc.next();
-                if(rc instanceof org.hl7.fhir.dstu3.model.Immunization) {
+                if (rc instanceof org.hl7.fhir.dstu3.model.Immunization) {
                     org.hl7.fhir.dstu3.model.Immunization imm = (org.hl7.fhir.dstu3.model.Immunization) rc;
                     if (imm != null) {
                         ResponseVaccinationEvent rve = TranslationUtils.translateImmunizationToResponseVaccinationEvent(imm);
-                        response.getEvents().add(rve);
+                        if (rve != null)
+                            response.getEvents().add(rve);
                     }
                 }
 
@@ -235,7 +222,7 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
 
             }
              */
-        }
+       // }
         return response;
     }
 
@@ -253,103 +240,6 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         this.adapterUrl = adapterUrl;
     }
 
-    public static void main(String[] args) {
-        //   TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:8080/forecast/ImmunizationRecommendations");
-        //      TestRunnerService test = new TestRunnerServiceFhirImpl("https://p860556.campus.nist.gov:8443/forecast/ImmunizationRecommendations");
-        TestRunnerService test = new TestRunnerServiceFhirImpl();
-        SoftwareConfig config = new SoftwareConfig();
-        TestCasePayLoad tc = new TestCasePayLoad();
-        //     config.setConnector(FHIRAdapter.TCH);
-        config.setConnector(FHIRAdapter.FHIR);
-        config.setUser("TCH");
-        //config.setEndPoint("http://tchforecasttester.orgg/fv/forecast");
-        config.setEndPoint("http://test-cdsi.rhcloud.com/CDSi/cds-forecast");
-
-        //Patient patient = new Patient();
-        //Date dob = new FixedDate("01/01/2016");
-        //patient.setDob(dob);
-        //patient.setGender(Gender.F);
-        //tc.setPatient(patient);        
-        tc.setGender(Gender.F);
-
-        Calendar evalCal = Calendar.getInstance();
-        evalCal.set(2017, 1, 1);
-        Date evalDate = evalCal.getTime();
-
-        Calendar dobCal = Calendar.getInstance();
-        dobCal.set(2009, 8, 9);
-        Date dobDate = dobCal.getTime();
-
-        tc.setEvaluationDate(evalDate);
-        tc.setDateOfBirth(dobDate);
-
-        /*
-        VaccinationEvent ve1 = new VaccinationEvent();
-        Set<Event> events = new HashSet<Event>();
-        ve1.setMVX("110");
-        ve1.setDate(new FixedDate("01/01/2017"));
-
-        events.add(ve1);
-
-        VaccinationEvent ve2 = new VaccinationEvent();
-        ve2.setMVX("116");
-        ve2.setDate(new FixedDate("01/01/2017"));
-        events.add(ve2);
-
-        VaccinationEvent ve3 = new VaccinationEvent();
-        ve3.setMVX("133");
-        ve3.setDate(new FixedDate("01/01/2017"));
-        events.add(ve3);
-         */
-        //List<VaccinationEventPayLoad> vaccinationEvents = new ArrayList<VaccinationEventPayLoad>();
-        Calendar immCal1 = Calendar.getInstance();
-        immCal1.set(2009, 10, 9);
-        Date immDate1 = immCal1.getTime();
-
-        Calendar immCal2 = Calendar.getInstance();
-        immCal2.set(2009, 12, 9);
-        Date immDate2 = immCal2.getTime();
-
-        Calendar immCal3 = Calendar.getInstance();
-        immCal3.set(2010, 4, 9);
-        Date immDate3 = immCal3.getTime();
-
-        Calendar immCal4 = Calendar.getInstance();
-        immCal4.set(2010, 10, 5);
-        Date immDate4 = immCal4.getTime();
-
-        VaccineRef vr1 = new VaccineRef();
-        vr1.setCvx("110");
-        tc.addImmunization(vr1, immDate1);
-        /*
-        VaccineRef vr2 = new VaccineRef();
-        vr2.setCvx("110");
-        tc.addImmunization(vr2, immDate2);
-
-        VaccineRef vr3 = new VaccineRef();
-        vr3.setCvx("110");
-        tc.addImmunization(vr3, immDate3);
-
-        VaccineRef vr4 = new VaccineRef();
-        vr4.setCvx("110");
-        tc.addImmunization(vr4, immDate4);
-         */
-        // http://tchforecasttester.org/fv/forecast?evalDate=20170101&evalSchedule=&resultFormat=text&patientDob=20160101&patientSex=F&vaccineDate1=20170101&vaccineCvx1=110
-        //tc.setEvents(events);
-        //tc.setImmunizations(events);
-        EngineResponse run = null;
-        try {
-            run = test.run(config, tc);
-        } catch (ConnectionException ex) {
-            Logger.getLogger(TestRunnerServiceFhirImpl.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Exception\nStatus Code = " + ex.getStatusCode());
-            System.out.println("Status Text = " + ex.getStatusText());
-        }
-        System.out.println(run.getForecasts().size());
-        System.out.println(run.getEvents().size());
-        //System.out.println(run.getResponse());
-    }
-
     /**
      * @return the useAdapter
      */
@@ -364,4 +254,101 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         this.useAdapter = useAdapter;
     }
 
+    
+    
+    public static void main(String[] args) throws IOException, ConnectionException {
+        
+
+        //   TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:8080/forecast/ImmunizationRecommendations");
+        //    TestRunnerService test = new TestRunnerServiceFhirImpl("https://p860556.campus.nist.gov:8443/forecast/ImmunizationRecommendations");
+
+        //TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:8084/fhir/ImmunizationRecommendation");
+//        TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:8084/fhir/Parameters/$IR");
+            //  TestRunnerService test = new TestRunnerServiceFhirImpl("http://p860556.campus.nist.gov:8084/fhirAdapter/fhir/Parameters/$IR");
+           TestRunnerService test = new TestRunnerServiceFhirImpl("https://p860556.campus.nist.gov:9443/fhirAdapter/fhir/Parameters/$cds-forecast");
+
+
+//TestRunnerService test = new TestRunnerServiceFhirImpl();
+        SoftwareConfig config = new SoftwareConfig();
+        TestCasePayLoad tc = new TestCasePayLoad();
+        config.setConnector(FHIRAdapter.TCH);
+        //config.setConnector(FHIRAdapter.FHIR);
+        config.setUser("TCH");
+        config.setEndPoint("http://tchforecasttester.org/fv/forecast");
+        //config.setEndPoint("http://test-cdsi.rhcloud.com/CDSi/cds-forecast");
+
+        //Patient patient = new Patient();
+        //Date dob = new FixedDate("01/01/2016");
+        //patient.setDob(dob);
+        //patient.setGender(Gender.F);
+        //tc.setPatient(patient);        
+        tc.setGender(Gender.F);
+
+        Calendar evalCal = Calendar.getInstance();
+        evalCal.set(2013, 5, 13);
+        Date evalDate = evalCal.getTime();
+
+        Calendar dobCal = Calendar.getInstance();
+        dobCal.set(2012, 9, 2);
+        Date dobDate = dobCal.getTime();
+
+        tc.setEvaluationDate(evalDate);
+        tc.setDateOfBirth(dobDate);
+
+        
+
+         
+        //List<VaccinationEventPayLoad> vaccinationEvents = new ArrayList<VaccinationEventPayLoad>();
+        
+        Calendar immCal1 = Calendar.getInstance();
+        immCal1.set(2012, 10, 5);
+        Date immDate1 = immCal1.getTime();
+
+        Calendar immCal2 = Calendar.getInstance();
+        immCal2.set(2009, 12, 9);
+        Date immDate2 = immCal2.getTime();
+/*
+        Calendar immCal3 = Calendar.getInstance();
+        immCal3.set(2010, 4, 9);
+        Date immDate3 = immCal3.getTime();
+
+        Calendar immCal4 = Calendar.getInstance();
+        immCal4.set(2010, 10, 5);
+        Date immDate4 = immCal4.getTime();
+*/
+        VaccineRef vr1 = new VaccineRef();
+        vr1.setCvx("49");
+        tc.addImmunization(vr1, immDate1);
+  
+        VaccineRef vr2 = new VaccineRef();
+        vr2.setCvx("110");
+        tc.addImmunization(vr2, immDate2);
+/*
+        VaccineRef vr3 = new VaccineRef();
+        vr3.setCvx("110");
+        tc.addImmunization(vr3, immDate3);
+
+        VaccineRef vr4 = new VaccineRef();
+        vr4.setCvx("110");
+        tc.addImmunization(vr4, immDate4);
+    */     
+        // http://tchforecasttester.org/fv/forecast?evalDate=20170101&evalSchedule=&resultFormat=text&patientDob=20160101&patientSex=F&vaccineDate1=20170101&vaccineCvx1=110
+        //tc.setEvents(events);
+        //tc.setImmunizations(events);
+        
+        EngineResponse run = null;
+        try {
+            run = test.run(config, tc);
+        } catch (ConnectionException ex) {
+            Logger.getLogger(TestRunnerServiceFhirImpl.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Exception\nStatus Code = " + ex.getStatusCode());
+            System.out.println("Status Text = " + ex.getStatusText());
+        }
+        System.out.println(run.getForecasts().size());
+        System.out.println(run.getEvents().size());
+        //System.out.println(run.getResponse());
+        
+    }
+
+    
 }

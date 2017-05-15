@@ -49,7 +49,8 @@ public class ExecutionService implements TestCaseExecutionService {
 		// Create PayLoad and Send request
 		TestCasePayLoad tcP = this.payLoad(tc, rds);
 		EngineResponse response = runner.run(conf, tcP);
-		
+		System.out.println("[RESPONSE]");
+		System.out.println(response);
 		// Compute Requirements
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
 		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);
