@@ -7,9 +7,12 @@ public enum EvaluationReason {
 	D("Vaccine Dose Administered was administered too soon following a previous dose."),
 	E("Vaccine Dose Administered was administered too close to another vaccine (e.g. live virus conflict)."),
 	F("Vaccine Dose Administered amount was less than the recommended amount."),
-	G("Vaccine Dose Administered was administered outside of an acceptable age range");
+	G("Vaccine Product was administered outside of an acceptable age range."),
+	H("Vaccine Dose Administered was administered at too old of an age."),
+	I("Patient has already completed the vaccination schedule.");
 	
 	private String details;
+	
 	private EvaluationReason(String d){
 		this.details = d;
 	}

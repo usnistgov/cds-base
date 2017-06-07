@@ -78,18 +78,47 @@ public class ImportService {
 		
 		if(tcs.size() > 0){
 			TestPlan tp = testPlanRepo.findOne(tpId);
-			for(TestCase tc : tcs){
-				if(tc.getGroupTag() != null && !tc.getGroupTag().isEmpty()){
-					TestCaseGroup tcg = tp.getByNameOrCreateGroup(tc.getGroupTag());
-					tc.setGroupTag(tcg.getId());
-					tc.setTestPlan(tpId);
-					tcg.setTestPlan(tpId);
-					tcg.getTestCases().add(tc);
+			if(config.isOvGroup()){
+				if(config.getGroupId() == null || config.getGroupId().isEmpty()){
+					for(TestCase tc : tcs){
+						tc.setGroupTag("");
+						tc.setTestPlan(tpId);
+						tp.getTestCases().add(tc);
+					}
 				}
-				else {
-					tp.addTestCase(tc);
+				else{
+					TestCaseGroup tcg = tp.getGroup(config.getGroupId());
+					if(tcg != null){
+						for(TestCase tc : tcs){
+							tc.setGroupTag(tcg.getId());
+							tc.setTestPlan(tpId);
+							tcg.getTestCases().add(tc);
+						}
+					}
+					else {
+						for(TestCase tc : tcs){
+							tc.setGroupTag("");
+							tc.setTestPlan(tpId);
+							tp.getTestCases().add(tc);
+						}
+					}	
 				}
 			}
+			else {
+				for(TestCase tc : tcs){
+					if(tc.getGroupTag() != null && !tc.getGroupTag().isEmpty()){
+						TestCaseGroup tcg = tp.getByNameOrCreateGroup(tc.getGroupTag());
+						tc.setGroupTag(tcg.getId());
+						tc.setTestPlan(tpId);
+						tcg.setTestPlan(tpId);
+						tcg.getTestCases().add(tc);
+					}
+					else {
+						tp.addTestCase(tc);
+					}
+				}
+			}
+			
 			testCaseRepo.save(tcs);
 			testPlanRepo.save(tp);
 			results.setTestPlan(tp);

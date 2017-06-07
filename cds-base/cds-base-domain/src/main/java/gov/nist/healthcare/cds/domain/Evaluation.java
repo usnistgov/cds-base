@@ -20,7 +20,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class Evaluation implements Serializable {
 
-	protected String evaluationReason;
 	@NotNull(message = "Evaluation must have an expected status")
 	@Valid
 	@Enumerated(EnumType.STRING)
@@ -28,12 +27,6 @@ public class Evaluation implements Serializable {
 	@Enumerated(EnumType.STRING)
 	protected EvaluationReason reason;
 	
-	public String getEvaluationReason() {
-		return evaluationReason;
-	}
-	public void setEvaluationReason(String evaluationReason) {
-		this.evaluationReason = evaluationReason;
-	}
 	public EvaluationStatus getStatus() {
 		return status;
 	}

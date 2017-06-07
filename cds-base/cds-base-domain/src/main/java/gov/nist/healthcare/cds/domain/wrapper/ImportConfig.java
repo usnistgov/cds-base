@@ -7,7 +7,8 @@ public class ImportConfig {
 	private boolean all;
 	private String lines;
 	private boolean ignore;
-	
+	private boolean ovGroup;
+	private String groupId;
 	
 	
 	public int getPosition() {
@@ -33,6 +34,19 @@ public class ImportConfig {
 	}
 	public void setAll(boolean all) {
 		this.all = all;
+	}
+	
+	public boolean isOvGroup() {
+		return ovGroup;
+	}
+	public void setOvGroup(boolean ovGroup) {
+		this.ovGroup = ovGroup;
+	}
+	public String getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 	@Override
 	public String toString() 

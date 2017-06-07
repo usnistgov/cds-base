@@ -1,0 +1,46 @@
+<head>
+	<style>
+		body {
+			font-size : 12px;
+		}
+		
+		.head1 {
+			color : rgb(93, 93, 189);
+			text-align : center;
+		}
+		
+		.head2{
+			color : #3235ff;
+		}
+		
+		.table {
+			width : 100%;
+		}
+		
+		.event-title {
+			color : blue;
+		}
+		
+		.no-break, table, tr, td, th, tbody, thead, tfoot {
+    		page-break-inside: avoid !important;
+		}
+
+		table {
+    		border-collapse: collapse;
+		}
+		
+		.no-border {
+    		border : 0 !important;
+		}
+
+		td {
+			padding : 2px;
+		}
+		
+		table, th, td {
+    		border: 1px solid black;
+		}
+		
+		
+	</style>
+</head>

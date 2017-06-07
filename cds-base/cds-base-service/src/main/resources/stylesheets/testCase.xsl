@@ -10,8 +10,9 @@
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 	<xsl:template match="/tc:TestCase">
 		<html>
+			[STYLE]
 			<body>
-				<h1 style="color : blue;" class="head1">
+				<h1 class="head1">
 					<xsl:value-of select="Name" />
 				</h1>
 				<h2 class="head2">Test Case Metadata</h2>
@@ -96,11 +97,12 @@
 							<xsl:choose>
 								<xsl:when test="AssessmentDate/Fixed">
 									<xsl:call-template name="dateTransformer">
-										<xsl:with-param name="myDate" select="AssessmentDate/Fixed/@date" />
+										<xsl:with-param name="myDate"
+											select="AssessmentDate/Fixed/@date" />
 									</xsl:call-template>
 								</xsl:when>
 								<xsl:otherwise>
-									Nope
+									Relative (Today)
 								</xsl:otherwise>
 							</xsl:choose>
 						</td>
@@ -113,11 +115,12 @@
 							<xsl:choose>
 								<xsl:when test="Patient/DateOfBirth/Fixed">
 									<xsl:call-template name="dateTransformer">
-										<xsl:with-param name="myDate" select="Patient/DateOfBirth/Fixed/@date" />
+										<xsl:with-param name="myDate"
+											select="Patient/DateOfBirth/Fixed/@date" />
 									</xsl:call-template>
 								</xsl:when>
 								<xsl:otherwise>
-									Nope
+									<xsl:apply-templates select="Patient/DateOfBirth/Relative" />
 								</xsl:otherwise>
 							</xsl:choose>
 						</td>
@@ -131,27 +134,96 @@
 						</td>
 					</tr>
 				</table>
-				<h3 class="head3">Vaccination History and Expoected Evaluations</h3>
+				<h3 class="head3">Vaccination History and Expected Evaluations</h3>
 				<xsl:apply-templates select="Events" />
-				<h3 class="head3">Expected Forecasts</h3>
-				<xsl:apply-templates select="Forecasts" />
+				<div class="no-break">
+					<h3 class="head3">Expected Forecasts</h3>
+					<xsl:apply-templates select="Forecasts" />
+				</div>
 			</body>
 		</html>
+	</xsl:template>
+	<xsl:template match="Relative">
+		<table class="no-border table">
+			<xsl:for-each select="Rule">
+					<tr class="no-border">
+						<td class="no-border">
+							<xsl:if test="position() > 1">
+								<strong>But Not Before</strong>
+							</xsl:if>
+						</td>
+						<td class="no-border">
+							<xsl:if test="@years != 0">
+								<xsl:value-of select="@years" /> Years
+							</xsl:if>
+						</td>
+						<td class="no-border">
+							<xsl:if test="@months != 0">
+								<xsl:value-of select="@months" /> Months
+							</xsl:if>
+						</td>
+						<td class="no-border">
+							<xsl:if test="@days != 0">
+								<xsl:value-of select="@days" /> Days
+							</xsl:if>
+						</td>
+						<td class="no-border">
+							<xsl:choose>
+								<xsl:when test="@years='0' and @months='0' and @days='0'">
+									On
+								</xsl:when>
+								<xsl:when test="RelativeTo[@position='BEFORE']">
+									Before
+								</xsl:when>
+								<xsl:when test="RelativeTo[@position='AFTER']">
+									After
+								</xsl:when>
+								<xsl:otherwise>
+									NOT_DEF
+								</xsl:otherwise>
+							</xsl:choose>
+						</td>
+						<td class="no-border">
+							<xsl:choose>
+								<xsl:when test="RelativeTo[@reference='VACCINATION']">
+									Vaccination (ID # <xsl:value-of select="RelativeTo/@id" />)'s Date
+								</xsl:when>
+								<xsl:when test="RelativeTo[@reference='EVALDATE']">
+									Assessment Date
+								</xsl:when>
+								<xsl:when test="RelativeTo[@reference='DOB']">
+									Date Of Birth
+								</xsl:when>
+								<xsl:otherwise>
+									NOT_DEF
+								</xsl:otherwise>
+							</xsl:choose>
+						</td>
+					</tr>
+			</xsl:for-each>
+		</table>
 	</xsl:template>
 	<xsl:template match="Events">
 		<xsl:for-each select="Event">
 			<table class="table">
-				<tr colspan="2">
-					<td> 
-						# <xsl:value-of select="@ID" /> - <xsl:value-of select="Administred/@name" />
-						- CVX : <xsl:value-of select="Administred/@cvx" />
+				<tr>
+					<td colspan="2" class="event-title">
+						#
+						<xsl:value-of select="@ID + 1" />
+						-
+						<xsl:value-of select="Administred/@name" />
+						- CVX :
+						<xsl:value-of select="Administred/@cvx" />
 						<xsl:if test="Administred/@mvx">
-						 MVX :  <xsl:value-of select="Administred/@mvx" />
+							MVX :
+							<xsl:value-of select="Administred/@mvx" />
 						</xsl:if>
 					</td>
 				</tr>
 				<tr>
-					<td><strong>Date Administred</strong></td>
+					<td>
+						<strong>Date Administred</strong>
+					</td>
 					<td>
 						<xsl:choose>
 							<xsl:when test="EventDate/Fixed">
@@ -160,23 +232,54 @@
 								</xsl:call-template>
 							</xsl:when>
 							<xsl:otherwise>
-								Nope
+								<xsl:apply-templates select="EventDate/Relative" />
 							</xsl:otherwise>
 						</xsl:choose>
 					</td>
 				</tr>
 				<tr>
-					<td><strong>Evaluations</strong></td>
-					<td></td>
+					<td>
+						<strong>Evaluations</strong>
+					</td>
+					<td>
+						<xsl:apply-templates select="Evaluations" />
+					</td>
 				</tr>
 			</table>
 		</xsl:for-each>
 	</xsl:template>
+	<xsl:template match="Evaluations">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>CVX</th>
+					<th>name</th>
+					<th>Status</th>
+					<th>Reason</th>
+				</tr>
+			</thead>
+			<tbody>
+				<xsl:for-each select="Evaluation">
+					<tr>
+						<td><xsl:value-of select="Vaccine/@cvx" /></td>
+						<td><xsl:value-of select="Vaccine/@name" /></td>
+						<td><xsl:value-of select="@status" /></td>
+						<td></td>
+					</tr>
+				</xsl:for-each>
+			</tbody>
+		</table>
+	</xsl:template>
+
 	<xsl:template match="Forecasts">
 		<xsl:for-each select="Forecast">
 			<table class="table">
-				<tr colspan="2">
-					<td><xsl:value-of select="target/@name" /> # <xsl:value-of select="target/@cvx" /></td>
+				<tr>
+					<td colspan="2" class="event-title">
+						<xsl:value-of select="target/@name" />
+						- CVX :
+						<xsl:value-of select="target/@cvx" />
+					</td>
 				</tr>
 				<tr>
 					<td>
@@ -187,7 +290,9 @@
 					</td>
 				</tr>
 				<tr>
-					<td><strong>Earliest Date</strong></td>
+					<td>
+						<strong>Earliest Date</strong>
+					</td>
 					<td>
 						<xsl:choose>
 							<xsl:when test="Earliest/Fixed">
@@ -196,13 +301,15 @@
 								</xsl:call-template>
 							</xsl:when>
 							<xsl:otherwise>
-								Nope
+								<xsl:apply-templates select="Earliest/Relative" />
 							</xsl:otherwise>
 						</xsl:choose>
 					</td>
 				</tr>
 				<tr>
-					<td><strong>Recommended Date</strong></td>
+					<td>
+						<strong>Recommended Date</strong>
+					</td>
 					<td>
 						<xsl:choose>
 							<xsl:when test="Recommended/Fixed">
@@ -211,13 +318,15 @@
 								</xsl:call-template>
 							</xsl:when>
 							<xsl:otherwise>
-								Nope
+								<xsl:apply-templates select="Recommended/Relative" />
 							</xsl:otherwise>
 						</xsl:choose>
 					</td>
 				</tr>
 				<tr>
-					<td><strong>Past Due Date</strong></td>
+					<td>
+						<strong>Past Due Date</strong>
+					</td>
 					<td>
 						<xsl:choose>
 							<xsl:when test="PastDue/Fixed">
@@ -226,21 +335,16 @@
 								</xsl:call-template>
 							</xsl:when>
 							<xsl:otherwise>
-								Nope
+								<xsl:apply-templates select="PastDue/Relative" />
 							</xsl:otherwise>
 						</xsl:choose>
 					</td>
-				</tr>
-				<tr>
-					<td>Evaluations</td>
-					<td></td>
 				</tr>
 			</table>
 		</xsl:for-each>
 	</xsl:template>
 	<xsl:template name="dateTransformer">
 		<xsl:param name="myDate" />
-		<xsl:param name="myTime" />
 		<xsl:variable name="year" select="substring-before($myDate, '-')" />
 		<xsl:variable name="month"
 			select="substring-before(substring-after($myDate, '-'), '-')" />

@@ -6,10 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import gov.nist.fhir.client.ir.FHIRParse;
-import gov.nist.fhir.client.ir.TestRunnerServiceFhirImpl;
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.Injection;
@@ -30,7 +26,6 @@ import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.service.DateService;
-import gov.nist.healthcare.cds.service.FHIRParser;
 import gov.nist.healthcare.cds.service.TestCaseExecutionService;
 import gov.nist.healthcare.cds.service.ValidationService;
 
@@ -55,7 +50,8 @@ public class TestExecutionSimulation implements TestCaseExecutionService {
 		TestCasePayLoad tcP = this.payLoad(tc, rds);
 		
 		System.out.println(simulationMap.getResult(tc.getUid()));
-		EngineResponse response = FHIRParse.parseResponseFromXml(simulationMap.getResult(tc.getUid()));
+//		EngineResponse response = FHIRParse.parseResponseFromXml(simulationMap.getResult(tc.getUid()));
+		EngineResponse response = new EngineResponse();
 		
 		// Compute Requirements
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);

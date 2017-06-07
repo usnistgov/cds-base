@@ -1,36 +1,47 @@
 package gov.nist.healthcare.cds.enumeration;
 
+
 public enum SerieStatus {
-	A("Assumed complete or immune"),
-	C("Complete"),
-	D("Due"),
-	F("Finished"),
-	G("Aged out"),
+	A("Assumed complete or immune",true),
+	C("Complete",false),
+	D("Due",true),
+	F("Finished",false),
+	G("Aged out",false),
 	
-	I("Immune"),
-	L("Due later"),
-	N("Not complete"),
-	O("Overdue"),
+	I("Immune",false),
+	L("Due later",true),
+	N("Not complete",true),
+	O("Overdue", true),
 	
-	S("Complete for season"),
-	V("Consider"),
-	W("Waivered"),
-	X("Contraindicated"),
+	S("Complete for season", false),
+	V("Consider", false),
+	W("Waivered", true),
+	X("Contraindicated", false),
 	
-	Z("Recommended but not required");
+	Z("Recommended but not required",true),
+	U("Other", false);
 	
 	private String details;
-	private SerieStatus(String d){
-		this.details = d;
-	}
+	private boolean dates;
 	
+	private SerieStatus(String d, boolean dates){
+		this.details = d;
+		this.dates = dates;
+	}
+
 	public String getDetails() {
 		return details;
 	}
 	public void setDetails(String details) {
 		this.details = details;
 	}
-	
+	public boolean hasDates() {
+		return dates;
+	}
+	public void setDates(boolean dates) {
+		this.dates = dates;
+	}
+
 	public static SerieStatus  getSerieStatus(String details) {
 		String lookup = details.toLowerCase();
 		switch(lookup.trim()){

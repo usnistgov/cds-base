@@ -36,8 +36,8 @@ public enum StatusType {
 
     @XmlEnumValue("Valid")
     VALID("Valid"),
-    @XmlEnumValue("Invalid")
-    INVALID("Invalid"),
+    @XmlEnumValue("Not Valid")
+    INVALID("Not Valid"),
     @XmlEnumValue("Substandard")
     SUBSTANDARD("Substandard"),
     @XmlEnumValue("Extraneous")

@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -82,8 +84,11 @@ public class PDFFormatServiceImpl implements FormatService {
 		transformer = tFactory.newTransformer(new StreamSource(this
 				.getClass().getResourceAsStream("/stylesheets/testCase.xsl")));
 
+		String style = IOUtils.toString(this.getClass().getResourceAsStream("/stylesheets/style.css"), StandardCharsets.UTF_8.name());
+	    
 		transformer.transform(new StreamSource(tcXml), new StreamResult(os));
 		String str = os.toString();
+		str = str.replace("[STYLE]", style);
 		System.out.println(str);
 		ITextRenderer renderer = new ITextRenderer();
 		renderer.setDocumentFromString( str );

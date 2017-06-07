@@ -49,10 +49,12 @@ import gov.nist.healthcare.cds.domain.wrapper.ExportConfig;
 import gov.nist.healthcare.cds.domain.wrapper.ExportResult;
 import gov.nist.healthcare.cds.domain.wrapper.ImportConfig;
 import gov.nist.healthcare.cds.domain.wrapper.MetaData;
+import gov.nist.healthcare.cds.domain.wrapper.ModelError;
 import gov.nist.healthcare.cds.domain.wrapper.TransformResult;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.domain.xml.ErrorModel;
 import gov.nist.healthcare.cds.enumeration.DateType;
+import gov.nist.healthcare.cds.enumeration.EvaluationReason;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.Gender;
 import gov.nist.healthcare.cds.enumeration.SerieStatus;
@@ -212,6 +214,12 @@ public class CSSFormatServiceImpl implements FormatService {
 	}
 
 	public void exportForecast(Row r, ExpectedForecast ef) {
+		transform = new Hashtable<String, String>();
+		transform.put("polio","POL");
+		transform.put("pneumopcv", "PCV");
+		transform.put("rotavirus", "ROTA");
+		transform.put("meningb", "MCV");
+		transform.put("varicella", "VAR");
 		
 		Cell _SERIESTATUS = r.createCell(SERIESTATUS);
 		_SERIESTATUS.setCellValue(ef.getSerieStatus().getDetails());
@@ -219,13 +227,17 @@ public class CSSFormatServiceImpl implements FormatService {
 		Cell _DOSE_N = r.createCell(DOSE_N);
 		_DOSE_N.setCellValue(ef.getDoseNumber());
 		
-		Cell _EARLIEST = r.createCell(EARLIEST);
-		_EARLIEST.setCellValue(asFixed(ef.getEarliest()));
-		_EARLIEST.setCellStyle(csDate);
+		if(ef.getEarliest() != null){
+			Cell _EARLIEST = r.createCell(EARLIEST);
+			_EARLIEST.setCellValue(asFixed(ef.getEarliest()));
+			_EARLIEST.setCellStyle(csDate);
+		}
 		
-		Cell _RECOMMENDED = r.createCell(RECOMMENDED);
-		_RECOMMENDED.setCellValue(asFixed(ef.getRecommended()));
-		_RECOMMENDED.setCellStyle(csDate);
+		if(ef.getRecommended() != null){
+			Cell _RECOMMENDED = r.createCell(RECOMMENDED);
+			_RECOMMENDED.setCellValue(asFixed(ef.getRecommended()));
+			_RECOMMENDED.setCellStyle(csDate);
+		}
 		
 		if(ef.getPastDue() != null){
 			Cell _PAST_DUE = r.createCell(PAST_DUE);
@@ -233,13 +245,37 @@ public class CSSFormatServiceImpl implements FormatService {
 			_PAST_DUE.setCellStyle(csDate);
 		}
 		
-		
 		Cell _TARGET = r.createCell(TARGET);
-		_TARGET.setCellValue(ef.getTarget().getName());
+		String target = getTarget(ef.getTarget().getCvx());
+		_TARGET.setCellValue(target);
 		
 	}
 	
-	public void fillForecast(Row r, TestCase tc) throws NoDataInCell, VaccineNotFoundException{
+	public String getTarget(String cvx){
+		Hashtable<String, String> transform = new Hashtable<String, String>();
+		transform.put("polio","POL");
+		transform.put("pneumopcv", "PCV");
+		transform.put("rotavirus", "ROTA");
+		transform.put("meningb", "MCV");
+		transform.put("varicella", "VAR");
+		
+		String target = "";
+		VaccineMapping mp = this.vaccineMpRepository.findMapping(cvx);
+		if(mp.getGroups().size() > 1 || mp.getGroups().size() == 0){
+			target = mp.getVx().getName();
+		}
+		else {
+			target = mp.getGroups().toArray(new VaccineGroup[0])[0].getName();
+		}
+		
+		if(transform.containsKey(target.toLowerCase())){
+			target = transform.get(target.toLowerCase());
+		}
+		
+		return target;
+	}
+	
+	public Vaccine fillForecast(Row r, TestCase tc) throws NoDataInCell, VaccineNotFoundException{
 		ExpectedForecast fc = new ExpectedForecast();
 		fc.setSerieStatus(SerieStatus.getSerieStatus(this.getString(r.getCell(SERIESTATUS),SERIESTATUS)));
 		if(r.getCell(50).getCellType() == Cell.CELL_TYPE_STRING){
@@ -249,14 +285,35 @@ public class CSSFormatServiceImpl implements FormatService {
 			fc.setDoseNumber((int) r.getCell(DOSE_N).getNumericCellValue() + "");
 		}
 		
-		if(this.getDate(r.getCell(EARLIEST),EARLIEST) != null){
-			fc.setEarliest(new FixedDate(this.getDate(r.getCell(EARLIEST),EARLIEST)));
+		try {
+			if(this.getDate(r.getCell(EARLIEST),EARLIEST) != null){
+				fc.setEarliest(new FixedDate(this.getDate(r.getCell(EARLIEST),EARLIEST)));
+			}
 		}
-		if(this.getDate(r.getCell(RECOMMENDED),RECOMMENDED) != null){
-			fc.setRecommended(new FixedDate(this.getDate(r.getCell(RECOMMENDED),RECOMMENDED)));
+		catch(Exception x){
+			if(fc.getSerieStatus().hasDates()){
+				throw x;
+			}
 		}
-		if(this.getDate(r.getCell(PAST_DUE),PAST_DUE) != null){
-			fc.setPastDue(new FixedDate(this.getDate(r.getCell(PAST_DUE),PAST_DUE)));
+		
+		try {
+			if(this.getDate(r.getCell(RECOMMENDED),RECOMMENDED) != null){
+				fc.setRecommended(new FixedDate(this.getDate(r.getCell(RECOMMENDED),RECOMMENDED)));
+			}	
+		}
+		catch(Exception x){
+			if(fc.getSerieStatus().hasDates()){
+				throw x;
+			}
+		}
+		
+		try {
+			if(this.getDate(r.getCell(PAST_DUE),PAST_DUE) != null){
+				fc.setPastDue(new FixedDate(this.getDate(r.getCell(PAST_DUE),PAST_DUE)));
+			}
+		}
+		catch(Exception x){
+			
 		}
 		
 		String target = this.getString(r.getCell(TARGET),TARGET);
@@ -281,6 +338,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 		fc.setTarget(v);
 		tc.setForecast(Arrays.asList(fc));
+		return v;
 	}
 	
 	private VaccineRef getRef(Injection i){
@@ -295,10 +353,20 @@ public class CSSFormatServiceImpl implements FormatService {
 	}
 	
 	public void exportEvent(Row r, VaccinationEvent ve, int start) {
+		Hashtable<EvaluationReason, String> transform = new Hashtable<EvaluationReason, String>();
+		transform.put(EvaluationReason.H, "Age: Too Old");
+		transform.put(EvaluationReason.C, "Age: Too Young");
+		transform.put(EvaluationReason.G, "Inadvertent Vaccine");
+		transform.put(EvaluationReason.D, "Interval: too short");
+		transform.put(EvaluationReason.E, "Live Virus Conflict");
+		transform.put(EvaluationReason.I, "Series Already Complete");
 		
 		Cell _ADMIN_DATE = r.createCell(start+ADMIN_DATE);
 		_ADMIN_DATE.setCellValue(asFixed(ve.getDate()));
 		_ADMIN_DATE.setCellStyle(csDate);
+		
+		Cell _VA_NAME = r.createCell(start+VA_NAME);
+		_VA_NAME.setCellValue(ve.getAdministred().getName());
 		
 		VaccineRef ref = getRef(ve.getAdministred());
 		
@@ -308,21 +376,36 @@ public class CSSFormatServiceImpl implements FormatService {
 		Cell _MVX = r.createCell(start+MVX);
 		_MVX.setCellValue(ref.getMvx());
 		
+		
 		ExpectedEvaluation ev = null;
 		for(ExpectedEvaluation x : ve.getEvaluations()){
 			ev = x;
 			break;
 		}
-		
-		if(ev != null){
+
+		if(ev != null && ev.getStatus() != null){
 			Cell _EVAL = r.createCell(start+EVAL);
-			_EVAL.setCellValue(ev.getStatus().toString());
+			_EVAL.setCellValue(ev.getStatus().getDetails());
+			
+			if(ev.getReason() != null && transform.containsKey(ev.getReason())){
+				Cell _EVAL_REASON = r.createCell(start+EVAL_REASON);
+				_EVAL_REASON.setCellValue(transform.get(ev.getReason()));
+			}
 		}
-		
 		
 	}
 	
 	public void fillEvent(Row r, TestCase tc, int start, int id, boolean ignore) throws VaccineNotFoundException, NoDataInCell, ProductNotFoundException{
+		Hashtable<String,EvaluationReason> transform = new Hashtable<String,EvaluationReason>();
+		transform.put("Age: Too Old", EvaluationReason.H);
+		transform.put("Age: Too Young", EvaluationReason.C);
+		transform.put("Inadvertent Vaccine", EvaluationReason.G);
+		transform.put("Inadvertent Vaccine: Inadvertent Administration", EvaluationReason.G);
+		transform.put("Vaccine: Invalid Usage", EvaluationReason.G);
+		transform.put("Interval: too short", EvaluationReason.D);
+		transform.put("Live Virus Conflict", EvaluationReason.E);
+		transform.put("Series Already Complete", EvaluationReason.I);
+		
 		VaccinationEvent ve = new VaccinationEvent();
 		ve.setPosition(id);
 		ve.setDoseNumber(0);
@@ -335,8 +418,8 @@ public class CSSFormatServiceImpl implements FormatService {
 		catch(Exception e){
 			mvx = "";
 		}
-		String eval = this.getString(r.getCell(start+EVAL),start+EVAL);
 		
+		String eval = this.getString(r.getCell(start+EVAL),start+EVAL);
 		ExpectedEvaluation evalt = new ExpectedEvaluation();
 		
 		if(eval.toUpperCase().equals("VALID")){
@@ -350,6 +433,16 @@ public class CSSFormatServiceImpl implements FormatService {
 		}
 		else if(eval.toUpperCase().equals("SUB-STANDARD")){
 			evalt.setStatus(EvaluationStatus.SUBSTANDARD);
+		}
+		
+		try {
+			String reason = this.getString(r.getCell(start+EVAL_REASON),start+EVAL_REASON);
+			if(transform.containsKey(reason)){
+				evalt.setReason(transform.get(reason));
+			}
+		}
+		catch(Exception e){
+			
 		}
 
 		if(mvx != null && !mvx.isEmpty()){
@@ -473,7 +566,7 @@ public class CSSFormatServiceImpl implements FormatService {
 					total++;
 					try {
 						this.fillTestCaseInfo(r, tc);
-						this.fillForecast(r, tc);
+						Vaccine targetV = this.fillForecast(r, tc);
 						tc.setEvents(new ArrayList<Event>());
 						int position = 0;
 						for(int event = START_EVENTS; event <= END_EVENTS; event = event + 6){
@@ -481,6 +574,13 @@ public class CSSFormatServiceImpl implements FormatService {
 								break;
 							}
 							this.fillEvent(r, tc, event, position++, config.isIgnore());
+						}
+						
+						try {
+							tc.setGroupTag(getTarget(targetV.getCvx()));
+						}
+						catch(Exception e){
+							e.printStackTrace();
 						}
 						ret.add(tc);
 					}
@@ -544,7 +644,14 @@ public class CSSFormatServiceImpl implements FormatService {
 	
 	@Override
 	public List<ErrorModel> preExport(TestCase tc) {
-		return new ArrayList<ErrorModel>();
+		ArrayList<ErrorModel> list = new ArrayList<ErrorModel>();
+		if(!tc.isRunnable()){
+			for(ModelError r : tc.getErrors()){
+				list.add(new ErrorModel(r.getPath(),r.getMessage()));
+			}
+		}
+		
+		return list;
 	}
 
 	@Override
@@ -553,13 +660,13 @@ public class CSSFormatServiceImpl implements FormatService {
 	}
 	
 	public void createHeader(Row r){
-		r.createCell(UID).setCellValue("Test_ID");
+		r.createCell(UID).setCellValue("CDC_Test_ID");
 		r.createCell(NAME).setCellValue("Test_Case_Name");
 		r.createCell(DOB).setCellValue("DOB");
 		r.createCell(GENDER).setCellValue("gender");
 		r.createCell(GENDER+1).setCellValue("Med_History_Text");
 		r.createCell(GENDER+2).setCellValue("Med_History_Code");
-		r.createCell(GENDER+3).setCellValue("Med_History_CodeSys");
+		r.createCell(GENDER+3).setCellValue("Med_History_Code_Sys");
 		r.createCell(SERIESTATUS).setCellValue("Series_Status");
 		int i = 1;
 		for(int event = START_EVENTS; event <= END_EVENTS; event = event + 6){
@@ -583,7 +690,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		r.createCell(FORECAST_TYPE).setCellValue("Forecast_Test_Type");
 		r.createCell(CHANGE).setCellValue("Reason_For_Change");
 		r.createCell(VERSION).setCellValue("Changed_In_Version");
-		r.createCell(DESCRIPTION).setCellValue("Description");
+		r.createCell(DESCRIPTION).setCellValue("General_Description");
 
 	}
 
@@ -595,7 +702,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 		XSSFDataFormat df = workbook.createDataFormat();
 		csDate = workbook.createCellStyle();
-		csDate.setDataFormat(df.getFormat("dd/mm/yyyy"));
+		csDate.setDataFormat(df.getFormat("mm/dd/yyyy"));
 		
 		
 		this.createHeader(sheet.createRow(0));

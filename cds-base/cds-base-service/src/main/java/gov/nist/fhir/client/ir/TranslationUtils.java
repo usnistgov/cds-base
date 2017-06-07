@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import org.hl7.fhir.dstu3.model.CodeType;
+import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Immunization.ImmunizationVaccinationProtocolComponent;
 import org.hl7.fhir.dstu3.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationDateCriterionComponent;
 
@@ -34,31 +36,31 @@ public class TranslationUtils {
     public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE = "overdue";
     public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST = "latest";
     public static final String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_RECOMMENDED = "recommended";
-
+    
     public static String translateCsdiDateToFhirDate(FixedDate date) {
         SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
         return print.format(date.getDate());
     }
-
+    
     public static Date translateHl7DateToJavaDate(String date) throws ParseException {
-
+        
         DateFormat df = new SimpleDateFormat("yyy-MM-dd");
         return df.parse(date);
     }
-
+    
     public static String translateJavaDateToFhirDate(Date date) {
         SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
         return print.format(date);
     }
-
+    
     public static FixedDate translateTchDateToFhirDate(String date) {
-
+        
         String year = date.substring(0, 4);
         String month = date.substring(5, 7);
         String day = date.substring(8, 10);
-
+        
         return new FixedDate(month + '/' + day + '/' + year);
-
+        
     }
 
     /*
@@ -103,24 +105,24 @@ public class TranslationUtils {
     }
      */
     public static ResponseVaccinationEvent translateImmunizationToResponseVaccinationEvent(org.hl7.fhir.dstu3.model.Immunization imm) {
-
+        
         ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
         VaccineRef vaccineRef = new VaccineRef();
-
+        
         if (imm.getVaccineCode() != null && imm.getVaccineCode().getCoding() != null
                 && imm.getVaccineCode().getCoding().get(0) != null
                 && imm.getVaccineCode().getCoding().get(0).getCode() != null) {
             vaccineRef.setCvx(imm.getVaccineCode().getCoding().get(0).getCode());
         }
         rve.setAdministred(vaccineRef);
-
+        
         rve.setDate(new FixedDate(imm.getDate()));
         rve.setEvaluations(new HashSet<ActualEvaluation>());
-
+        
         List<ImmunizationVaccinationProtocolComponent> vaccinationProtocols = imm.getVaccinationProtocol();
         Iterator<ImmunizationVaccinationProtocolComponent> it = vaccinationProtocols.iterator();
         while (it.hasNext()) {
-            ImmunizationVaccinationProtocolComponent ivp = it.next();
+            ImmunizationVaccinationProtocolComponent ivp = it.next();            
             ActualEvaluation ae = new ActualEvaluation();
             String status = "";
             if (ivp.getDoseStatus() != null && ivp.getDoseStatus().getCoding() != null
@@ -128,16 +130,34 @@ public class TranslationUtils {
                     && ivp.getDoseStatus().getCoding().get(0).getCode() != null) {
                 status = ivp.getDoseStatus().getCoding().get(0).getCode();
             }
-            if ("Y".equalsIgnoreCase(status)) {
+            
+            System.out.println("Status for " + ivp.getSeries() + " = " + status);
+            if ("Valid".equalsIgnoreCase(status)) {
+                ae.setStatus(EvaluationStatus.VALID);
+            } else if ("Not Valid".equalsIgnoreCase(status)) {
+                ae.setStatus(EvaluationStatus.INVALID);
+                System.out.println("Setting " + ivp.getSeries() + " to EvaluationStatus.INVALID");
+            } else if ("Extraneous".equalsIgnoreCase(status)) {
+                ae.setStatus(EvaluationStatus.EXTRANEOUS);
+            } else if ("Sub standard".equalsIgnoreCase(status)) {
+                ae.setStatus(EvaluationStatus.SUBSTANDARD);
+            } else if ("Y".equalsIgnoreCase(status)) {
                 ae.setStatus(EvaluationStatus.VALID);
             } else {
                 ae.setStatus(EvaluationStatus.INVALID);
             }
             VaccineRef vr = new VaccineRef();
+            
+            /*
             if (ivp.getSeries() != null) {
                 vr.setCvx(ivp.getSeries());
+            }*/
+            if(ivp.getTargetDiseaseFirstRep() != null && ivp.getTargetDiseaseFirstRep().getCodingFirstRep() != null
+                    && ivp.getTargetDiseaseFirstRep().getCodingFirstRep().getCode() !=  null) {
+                vr.setCvx(ivp.getTargetDiseaseFirstRep().getCodingFirstRep().getCode());
             }
-            ae.setVaccine(vr);
+            
+            ae.setVaccine(vr);            
             rve.getEvaluations().add(ae);
         }
         return rve;
@@ -294,27 +314,28 @@ public class TranslationUtils {
         if (irr.getDate() == null || "".equals(irr.getDate())) {
             return null;
         }
-
         
         ActualForecast af = new ActualForecast();
         //TODO: Error checking
         af.setDoseNumber(Integer.toString(irr.getDoseNumber()));
         VaccineRef vaccineRef = new VaccineRef();
         if (irr.getVaccineCode() != null && irr.getVaccineCode().getCoding() != null
-                && irr.getVaccineCode().getCoding().size() > 1
+                && irr.getVaccineCode().getCoding().size() > 0
                 && irr.getVaccineCode().getCoding().get(0) != null
                 && irr.getVaccineCode().getCoding().get(0).getCode() != null) {
+            Coding ct = irr.getVaccineCode().getCoding().get(0);
             vaccineRef.setCvx(irr.getVaccineCode().getCoding().get(0).getCode());
+            
         }
         af.setVaccine(vaccineRef);
-
+        
         List<ImmunizationRecommendationRecommendationDateCriterionComponent> dateCriterions = irr.getDateCriterion();
-
+        
         Iterator<ImmunizationRecommendationRecommendationDateCriterionComponent> it = dateCriterions.iterator();
         while (it.hasNext()) {
-
+            
             ImmunizationRecommendationRecommendationDateCriterionComponent dateCriterion = it.next();
-
+            
             if (dateCriterion.getValue() != null && dateCriterion.getValue() != null) {
                 FixedDate date = new FixedDate(dateCriterion.getValue());
 
@@ -326,9 +347,9 @@ public class TranslationUtils {
                     status = dateCriterion.getCode().getCoding().get(0).getCode();
                 }
                 switch (status) {
-                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE:
-                        af.setRecommended(date.getDate());
-                        break;
+                    //case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_DUE:
+//                        af.setRecommended(date.getDate());
+  //                      break;
                     case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST:
                         af.setEarliest(date.getDate());
                         break;
@@ -338,6 +359,9 @@ public class TranslationUtils {
                     case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST:
                         af.setComplete(date.getDate());
                         break;
+                    case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_RECOMMENDED:
+                        af.setRecommended(date.getDate());
+                        break;                    
                 }
             }
         }
@@ -347,28 +371,51 @@ public class TranslationUtils {
                 && irr.getForecastStatus().getCoding().get(0).getCode() != null) {
             String status = irr.getForecastStatus().getCoding().get(0).getCode();
 
-            // TODO: Is this work around needed? Or is one just wrong?
+            
             try {
-                if (status.equals("Not Complete")) {
-                    af.setSerieStatus(SerieStatus.N);
-                } else if (status.equals("Aged Out")) {
-                    af.setSerieStatus(SerieStatus.G);
-                } else if (status.startsWith("o")) {
-                    af.setSerieStatus(SerieStatus.O);
-                } else if (status.equalsIgnoreCase("d")) {
+                if (status.equalsIgnoreCase("assumed complete or immune")){
+                    af.setSerieStatus(SerieStatus.A);
+                } else if (status.equalsIgnoreCase("complete")) {
+                    af.setSerieStatus(SerieStatus.C);
+                } else if (status.equalsIgnoreCase("due")) {
                     af.setSerieStatus(SerieStatus.D);
-                } else if (status.startsWith("u")) {
+                } else if(status.equalsIgnoreCase("error")) {
+                    af.setSerieStatus(SerieStatus.U);
+                } else if(status.equalsIgnoreCase("finished")) {
+                    af.setSerieStatus(SerieStatus.F);
+                } else if(status.equalsIgnoreCase("aged out")) {
+                    af.setSerieStatus(SerieStatus.G);                    
+                } else if(status.equalsIgnoreCase("immue")) {
+                    af.setSerieStatus(SerieStatus.I);
+                } else if(status.equalsIgnoreCase("due later")) {
+                    af.setSerieStatus(SerieStatus.L);
+                } else if(status.equalsIgnoreCase("not complete")) {
+                    af.setSerieStatus(SerieStatus.N);                    
+                } else if(status.equalsIgnoreCase("overdue")) {
+                    af.setSerieStatus(SerieStatus.O);                    
+                } else if(status.equalsIgnoreCase("no results")) {
+                    af.setSerieStatus(SerieStatus.U);
+                } else if(status.equalsIgnoreCase("complete for season")) {
+                    af.setSerieStatus(SerieStatus.S);
+                } else if(status.equalsIgnoreCase("unknown")) {
+                    af.setSerieStatus(SerieStatus.U);
+                } else if(status.equalsIgnoreCase("Consider")) {
+                    af.setSerieStatus(SerieStatus.V);
+                } else if(status.equalsIgnoreCase("waivered")) {
+                    af.setSerieStatus(SerieStatus.W);
+                } else if(status.equalsIgnoreCase("contraindicated")) {
                     af.setSerieStatus(SerieStatus.X);
-                } else {
-                    af.setSerieStatus(SerieStatus.valueOf(status));
+                } else if(status.equalsIgnoreCase("recommended but not required")) {
+                    af.setSerieStatus(SerieStatus.Z);
                 }
+
             } catch (Exception e) {
                 //TODO better error checking
                 System.out.println("Unexpected dose status = " + status);
             }
         }
         return af;
-
+        
     }
     /*
     public static boolean doesRecommendationHaveDateCriterion(ImmunizationRecommendationRecommendation irr) {

@@ -45,4 +45,6 @@ public abstract class Injection {
 		this.id = id;
 	}
 	
+	public abstract String getName();
+	
 }

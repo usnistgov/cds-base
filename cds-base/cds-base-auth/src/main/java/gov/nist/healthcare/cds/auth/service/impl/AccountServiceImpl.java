@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -125,7 +124,8 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account changePasswordForUser(Account account, PasswordChange pChange) throws PasswordChangeException {
-		if(!pChange.getPassword().equals(pChange.getNewPassword())){
+		
+		if(!encoder.matches(pChange.getNewPassword(),account.getPassword())){
 			account.setPassword(encoder.encode(pChange.getNewPassword()));
 			return this.accountRepository.save(account);
 		}
