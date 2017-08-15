@@ -17,6 +17,18 @@ public class VaccineGroup implements Serializable {
 	private String cvx;
 	private String name;
 	
+	
+	
+	public VaccineGroup() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	public VaccineGroup(String cvx) {
+		super();
+		this.cvx = cvx;
+	}
+
 	public String getCvx() {
 		return cvx;
 	}

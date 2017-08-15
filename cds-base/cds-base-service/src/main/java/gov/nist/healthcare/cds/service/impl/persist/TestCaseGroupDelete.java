@@ -9,6 +9,7 @@ import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.TestCaseGroup;
 import gov.nist.healthcare.cds.domain.TestPlan;
 import gov.nist.healthcare.cds.domain.wrapper.Report;
+import gov.nist.healthcare.cds.enumeration.EntityAccess;
 import gov.nist.healthcare.cds.repositories.ReportRepository;
 import gov.nist.healthcare.cds.repositories.TestCaseRepository;
 import gov.nist.healthcare.cds.repositories.TestPlanRepository;
@@ -32,7 +33,7 @@ public class TestCaseGroupDelete extends EntityDelete<TestCaseGroup> {
 
 	@Override
 	public boolean proceed(TestCaseGroup tg, String user) {
-		TestPlan tp = this.ledger.tpBelongsTo(tg.getTestPlan(), user);
+		TestPlan tp = this.ledger.tpBelongsTo(tg.getTestPlan(), user, EntityAccess.W);
 		TestCaseGroup tcg = tp.getGroup(tg.getId());
 		for(TestCase tc : tcg.getTestCases()){
 			this.deleteReportsForTC(tc);

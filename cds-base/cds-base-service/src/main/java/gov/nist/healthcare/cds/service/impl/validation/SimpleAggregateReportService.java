@@ -44,12 +44,14 @@ public class SimpleAggregateReportService implements AggregateReportService {
 			report.add(ValidationCriterion.RecommendedDate, fv.getRecommended());
 			report.add(ValidationCriterion.PastDueDate, fv.getPastDue());
 			report.add(ValidationCriterion.CompleteDate, fv.getComplete());
+			report.add(ValidationCriterion.SeriesStatus, fv.getSerieStatus());
 			if(!hasErrors){
 				hasErrors = fv.getDose().getStatus().equals(ValidationStatus.F) || 
 						fv.getEarliest().getStatus().equals(ValidationStatus.F) ||
 						fv.getRecommended().getStatus().equals(ValidationStatus.F) ||
 						fv.getPastDue().getStatus().equals(ValidationStatus.F) ||
-						fv.getComplete().getStatus().equals(ValidationStatus.F);
+						fv.getComplete().getStatus().equals(ValidationStatus.F) ||
+						fv.getSerieStatus().getStatus().equals(ValidationStatus.F);
 			}
 		}
 		return hasErrors;

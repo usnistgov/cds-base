@@ -5,8 +5,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.Injection;
@@ -25,7 +23,6 @@ import gov.nist.healthcare.cds.domain.wrapper.TestCaseInformation;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
-import gov.nist.healthcare.cds.repositories.TestPlanRepository;
 import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.TestCaseExecutionService;
 import gov.nist.healthcare.cds.service.TestRunnerService;
@@ -105,6 +102,8 @@ public class ExecutionService implements TestCaseExecutionService {
 				fcReq.setPastDue(dates.fix(rds, fc.getPastDue()));
 			if(fc.getComplete() != null)
 				fcReq.setComplete(dates.fix(rds, fc.getComplete()));
+			if(fc.getSerieStatus() != null)
+				fcReq.setSeriesStatus(fc.getSerieStatus());
 			
 			fcRequirements.add(fcReq);
 		}

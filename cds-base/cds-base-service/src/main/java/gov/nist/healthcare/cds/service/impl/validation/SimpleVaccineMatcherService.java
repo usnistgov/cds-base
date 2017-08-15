@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import gov.nist.healthcare.cds.domain.Injection;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.Vaccine;
@@ -15,12 +13,14 @@ import gov.nist.healthcare.cds.domain.VaccineMapping;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.repositories.VaccineMappingRepository;
 import gov.nist.healthcare.cds.service.VaccineMatcherService;
+import gov.nist.healthcare.cds.service.VaccineService;
 
-@Service
 public class SimpleVaccineMatcherService implements VaccineMatcherService {
 
 	@Autowired
 	private VaccineMappingRepository vmRepo;
+	@Autowired
+	private VaccineService vaccineService;
 	
 	@Override
 	public boolean match(VaccineRef ref, Injection i) {

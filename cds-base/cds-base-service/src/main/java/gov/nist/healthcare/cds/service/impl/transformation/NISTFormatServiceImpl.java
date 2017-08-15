@@ -1,6 +1,5 @@
 package gov.nist.healthcare.cds.service.impl.transformation;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,7 +11,6 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipOutputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -52,7 +50,6 @@ import gov.nist.healthcare.cds.domain.exception.ProductNotFoundException;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
 import gov.nist.healthcare.cds.domain.wrapper.ExportConfig;
 import gov.nist.healthcare.cds.domain.wrapper.ExportResult;
-import gov.nist.healthcare.cds.domain.wrapper.ExportedFileStream;
 import gov.nist.healthcare.cds.domain.wrapper.ImportConfig;
 import gov.nist.healthcare.cds.domain.wrapper.MetaData;
 import gov.nist.healthcare.cds.domain.wrapper.TransformResult;

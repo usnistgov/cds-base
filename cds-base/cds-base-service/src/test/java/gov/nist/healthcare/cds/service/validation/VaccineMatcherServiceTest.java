@@ -44,7 +44,6 @@ public class VaccineMatcherServiceTest {
 		return vm;
 	}
 	
-	
 	public Vaccine vx(String cvx){
 		Vaccine vx = new Vaccine();
 		vx.setCvx(cvx);

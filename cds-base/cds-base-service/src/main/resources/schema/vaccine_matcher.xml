@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:VaccineMatcher xmlns:tns="http://fits.nist.gov/vaccine_matcher/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://fits.nist.gov/vaccine_matcher/ vaccine_matcher.xsd ">
+  <VaccineMapping/>
+</tns:VaccineMatcher>

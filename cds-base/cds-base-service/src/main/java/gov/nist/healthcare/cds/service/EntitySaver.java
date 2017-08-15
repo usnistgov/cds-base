@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import gov.nist.healthcare.cds.domain.Entity;
 import gov.nist.healthcare.cds.domain.exception.IllegalSave;
+import gov.nist.healthcare.cds.enumeration.EntityAccess;
 import gov.nist.healthcare.cds.service.domain.SaveObject;
 
 public abstract class EntitySaver<T extends Entity> {
@@ -32,7 +33,7 @@ public abstract class EntitySaver<T extends Entity> {
 		saveObject.clear();
 		if(this.exists(e)){
 			System.out.println("[HTEX]");
-			T persisted = ledger.belongsTo(e.getId(), user, clazz);
+			T persisted = ledger.belongsTo(e.getId(), user, clazz, EntityAccess.W);
 			this.verify(clazz, persisted, e.getId());
 			this.prepare(persisted, e, user);
 			return save(e);

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
+
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import gov.nist.healthcare.cds.domain.Date;
@@ -53,8 +56,7 @@ public class SimpleDateService implements DateService {
 				}
 			}
 			return rds;
-		}
-		
+		}	
 	}
 	
 	public java.util.Date asFixed(Date d){
@@ -73,7 +75,6 @@ public class SimpleDateService implements DateService {
 		else {
 			return asFixed(dt);
 		}
-		
 	}
 	
 	public void fixEvents(ResolvedDates rds, List<VaccinationEvent> veL) {
@@ -155,12 +156,13 @@ public class SimpleDateService implements DateService {
 	@Override
 	public java.util.Date from(int years, int months, int days, DatePosition p, java.util.Date ref) {
 		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
 	    calendar.setTime(ref);
 	    int multiple = 1;
 	    if(p.equals(DatePosition.BEFORE)){
 	    	multiple = multiple * -1;
 	    }
-	    int nbMonths = months + years * 12 * multiple;
+	    int nbMonths = ( months + years * 12) * multiple;
 	    int nbDays = days * multiple;
 	    
 	    calendar.add(Calendar.MONTH, nbMonths);
@@ -170,7 +172,9 @@ public class SimpleDateService implements DateService {
 
 	@Override
 	public boolean same(java.util.Date d1, java.util.Date d2) {
-		return d1.compareTo(d2) == 0;
+		DateTime dt1 = new DateTime(d1);
+		DateTime dt2 = new DateTime(d2);
+		return dt1.toLocalDate().compareTo(dt2.toLocalDate()) == 0;
 	}
 
 	@Override
@@ -187,6 +191,7 @@ public class SimpleDateService implements DateService {
 				ve.setDate(fixed(dA));
 			}
 		}
+		
 		for(ExpectedForecast fc : tc.getForecast()){
 		
 			if(fc.getEarliest() != null)

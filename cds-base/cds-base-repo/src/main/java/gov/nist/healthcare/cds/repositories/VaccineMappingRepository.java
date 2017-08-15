@@ -14,4 +14,8 @@ public interface VaccineMappingRepository extends MongoRepository<VaccineMapping
 	
 	@Query("{ 'vx.$id' : ?0 }")
 	public VaccineMapping findMapping(String cvx);
+	
+	@Query("{ 'vx.$id' : ?0, 'products' : { 'mx.$id' :  ?1 } }")
+	public VaccineMapping findMapping(String cvx, String mvx);
+	
 }

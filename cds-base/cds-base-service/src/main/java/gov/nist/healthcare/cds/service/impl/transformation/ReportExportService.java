@@ -4,18 +4,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.GregorianCalendar;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.springframework.stereotype.Service;
-
 import gov.nist.healthcare.cds.domain.Injection;
-import gov.nist.healthcare.cds.domain.Patient;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
@@ -60,8 +56,7 @@ import gov.nist.healthcare.cds.enumeration.ValidationStatus;
 public class ReportExportService implements gov.nist.healthcare.cds.service.ReportExportService {
 
 	@Override
-	public String exportXML(Report report, TestCase tc)
-			throws UnsupportedEncodingException, JAXBException, DatatypeConfigurationException {
+	public String exportXML(Report report, TestCase tc) throws UnsupportedEncodingException, JAXBException, DatatypeConfigurationException {
 		ValidationReport vrt = new ValidationReport();
 		vrt.setReportMetaData(reportMd(report));
 		vrt.setTestCaseMetaData(tcMd(report, tc));
@@ -347,4 +342,5 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregory);
 		return calendar;
 	}
+
 }

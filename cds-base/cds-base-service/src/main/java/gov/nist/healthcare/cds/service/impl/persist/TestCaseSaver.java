@@ -7,6 +7,7 @@ import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.TestCaseGroup;
 import gov.nist.healthcare.cds.domain.TestPlan;
 import gov.nist.healthcare.cds.domain.exception.IllegalSave;
+import gov.nist.healthcare.cds.enumeration.EntityAccess;
 import gov.nist.healthcare.cds.repositories.TestCaseRepository;
 import gov.nist.healthcare.cds.service.EntitySaver;
 import gov.nist.healthcare.cds.service.domain.SaveObject;
@@ -24,7 +25,7 @@ public class TestCaseSaver extends EntitySaver<TestCase> {
 
 	@Override
 	public void prepare(TestCase persisted, TestCase e, String user) throws IllegalSave {
-		TestPlan tp = ledger.tpBelongsTo(e.getTestPlan(), user);
+		TestPlan tp = ledger.tpBelongsTo(e.getTestPlan(), user, EntityAccess.W);
 		this.verify(TestPlan.class, tp, e.getTestPlan());
 		
 		//--- New

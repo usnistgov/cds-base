@@ -9,6 +9,7 @@ import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.TestCaseGroup;
 import gov.nist.healthcare.cds.domain.TestPlan;
 import gov.nist.healthcare.cds.domain.wrapper.Report;
+import gov.nist.healthcare.cds.enumeration.EntityAccess;
 import gov.nist.healthcare.cds.repositories.ReportRepository;
 import gov.nist.healthcare.cds.repositories.SoftwareConfigRepository;
 import gov.nist.healthcare.cds.repositories.TestCaseRepository;
@@ -31,19 +32,22 @@ public class SimplePropretyService implements PropertyService {
 	private SoftwareConfigRepository configRepository;
 
 	@Override
-	public TestCase tcBelongsTo(String tc, String user) {
+	public TestCase tcBelongsTo(String tc, String user, EntityAccess accessType) {
 		TestPlan tp = testPlanRepository.tcUser(tc);
-		if(tp != null && tp.getUser().equals(user)){
-			return testCaseRepository.findOne(tc);
+		if(tp != null){
+			System.out.println("NNNULL");
+			boolean pass = tp.getUser().equals(user) || (accessType.equals(EntityAccess.R) && tp.getViewers().contains(user));
+			return pass ? testCaseRepository.findOne(tc) : null;
 		}
 		return null;
 	}
 
 	@Override
-	public TestPlan tpBelongsTo(String tpId, String user) {
+	public TestPlan tpBelongsTo(String tpId, String user, EntityAccess accessType) {
 		TestPlan tp = testPlanRepository.findOne(tpId);
-		if(tp != null && tp.getUser().equals(user)){
-			return tp;
+		if(tp != null){
+			boolean pass = tp.getUser().equals(user) || (accessType.equals(EntityAccess.R) && tp.getViewers().contains(user));
+			return pass ? tp : null;
 		}
 		return null;
 	}
@@ -51,11 +55,8 @@ public class SimplePropretyService implements PropertyService {
 	@Override
 	public Report reportBelongsTo(String reportId, String user) {
 		Report r = reportRepository.findOne(reportId);
-		if(r != null){
-			TestPlan tp = testPlanRepository.tcUser(r.getTc());
-			if(tp != null && tp.getUser().equals(user)){
-				return r;
-			}
+		if(r != null && r.getUser() != null && r.getUser().equals(user)){
+			return r;
 		}
 		return null;
 	}
@@ -70,24 +71,25 @@ public class SimplePropretyService implements PropertyService {
 	}
 
 	@Override
-	public TestCaseGroup tgBelongsTo(String tgId, String user) {
+	public TestCaseGroup tgBelongsTo(String tgId, String user, EntityAccess accessType) {
 		TestPlan tp = testPlanRepository.testCaseGroup(tgId);
 		if(tp != null && tp.getUser().equals(user)){
-			return tp.getGroup(tgId);
+			boolean pass = tp.getUser().equals(user) || (accessType.equals(EntityAccess.R) && tp.getViewers().contains(user));
+			return pass ? tp.getGroup(tgId) : null;
 		}
 		return null;
 	}
 
 	@Override
-	public <T extends Entity> T belongsTo(String id, String user, Class<T> type) {
+	public <T extends Entity> T belongsTo(String id, String user, Class<T> type, EntityAccess accessType) {
 		if(type.equals(TestCase.class)){
-			return (T) this.tcBelongsTo(id, user);
+			return (T) this.tcBelongsTo(id, user, accessType);
 		}
 		else if(type.equals(TestCaseGroup.class)){
-			return (T) this.tgBelongsTo(id, user);
+			return (T) this.tgBelongsTo(id, user, accessType);
 		}
 		else if(type.equals(TestPlan.class)){
-			return (T) this.tpBelongsTo(id, user);
+			return (T) this.tpBelongsTo(id, user, accessType);
 		}
 		else if(type.equals(Report.class)){
 			return (T) this.reportBelongsTo(id, user);

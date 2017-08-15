@@ -10,6 +10,7 @@ public class ForecastValidation {
 	private DateCriterion recommended;
 	private DateCriterion pastDue;
 	private DateCriterion complete;
+	private StringCriterion serieStatus;
 	private ResultCounts counts;
 	
 	public static ForecastValidation unMatched(ForecastRequirement fr){
@@ -63,8 +64,17 @@ public class ForecastValidation {
 			counts.addU();
 		}
 		
+		// Series Status
+		if(fr.getSeriesStatus() == null){
+			fv.setSerieStatus(new StringCriterion(ValidationStatus.N));
+		}
+		else {
+			fv.setSerieStatus(new StringCriterion(ValidationStatus.U));
+			counts.addU();
+		}
 		return fv;
 	}	
+	
 	public ForecastRequirement getForecastRequirement() {
 		return forecastRequirement;
 	}
@@ -106,6 +116,12 @@ public class ForecastValidation {
 	}
 	public void setCounts(ResultCounts counts) {
 		this.counts = counts;
+	}
+	public StringCriterion getSerieStatus() {
+		return serieStatus;
+	}
+	public void setSerieStatus(StringCriterion serieStatus) {
+		this.serieStatus = serieStatus;
 	}
 	
 	

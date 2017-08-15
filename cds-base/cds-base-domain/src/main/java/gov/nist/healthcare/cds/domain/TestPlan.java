@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -16,18 +15,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Document
 public class TestPlan extends ContainingEntity implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8368001729121705377L;
+	
 	@NotNull
 	private String name;
 	private String description;
-	@JsonIgnore
 	@Indexed
 	private String user;
-
+	private boolean isPublic;
+	private List<String> viewers;
 	private List<TestCaseGroup> testCaseGroups;
 	
 	public TestPlan(){
-//		testCaseGroups = new ArrayList<>();
-//		testCases = new ArrayList<>();
+
 	}
 	
 	public String getName() {
@@ -42,7 +45,6 @@ public class TestPlan extends ContainingEntity implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
 	public List<TestCaseGroup> getTestCaseGroups() {
 		if(this.testCaseGroups == null)
 			this.testCaseGroups = new ArrayList<>();
@@ -51,14 +53,12 @@ public class TestPlan extends ContainingEntity implements Serializable {
 	public void setTestCaseGroups(List<TestCaseGroup> testCaseGroups) {
 		this.testCaseGroups = testCaseGroups;
 	}
-	
 	public void addTestCase(TestCase tc){
 		if(this.testCases == null)
 			this.testCases = new ArrayList<TestCase>();
 		tc.setTestPlan(this.getId());
 		this.testCases.add(tc);
 	}
-	
 	public TestCaseGroup getOrCreateGroup(String id,String name){
 		if(testCaseGroups != null){
 			for(TestCaseGroup gr : testCaseGroups){
@@ -74,7 +74,6 @@ public class TestPlan extends ContainingEntity implements Serializable {
 		this.getTestCaseGroups().add(tcg);
 		return tcg;
 	}
-	
 	public TestCaseGroup createGroup(String name){
 		TestCaseGroup tcg = new TestCaseGroup();
 		tcg.setId(UUID.randomUUID().toString());
@@ -83,7 +82,6 @@ public class TestPlan extends ContainingEntity implements Serializable {
 		this.getTestCaseGroups().add(tcg);
 		return tcg;
 	}
-	
 	public TestCaseGroup getByNameOrCreateGroup(String name){
 		if(testCaseGroups != null){
 			for(TestCaseGroup gr : testCaseGroups){
@@ -131,5 +129,25 @@ public class TestPlan extends ContainingEntity implements Serializable {
 	public void setUser(String user) {
 		this.user = user;
 	}
+
+	public List<String> getViewers() {
+		if(viewers == null){
+			viewers = new ArrayList<String>();
+		}
+		return viewers;
+	}
+
+	public void setViewers(List<String> viewers) {
+		this.viewers = viewers;
+	}
+
+	public boolean isPublic() {
+		return isPublic;
+	}
+
+	public void setPublic(boolean isPublic) {
+		this.isPublic = isPublic;
+	}
+	
 	
 }

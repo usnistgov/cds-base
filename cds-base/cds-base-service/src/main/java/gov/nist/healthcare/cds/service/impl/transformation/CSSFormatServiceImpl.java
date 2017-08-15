@@ -14,7 +14,6 @@ import java.util.UUID;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.format.CellFormatType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -63,6 +62,7 @@ import gov.nist.healthcare.cds.repositories.VaccineMappingRepository;
 import gov.nist.healthcare.cds.repositories.VaccineRepository;
 import gov.nist.healthcare.cds.service.FormatService;
 import gov.nist.healthcare.cds.service.MetaDataService;
+import gov.nist.healthcare.cds.service.VaccineService;
 
 @Service
 public class CSSFormatServiceImpl implements FormatService {
@@ -75,6 +75,8 @@ public class CSSFormatServiceImpl implements FormatService {
 	private VaccineMappingRepository vaccineMpRepository;
 	@Autowired
 	private MetaDataService mdService;
+	@Autowired
+	private VaccineService vaxService;
 	
 	private Hashtable<String,String> transform;
 	
@@ -126,6 +128,15 @@ public class CSSFormatServiceImpl implements FormatService {
 		}
 	}
 	
+	public String getDoubleAsStringOpt(Cell cell,String def) {
+		if(cell != null && cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+			return cell.getNumericCellValue()+"";
+		}
+		else {
+			return def;
+		}
+	}
+	
 	public java.util.Date getDate(Cell cell,int i) throws NoDataInCell{
 		try {
 			if(cell != null){
@@ -158,7 +169,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 		MetaData md = mdService.create(true);
 		md.setChangeLog(this.getStringOpt(r.getCell(CHANGE),""));
-		md.setVersion(this.getStringOpt(r.getCell(VERSION),"1.0"));
+		md.setVersion(this.getDoubleAsStringOpt(r.getCell(VERSION),"1.0"));
 		md.setDateCreated(this.getDate(r.getCell(DATE_ADD),DATE_ADD));
 		md.setDateLastUpdated(this.getDate(r.getCell(DATE_UP),DATE_UP));
 		
@@ -317,28 +328,32 @@ public class CSSFormatServiceImpl implements FormatService {
 		}
 		
 		String target = this.getString(r.getCell(TARGET),TARGET);
-		Vaccine v = vaccineRepository.findByNameIgnoreCase(target);
-		if(v == null){
-			String tr = transform.get(target.toUpperCase());
-			VaccineGroup vg;
-			if(tr != null && !tr.isEmpty()){
-				vg = vaccineGrRepository.findByNameIgnoreCase(tr);
-			}
-			else {
-				vg = vaccineGrRepository.findByNameIgnoreCase(target);
-			}
-			
-			if(vg != null){
-				v = vaccineRepository.findOne(vg.getCvx());
-			}
-			else {
-				throw new VaccineNotFoundException(target);
-			}
-		}
+		Vaccine v = vaxService.findGroup(target);
 		
 		fc.setTarget(v);
 		tc.setForecast(Arrays.asList(fc));
 		return v;
+		
+//		Vaccine v = vaccineRepository.findByNameIgnoreCase(target);
+//		if(v == null){
+//			String tr = transform.get(target.toUpperCase());
+//			VaccineGroup vg;
+//			if(tr != null && !tr.isEmpty()){
+//				vg = vaccineGrRepository.findByNameIgnoreCase(tr);
+//			}
+//			else {
+//				vg = vaccineGrRepository.findByNameIgnoreCase(target);
+//			}
+//			
+//			if(vg != null){
+//				v = vaccineRepository.findOne(vg.getCvx());
+//			}
+//			else {
+//				throw new VaccineNotFoundException(target);
+//			}
+//		}
+		
+		
 	}
 	
 	private VaccineRef getRef(Injection i){
@@ -388,23 +403,29 @@ public class CSSFormatServiceImpl implements FormatService {
 			_EVAL.setCellValue(ev.getStatus().getDetails());
 			
 			if(ev.getReason() != null && transform.containsKey(ev.getReason())){
-				Cell _EVAL_REASON = r.createCell(start+EVAL_REASON);
-				_EVAL_REASON.setCellValue(transform.get(ev.getReason()));
+				if(transform.containsKey(ev.getReason())) {
+					Cell _EVAL_REASON = r.createCell(start+EVAL_REASON);
+					_EVAL_REASON.setCellValue(transform.get(ev.getReason()));
+				}
+				else {
+					Cell _EVAL_REASON = r.createCell(start+EVAL_REASON);
+					_EVAL_REASON.setCellValue(ev.getReason().getDetails());
+				}
 			}
 		}
 		
 	}
 	
-	public void fillEvent(Row r, TestCase tc, int start, int id, boolean ignore) throws VaccineNotFoundException, NoDataInCell, ProductNotFoundException{
+	public void fillEvent(Row r, TestCase tc, int start, int id, boolean ignore, Vaccine target) throws VaccineNotFoundException, NoDataInCell, ProductNotFoundException{
 		Hashtable<String,EvaluationReason> transform = new Hashtable<String,EvaluationReason>();
-		transform.put("Age: Too Old", EvaluationReason.H);
-		transform.put("Age: Too Young", EvaluationReason.C);
-		transform.put("Inadvertent Vaccine", EvaluationReason.G);
-		transform.put("Inadvertent Vaccine: Inadvertent Administration", EvaluationReason.G);
-		transform.put("Vaccine: Invalid Usage", EvaluationReason.G);
-		transform.put("Interval: too short", EvaluationReason.D);
-		transform.put("Live Virus Conflict", EvaluationReason.E);
-		transform.put("Series Already Complete", EvaluationReason.I);
+		transform.put("age: too old", EvaluationReason.H);
+		transform.put("age: too young", EvaluationReason.C);
+		transform.put("inadvertent vaccine", EvaluationReason.G);
+		transform.put("inadvertent vaccine: inadvertent administration", EvaluationReason.G);
+		transform.put("vaccine: invalid usage", EvaluationReason.G);
+		transform.put("interval: too short", EvaluationReason.D);
+		transform.put("live virus conflict", EvaluationReason.E);
+		transform.put("series already complete", EvaluationReason.I);
 		
 		VaccinationEvent ve = new VaccinationEvent();
 		ve.setPosition(id);
@@ -436,51 +457,73 @@ public class CSSFormatServiceImpl implements FormatService {
 		}
 		
 		try {
-			String reason = this.getString(r.getCell(start+EVAL_REASON),start+EVAL_REASON);
-			if(transform.containsKey(reason)){
-				evalt.setReason(transform.get(reason));
-			}
-		}
-		catch(Exception e){
 			
-		}
+			String reason = this.getString(r.getCell(start+EVAL_REASON),start+EVAL_REASON);
 
-		if(mvx != null && !mvx.isEmpty()){
-			VaccineMapping vm = vaccineMpRepository.findMapping(cvx);
-			if(vm == null){
-				throw new ProductNotFoundException(cvx+"", mvx);
+			if(transform.containsKey(reason.toLowerCase())){
+				evalt.setReason(transform.get(reason.toLowerCase()));
 			}
 			else {
-				Product pr = null;
-				for(Product cp : vm.getProducts()){
-					if(cp.getMx().getMvx().equals(mvx)){
-						pr = cp;
+				for(EvaluationReason rs : EvaluationReason.values()){
+					if(rs.getDetails().toLowerCase().equals(reason.toLowerCase())){
+						evalt.setReason(rs);
 						break;
 					}
 				}
-				if(pr == null){
-					if(ignore){
-						throw new ProductNotFoundException(cvx+"", mvx);
-					}
-					else {
-						ve.setAdministred(vm.getVx());
-						evalt.setRelatedTo(vm.getVx());
-					}
-				}
-				else {
-					ve.setAdministred(pr);
-					evalt.setRelatedTo(pr.getVx());
-				}
 			}
+		}
+		catch(Exception e){
+			//e.printStackTrace();
+		}
+
+		VaccineRef ref = new VaccineRef(cvx,mvx);
+		Injection injection = vaxService.getVax(ref,ignore);
+		ve.setAdministred(injection);
+		
+		if(vaxService.isGroupOf(injection.getCvx(), target.getCvx())){
+			evalt.setRelatedTo(target);
 		}
 		else {
-			Vaccine vx = vaccineRepository.findOne(cvx+"");
-			if(vx == null){
-				throw new VaccineNotFoundException(cvx+"");
-			}
-			ve.setAdministred(vx);
-			evalt.setRelatedTo(vx);
+			evalt.setRelatedTo(vaxService.asVaccine(injection));
 		}
+		
+//		if(mvx != null && !mvx.isEmpty()){
+//			VaccineMapping vm = vaccineMpRepository.findMapping(cvx);
+//			if(vm == null){
+//				throw new ProductNotFoundException(cvx+"", mvx);
+//			}
+//			else {
+//				Product pr = null;
+//				for(Product cp : vm.getProducts()){
+//					if(cp.getMx().getMvx().equals(mvx)){
+//						pr = cp;
+//						break;
+//					}
+//				}
+//				if(pr == null){
+//					if(ignore){
+//						throw new ProductNotFoundException(cvx+"", mvx);
+//					}
+//					else {
+//						ve.setAdministred(vm.getVx());
+//						evalt.setRelatedTo(vm.getVx());
+//					}
+//				}
+//				else {
+//					ve.setAdministred(pr);
+//					evalt.setRelatedTo(pr.getVx());
+//				}
+//			}
+//		}
+//		else {
+//			Vaccine vx = vaccineRepository.findOne(cvx+"");
+//			if(vx == null){
+//				throw new VaccineNotFoundException(cvx+"");
+//			}
+//			ve.setAdministred(vx);
+//			evalt.setRelatedTo(vx);
+//		}
+		
 		ve.setEvaluations(new HashSet<ExpectedEvaluation>(Arrays.asList(evalt)));
 		tc.getEvents().add(ve);
 	}
@@ -573,7 +616,7 @@ public class CSSFormatServiceImpl implements FormatService {
 							if(r.getCell(event) == null || r.getCell(event).getCellType() == Cell.CELL_TYPE_BLANK){
 								break;
 							}
-							this.fillEvent(r, tc, event, position++, config.isIgnore());
+							this.fillEvent(r, tc, event, position++, config.isIgnore(), targetV);
 						}
 						
 						try {

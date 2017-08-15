@@ -3,6 +3,7 @@ package gov.nist.healthcare.cds.domain.wrapper;
 import java.util.Date;
 
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
+import gov.nist.healthcare.cds.enumeration.SerieStatus;
 
 public class ForecastRequirement {
 
@@ -11,6 +12,7 @@ public class ForecastRequirement {
 	private Date recommended;
 	private Date pastDue;
 	private Date complete;
+	private SerieStatus seriesStatus;
 	
 	public ExpectedForecast getExpForecast() {
 		return expForecast;
@@ -42,6 +44,13 @@ public class ForecastRequirement {
 	public void setComplete(Date complete) {
 		this.complete = complete;
 	}
+	public SerieStatus getSeriesStatus() {
+		return seriesStatus;
+	}
+	public void setSeriesStatus(SerieStatus seriesStatus) {
+		this.seriesStatus = seriesStatus;
+	}
+	
 	
 	
 }

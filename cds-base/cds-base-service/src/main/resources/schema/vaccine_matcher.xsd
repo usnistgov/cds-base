@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://fits.nist.gov/vaccine_matcher/" targetNamespace="http://fits.nist.gov/vaccine_matcher/">
+
+    <element name="VaccineMatcher" type="tns:VaccineMatcherType"></element>
+    
+    <complexType name="VaccineMatcherType">
+    	<sequence>
+    		<element name="VaccineMapping" type="tns:VaccineMappingType"></element>
+    	</sequence>
+    	<attribute name="matchSameGroup" type="boolean"></attribute>
+    </complexType>
+
+    <complexType name="VaccineMappingType">
+    	<sequence>
+    		<element maxOccurs="unbounded" minOccurs="0" name="EquivalentMatch" type="tns:EquivalentMatchType"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="EquivalentMatchType">
+
+    	<sequence>
+    		<choice maxOccurs="unbounded" minOccurs="1"><element name="Group" type="tns:GroupType"></element><element name="CVX" type="tns:CVXType"></element></choice>
+    	</sequence>
+    </complexType>
+
+    <complexType name="GroupType">
+    	<attribute name="code" type="string"></attribute>
+    	<attribute name="value" type="string"></attribute>
+    </complexType>
+
+    <complexType name="CVXType">
+    	<attribute name="code" type="string"></attribute>
+    	<attribute name="value" type="string"></attribute>
+    </complexType>
+    
+</schema>

@@ -3,7 +3,6 @@ package gov.nist.healthcare.cds.domain.wrapper;
 
 import gov.nist.healthcare.cds.domain.Entity;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
-import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.enumeration.Gender;
 import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 
@@ -18,6 +17,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Report extends Entity implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7577271749336291552L;
 	private String tc;
 	private TestCaseInformation tcInfo;
 	private Gender gender;
@@ -31,6 +34,7 @@ public class Report extends Entity implements Serializable {
 	private String response;
 	private ResultCounts events;
 	private ResultCounts forecasts;
+	private String user;
 	
 	
 	
@@ -140,5 +144,37 @@ public class Report extends Entity implements Serializable {
 	public void setTcInfo(TestCaseInformation tcInfo) {
 		this.tcInfo = tcInfo;
 	}
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+
+
+
+	public String getUser() {
+		return user;
+	}
+
+
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+
+
+	public MetaData getMetaData() {
+		return metaData;
+	}
+
+
+
+	public void setMetaData(MetaData metaData) {
+		this.metaData = metaData;
+	}
+	
 
 }

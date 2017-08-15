@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:VaccineMatcher matchSameGroups="true" xmlns:tns="http://fits.nist.gov/vaccine_matcher/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://fits.nist.gov/vaccine_matcher/ vaccine_matcher.xsd ">
+	<VaccineMapping>
+	
+		<EquivalentMatch>
+			<Group code="115" value="TDAP"/>
+			<Group code="139" value="Td"/>
+			<Group code="107" value="DTAP"/>
+		</EquivalentMatch>
+		
+		<EquivalentMatch>
+			<Group code="152" value="PneumoPCV"/>
+			<Group code="33" value="PneumoPPV"/>
+			<CVX code="109" value="Pneumococcal, Unspecified formulation"/>
+		</EquivalentMatch>
+		
+	</VaccineMapping>
+</tns:VaccineMatcher>

@@ -67,5 +67,9 @@ public class Product extends Injection implements Serializable {
     public int hashCode() {
         return id == null ? 0 : id.hashCode();
     }
+	@Override
+	public String getCvx() {
+		return this.getVx().getCvx();
+	}
 	
 }

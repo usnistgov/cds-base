@@ -12,6 +12,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReportRepository extends MongoRepository<Report, String>{ 
 	
-	@Query("{ 'tc' : ?0 } }")
+	@Query("{ 'tc' : ?0 }")
 	public List<Report> reportsForTestCase(String tcId);
+	
+	@Query("{ 'tc' : ?0 , 'user' : ?1 }")
+	public List<Report> reportsForTestCase(String tcId, String user);
+	
+	public List<Report> findByUser(String user);
 }

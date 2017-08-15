@@ -2,6 +2,7 @@ package gov.nist.healthcare.cds.domain;
 
 import gov.nist.healthcare.cds.domain.wrapper.ModelError;
 import gov.nist.healthcare.cds.enumeration.DateType;
+import gov.nist.healthcare.cds.enumeration.WorkflowTag;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class TestCase extends Entity implements Serializable {
 	private String testPlan;
 	@JsonProperty("group")
 	private String groupTag;
+	private WorkflowTag workflowTag;
 	private boolean runnable;
 	private List<ModelError> errors;
 	
@@ -169,8 +171,13 @@ public class TestCase extends Entity implements Serializable {
 	public void setDateType(DateType dateType) {
 		this.dateType = dateType;
 	}
-	
-	
-	
+
+	public WorkflowTag getWorkflowTag() {
+		return workflowTag;
+	}
+
+	public void setWorkflowTag(WorkflowTag workflowTag) {
+		this.workflowTag = workflowTag;
+	}
 	
 }

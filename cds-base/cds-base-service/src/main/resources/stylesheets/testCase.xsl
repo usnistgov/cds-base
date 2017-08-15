@@ -264,7 +264,7 @@
 						<td><xsl:value-of select="Vaccine/@cvx" /></td>
 						<td><xsl:value-of select="Vaccine/@name" /></td>
 						<td><xsl:value-of select="@status" /></td>
-						<td></td>
+						<td><xsl:value-of select="EvaluationReason/@value" /></td>
 					</tr>
 				</xsl:for-each>
 			</tbody>

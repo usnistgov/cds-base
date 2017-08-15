@@ -121,7 +121,7 @@
     <simpleType name="statusType">
     	<restriction base="string">
     		<enumeration value="Valid"></enumeration>
-    		<enumeration value="Invalid"></enumeration>
+    		<enumeration value="Not Valid"></enumeration>
     		<enumeration value="Substandard"></enumeration>
     		<enumeration value="Extraneous"></enumeration>
     	</restriction>

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import gov.nist.healthcare.cds.domain.Entity;
 import gov.nist.healthcare.cds.domain.exception.IllegalDelete;
+import gov.nist.healthcare.cds.enumeration.EntityAccess;
 
 public abstract class EntityDelete<T extends Entity> {
 
@@ -22,7 +23,7 @@ public abstract class EntityDelete<T extends Entity> {
 	public abstract boolean proceed(T entity, String user);
 	
 	public boolean delete(String id, String user) throws IllegalDelete{
-		T _e = ledger.belongsTo(id, user, clazz);
+		T _e = ledger.belongsTo(id, user, clazz, EntityAccess.W);
 		this.verify(clazz, _e, id);
 		return this.proceed(_e, user);
 	}

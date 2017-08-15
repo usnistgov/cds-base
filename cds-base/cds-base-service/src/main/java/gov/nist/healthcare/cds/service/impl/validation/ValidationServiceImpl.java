@@ -1,6 +1,7 @@
 package gov.nist.healthcare.cds.service.impl.validation;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -139,7 +140,13 @@ public class ValidationServiceImpl implements ValidationService {
 		return null;
 	}
 	
-	
+	public boolean doseEqual(String d1, String d2){
+		List<String> none = new ArrayList<String>();
+		none.add("0");
+		none.add("-");
+		
+		return d1.toLowerCase().equals(d2.toLowerCase()) || (none.contains(d1) && none.contains(d2));
+	}
 	public ForecastValidation validate(ForecastRequirement fr, ActualForecast af, Report vr){
 		ForecastValidation fv = new ForecastValidation();
 		ResultCounts counts = new ResultCounts();
@@ -155,11 +162,10 @@ public class ValidationServiceImpl implements ValidationService {
 		else if(af.getDoseNumber().isEmpty()){
 			dose = new StringCriterion(ValidationStatus.U);
 		}
-		else if(ef.getDoseNumber().equals(af.getDoseNumber())) {
+		else if(doseEqual(ef.getDoseNumber(),af.getDoseNumber())) {
 			dose = new StringCriterion(ValidationStatus.P, af.getDoseNumber());
 		}
 		else {
-			
 			dose = new StringCriterion(config.failed(ValidationCriterion.DoseNumber), af.getDoseNumber());
 			vr.put(ValidationCriterion.DoseNumber, true);
 		}
@@ -183,7 +189,6 @@ public class ValidationServiceImpl implements ValidationService {
 		}
 		fv.setEarliest(earliest);
 		counts.consider(earliest);
-
 		
 		// Recommended
 		DateCriterion recommended;
@@ -238,6 +243,24 @@ public class ValidationServiceImpl implements ValidationService {
 		}
 		fv.setComplete(complete);
 		counts.consider(complete);
+		
+		// Series Status
+		StringCriterion seriesStatus;
+		if(fr.getSeriesStatus() == null){
+			seriesStatus = new StringCriterion(ValidationStatus.N);
+		}
+		else if(af.getSerieStatus() == null){
+			seriesStatus = new StringCriterion(ValidationStatus.U);
+		}
+		else if(af.getSerieStatus().equals(fr.getSeriesStatus())){
+			seriesStatus = new StringCriterion(ValidationStatus.P, af.getSerieStatus().toString());
+		}
+		else {
+			seriesStatus =  new StringCriterion(config.failed(ValidationCriterion.SeriesStatus), af.getSerieStatus().toString());
+			vr.put(ValidationCriterion.SeriesStatus,true);
+		}
+		fv.setSerieStatus(seriesStatus);
+		counts.consider(seriesStatus);
 		
 		return fv;
 	}

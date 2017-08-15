@@ -13,10 +13,16 @@ public interface TestPlanRepository extends MongoRepository<TestPlan, String>{
 	
 	public List<TestPlan> findByUser(String user);
 	
-	//@Query(value="{ $or : [ {'testCases' : { $elemMatch: { 'id' :  ?0 } } }, { 'testCaseGroups' : { $elemMatch: { 'testCases' :  { $elemMatch : { 'id' : ?0 } } } } } ] }",fields="{ 'user' : 1 }")
-	@Query(value="{ $or : [ {'testCases.id' : ?0}, { 'testCaseGroups.testCases.id' : ?0 } ] }",fields="{ 'user' : 1 }")
+	@Query(value="{ $or : [ {'testCases.id' : ?0}, { 'testCaseGroups.testCases.id' : ?0 } ] }",fields="{ 'user' : 1, 'viewers' : 1 }")
 	public TestPlan tcUser(String testId);
+	
+	@Query(value="{ $and : [ { 'user' : { $ne : ?0 } },{ $or : [ {'viewers' : ?0} , {'isPublic' : true } ] } ] }")
+	public List<TestPlan> sharedWithUser(String user);
+	
+	@Query(value="{ $or : [ {'viewers' : ?0} , {'user' : ?0 } ] }")
+	public List<TestPlan> filtred(String user);
 	
 	@Query(value="{'testCaseGroups' : { $elemMatch: { 'id' :  ?0 } } }")
 	public TestPlan testCaseGroup(String groupId);
+
 }
