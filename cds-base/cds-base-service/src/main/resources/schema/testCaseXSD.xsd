@@ -177,6 +177,7 @@
     	<attribute name="years" type="int"></attribute>
     	<attribute name="months" type="int"></attribute>
     	<attribute name="days" type="int"></attribute>
+    	<attribute name="weeks" type="int"></attribute>
     </complexType>
 
     <complexType name="RelativeToType">

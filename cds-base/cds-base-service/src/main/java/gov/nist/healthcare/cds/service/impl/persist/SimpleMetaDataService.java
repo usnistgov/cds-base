@@ -1,6 +1,5 @@
 package gov.nist.healthcare.cds.service.impl.persist;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import org.springframework.stereotype.Service;
@@ -13,8 +12,8 @@ public class SimpleMetaDataService implements MetaDataService {
 
 	@Override
 	public MetaData create(boolean imported) {
-		Date dateCreated = Calendar.getInstance().getTime();
-		Date dateUpdated = Calendar.getInstance().getTime();
+		Date dateCreated = new Date();
+		Date dateUpdated = new Date();
 		
 		MetaData md = new MetaData();
 		md.setDateCreated(dateCreated);
@@ -27,15 +26,15 @@ public class SimpleMetaDataService implements MetaDataService {
 	@Override
 	public void update(MetaData md) {
 		if(md != null){
-			Date dateUpdated = Calendar.getInstance().getTime();
+			Date dateUpdated = new Date();
 			md.setDateLastUpdated(dateUpdated);
 		}
 	}
 
 	@Override
 	public MetaData create(boolean imported, String version) {
-		Date dateCreated = Calendar.getInstance().getTime();
-		Date dateUpdated = Calendar.getInstance().getTime();
+		Date dateCreated = new Date();
+		Date dateUpdated = new Date();
 		
 		MetaData md = new MetaData();
 		md.setDateCreated(dateCreated);

@@ -46,6 +46,7 @@ public class TestPlanClone {
 			tp.setId(tpId);
 			tp.setUser(user);
 			tp.setViewers(null);
+			tp.setPublic(false);
 			
 			//-- TC
 			for(TestCase tc : tp.getTestCases()){

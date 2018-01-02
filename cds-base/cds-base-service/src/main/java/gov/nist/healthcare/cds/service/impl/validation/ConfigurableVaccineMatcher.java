@@ -33,7 +33,9 @@ public class ConfigurableVaccineMatcher implements VaccineMatcherService {
 	}
 	
 	private boolean straightMatch(Injection p, Injection i){
-		if(!p.getCvx().equals(i.getCvx())) return false;
+		
+		if(!p.getCvx().equals(i.getCvx())) 
+			return false;
 		else if(vaxService.typeOf(p).equals(vaxService.typeOf(i)) && vaxService.typeOf(p).equals("specific")){
 			return vaxService.asProduct(p).getMx().getMvx().equals(vaxService.asProduct(i).getMx().getMvx());
 		}
@@ -41,7 +43,6 @@ public class ConfigurableVaccineMatcher implements VaccineMatcherService {
 	}
 	
 	private boolean groupMatch(Injection p, Injection i) throws VaccineNotFoundException{
-//		if(vaxService.typeOf(p).equals("specific")) return false;
 		Set<VaccineGroup> pGroups = vaxService.groupsOf(p.getCvx());
 		Set<VaccineGroup> iGroups = vaxService.groupsOf(i.getCvx());
 		
@@ -52,15 +53,9 @@ public class ConfigurableVaccineMatcher implements VaccineMatcherService {
 		Set<VaccineGroup> pGroups = vaxService.groupsOf(p.getCvx());
 		Set<VaccineGroup> iGroups = vaxService.groupsOf(i.getCvx());
 		
-		Set<String> pGroupsC = new HashSet<>();
-		Set<String> iGroupsC = new HashSet<>();
+		Set<String> pGroupsC = transform(pGroups);
+		Set<String> iGroupsC = transform(iGroups);
 		
-		// Group Equivalents
-		pGroupsC = transform(pGroups);
-		iGroupsC = transform(iGroups);
-		
-		System.out.println(pGroupsC);
-		System.out.println(iGroupsC);
 		return pGroupsC.size() > 0 && iGroupsC.size() > 0 && pGroupsC.equals(iGroupsC);
 	}
 	
@@ -68,7 +63,7 @@ public class ConfigurableVaccineMatcher implements VaccineMatcherService {
 	private Set<String> transform(Set<VaccineGroup> pGroups){
 		Set<String> pGroupsC = new HashSet<>();
 		for(VaccineGroup grp : pGroups){
-			System.out.println("TUPLE FOR "+grp.getCvx());
+
 			EqTuple tuple = configuration.tupleFor(grp.getCvx());
 			if(tuple != null){
 				System.out.println(tuple.getEq());

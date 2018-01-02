@@ -60,6 +60,7 @@ import gov.nist.healthcare.cds.enumeration.SerieStatus;
 import gov.nist.healthcare.cds.repositories.VaccineGroupRepository;
 import gov.nist.healthcare.cds.repositories.VaccineMappingRepository;
 import gov.nist.healthcare.cds.repositories.VaccineRepository;
+import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.FormatService;
 import gov.nist.healthcare.cds.service.MetaDataService;
 import gov.nist.healthcare.cds.service.VaccineService;
@@ -77,6 +78,8 @@ public class CSSFormatServiceImpl implements FormatService {
 	private MetaDataService mdService;
 	@Autowired
 	private VaccineService vaxService;
+	@Autowired
+	private DateService dateService;
 	
 	private Hashtable<String,String> transform;
 	
@@ -180,10 +183,10 @@ public class CSSFormatServiceImpl implements FormatService {
 		tc.setMetaData(md);
 	}
 	
-	public void exportTestCaseInfo(Row r, TestCase tc) {
+	public void exportTestCaseInfo(Row r, TestCase tc, String postfix) {
 		
 		Cell _UID = r.createCell(UID);
-		_UID.setCellValue(tc.getUid());
+		_UID.setCellValue(tc.getUid()+postfix);
 		
 		Cell _NAME = r.createCell(NAME);
 		_NAME.setCellValue(tc.getName());
@@ -750,20 +753,46 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 		this.createHeader(sheet.createRow(0));
 		int i = 1;
+		java.util.Date today = new java.util.Date();
 		for(TestCase tc : tcs){
-			Row r = sheet.createRow(i++);
-			this.exportTestCaseInfo(r, tc);
-			if(tc.getForecast().size() == 1)
-				this.exportForecast(r , tc.getForecast().get(0));
 			
-			int position = START_EVENTS;
-			for(Event e : tc.getEvents()){
-				if(e instanceof VaccinationEvent && position <= END_EVENTS){
-					VaccinationEvent ve = (VaccinationEvent) e;
-					this.exportEvent(r, ve, position);
-					position += 6;
-				}
+			if(tc.getDateType().equals(DateType.RELATIVE)){
+				this.dateService.toFixed(tc, today);
 			}
+			boolean postfix = tc.getForecast().size() > 0;
+			int nfcast = 0;
+			for(ExpectedForecast fcast : tc.getForecast()){
+				Row r = sheet.createRow(i++);
+				nfcast++;
+				//-- INFO --
+				this.exportTestCaseInfo(r, tc, postfix ? "-"+nfcast+"" : "");
+				
+				//-- EVENTS --
+				int position = START_EVENTS;
+				for(Event e : tc.getEvents()){
+					if(e instanceof VaccinationEvent && position <= END_EVENTS){
+						VaccinationEvent ve = (VaccinationEvent) e;
+						this.exportEvent(r, ve, position);
+						position += 6;
+					}
+				}
+				
+				//-- FORECAST
+				this.exportForecast(r , fcast);
+			}
+//			Row r = sheet.createRow(i++);
+//			this.exportTestCaseInfo(r, tc);
+//			if(tc.getForecast().size() == 1)
+//				this.exportForecast(r , tc.getForecast().get(0));
+//			
+//			int position = START_EVENTS;
+//			for(Event e : tc.getEvents()){
+//				if(e instanceof VaccinationEvent && position <= END_EVENTS){
+//					VaccinationEvent ve = (VaccinationEvent) e;
+//					this.exportEvent(r, ve, position);
+//					position += 6;
+//				}
+//			}
 		}
 		for(int j = 0; j < 63; j++){
 			sheet.autoSizeColumn(j);

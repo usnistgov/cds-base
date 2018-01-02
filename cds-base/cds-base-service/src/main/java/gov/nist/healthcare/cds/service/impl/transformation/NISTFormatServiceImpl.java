@@ -243,6 +243,7 @@ public class NISTFormatServiceImpl implements FormatService {
 				RuleType rt = new RuleType();
 				rt.setDays(r.getDay());
 				rt.setMonths(r.getMonth());
+				rt.setWeeks(r.getWeek());
 				rt.setYears(r.getYear());
 				RelativeToType rtt = new RelativeToType();
 				rtt.setPosition(r.getPosition().toString());
@@ -274,6 +275,7 @@ public class NISTFormatServiceImpl implements FormatService {
 				RelativeDateRule rdr = new RelativeDateRule();
 				rdr.setDay(rt.getDays());
 				rdr.setMonth(rt.getMonths());
+				rdr.setWeek(rt.getWeeks());
 				rdr.setYear(rt.getYears());
 				rdr.setPosition(DatePosition.valueOf(rt.getRelativeTo().getPosition()));
 				if(rt.getRelativeTo() != null){

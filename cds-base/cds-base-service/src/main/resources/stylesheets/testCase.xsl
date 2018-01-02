@@ -163,13 +163,18 @@
 							</xsl:if>
 						</td>
 						<td class="no-border">
+							<xsl:if test="@weeks != 0">
+								<xsl:value-of select="@weeks" /> Weeks
+							</xsl:if>
+						</td>
+						<td class="no-border">
 							<xsl:if test="@days != 0">
 								<xsl:value-of select="@days" /> Days
 							</xsl:if>
 						</td>
 						<td class="no-border">
 							<xsl:choose>
-								<xsl:when test="@years='0' and @months='0' and @days='0'">
+								<xsl:when test="@years='0' and @months='0' and @weeks='0' and @days='0'">
 									On
 								</xsl:when>
 								<xsl:when test="RelativeTo[@position='BEFORE']">

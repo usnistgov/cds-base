@@ -14,6 +14,7 @@ public class RelativeDateRule {
 	private DatePosition position;
 	private int year;
 	private int month;
+	private int week;
 	private int day;
 	@NotNull(message = "Relative Date Rule's reference (Relative To) is required")
 	@Valid
@@ -24,7 +25,7 @@ public class RelativeDateRule {
 	}
 	
 	
-	public RelativeDateRule(DatePosition position, int year, int month, int day, DateReference relativeTo) {
+	public RelativeDateRule(DatePosition position, int year, int month, int week, int day, DateReference relativeTo) {
 		super();
 		this.position = position;
 		this.year = year;
@@ -64,6 +65,17 @@ public class RelativeDateRule {
 	public void setRelativeTo(DateReference relativeTo) {
 		this.relativeTo = relativeTo;
 	}
+
+
+	public int getWeek() {
+		return week;
+	}
+
+
+	public void setWeek(int week) {
+		this.week = week;
+	}
+	
 	
 	
 }

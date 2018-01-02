@@ -45,6 +45,7 @@ public class TestCase extends Entity implements Serializable {
 	private String testPlan;
 	@JsonProperty("group")
 	private String groupTag;
+	private List<Tag> tags;
 	private WorkflowTag workflowTag;
 	private boolean runnable;
 	private List<ModelError> errors;
@@ -59,6 +60,14 @@ public class TestCase extends Entity implements Serializable {
 	
 	public String getEvaluationType() {
 		return evaluationType;
+	}
+
+	public List<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<Tag> tags) {
+		this.tags = tags;
 	}
 
 	public void setEvaluationType(String evaluationType) {

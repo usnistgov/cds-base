@@ -7,10 +7,10 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import gov.nist.healthcare.cds.domain.EqTuple;
 import gov.nist.healthcare.cds.domain.VaccineMatcherCodeNode;
-import gov.nist.healthcare.cds.domain.xml.beans.CVXType;
-import gov.nist.healthcare.cds.domain.xml.beans.EquivalentMatchType;
-import gov.nist.healthcare.cds.domain.xml.beans.GroupType;
-import gov.nist.healthcare.cds.domain.xml.beans.VaccineMatcherType;
+import gov.nist.healthcare.cds.service.domain.matcher.CVXType;
+import gov.nist.healthcare.cds.service.domain.matcher.GroupType;
+import gov.nist.healthcare.cds.service.domain.matcher.VaccineMatcherType;
+
 
 public class VaccineMatcherConfiguration {
 	
@@ -18,29 +18,14 @@ public class VaccineMatcherConfiguration {
 	private List<EqTuple> eqTuples;
 	
 	public VaccineMatcherConfiguration(InputStream xml) throws JAXBException {
-		initTuplesX();
+		initTuples();
 	}
 	
 	public VaccineMatcherConfiguration() throws JAXBException {
-		initTuplesX();
+		initTuples();
 	}
 	
 	private void initTuples(){
-		
-		eqTuples = new ArrayList<EqTuple>();
-		
-		List<EquivalentMatchType> eqMs = xmlConfiguration.getVaccineMapping().getEquivalentMatch();
-		for(EquivalentMatchType eqM : eqMs){
-			List<Object> mappings = eqM.getGroupOrCVX();
-			if(mappings.size() > 0){
-				VaccineMatcherCodeNode n = this.getVMCNode(mappings.get(0));
-				EqTuple tuple = tupleFor(n);
-				addNodes(tuple, mappings);
-			}
-		}
-	}
-	
-	private void initTuplesX(){
 		eqTuples = new ArrayList<EqTuple>();
 		EqTuple tuple = new EqTuple();
 		tuple.addNode(new VaccineMatcherCodeNode("139"));
