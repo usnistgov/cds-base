@@ -9,12 +9,9 @@ import gov.nist.healthcare.cds.domain.VaccineGroup;
 import gov.nist.healthcare.cds.repositories.ManufacturerRepository;
 import gov.nist.healthcare.cds.repositories.ProductRepository;
 import gov.nist.healthcare.cds.repositories.VaccineGroupRepository;
-import gov.nist.healthcare.cds.repositories.VaccineMappingRepository;
 import gov.nist.healthcare.cds.repositories.VaccineRepository;
 import gov.nist.healthcare.cds.service.VaccineImportService;
-
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -22,8 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
@@ -52,7 +47,7 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 	
 	@Override
 	public Set<VaccineMapping> _import(InputStream _vaccines, InputStream _groups, InputStream _manufacturer, InputStream _products) throws IOException {
-		
+	
 		byte[] vaccines = IOUtils.toByteArray(_vaccines);
 		byte[] groups = IOUtils.toByteArray(_groups);
 		byte[] products = IOUtils.toByteArray(_products);
@@ -74,8 +69,9 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 			Sheet sheet = workbook.getSheetAt(0);
 			Iterator<Row> rowIterator = sheet.iterator();
 			rowIterator.next();
+
 			while(rowIterator.hasNext()){
-				
+
 				VaccineMapping vxm = new VaccineMapping();
 				
 				Row r = rowIterator.next();

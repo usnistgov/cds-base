@@ -19,6 +19,7 @@ import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.repositories.VaccineGroupRepository;
 import gov.nist.healthcare.cds.repositories.VaccineMappingRepository;
 import gov.nist.healthcare.cds.repositories.VaccineRepository;
+import gov.nist.healthcare.cds.service.NameTranslationService;
 import gov.nist.healthcare.cds.service.VaccineService;
 
 @Service
@@ -30,6 +31,8 @@ public class VaccineServiceImpl implements VaccineService {
 	private VaccineRepository vaccineRepository;
 	@Autowired
 	private VaccineGroupRepository vaccineGpRepository;
+	@Autowired
+	private NameTranslationService transform;
 
 	@Override
 	public Injection getVax(VaccineRef ref, boolean ignoreMvxInCaseOfFailure) throws ProductNotFoundException, VaccineNotFoundException {
@@ -119,13 +122,7 @@ public class VaccineServiceImpl implements VaccineService {
 
 	@Override
 	public Vaccine findGroup(String name) throws VaccineNotFoundException, IllegalArgumentException {
-		Hashtable<String, String> transform = new Hashtable<String, String>();
-		transform.put("POL", "POLIO");
-		transform.put("PCV", "PneumoPCV");
-		transform.put("ROTA", "ROTAVIRUS");
-		transform.put("MCV", "MeningB");
-		transform.put("VAR", "VARICELLA");
-		String transKey = transform.containsKey(name.toUpperCase()) ? transform.get(name.toUpperCase()) : name;
+		String transKey = transform.repToName(name);
 
 		//-- Vaccine
 		Vaccine vax = vaccineRepository.findByNameIgnoreCase(transKey);

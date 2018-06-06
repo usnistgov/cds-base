@@ -4,7 +4,6 @@ import gov.nist.healthcare.cds.domain.VaccineMapping;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Set;
 
 public interface VaccineImportService {

@@ -34,7 +34,7 @@ public class SimpleDateService implements DateService {
 		if(tc.getDateType().equals(DateType.RELATIVE)){
 			RelativeDate dob = (RelativeDate) tc.getPatient().getDob();
 			rds.setEval(today);
-			rds.setDob(this.from(dob.getRules().get(0).getYear(), dob.getRules().get(0).getMonth(), dob.getRules().get(0).getWeek(), dob.getRules().get(0).getDay(), DatePosition.BEFORE, today));
+			rds.setDob(this.back(dob.getRules().get(0).getYear(), dob.getRules().get(0).getMonth(), dob.getRules().get(0).getWeek(), dob.getRules().get(0).getDay(), DatePosition.BEFORE, today));
 		
 			// Fix Events 
 			List<VaccinationEvent> veL = new ArrayList<VaccinationEvent>();
@@ -154,7 +154,7 @@ public class SimpleDateService implements DateService {
 	}
 
 //	@Override
-	public java.util.Date from_(int years, int months, int days, DatePosition p, java.util.Date ref) {
+	public java.util.Date from_(int years, int months, int days, DatePosition p, java.util.Date ref, boolean backwards) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
 	    calendar.setTime(ref);
@@ -165,14 +165,26 @@ public class SimpleDateService implements DateService {
 	    int nbMonths = ( months + years * 12) * multiple;
 	    int nbDays = days * multiple;
 	    
-	    calendar.add(Calendar.MONTH, nbMonths);
-	    calendar.add(Calendar.DAY_OF_MONTH, nbDays);
+	    if(!backwards){
+	    	calendar.add(Calendar.MONTH, nbMonths);
+		    calendar.add(Calendar.DAY_OF_MONTH, nbDays);
+	    }
+	    else {
+	    	calendar.add(Calendar.DAY_OF_MONTH, nbDays);
+	    	calendar.add(Calendar.MONTH, nbMonths);
+	    }
+	    
 		return calendar.getTime();
 	}
 	
 	@Override
 	public java.util.Date from(int years, int months, int weeks, int days, DatePosition p, java.util.Date ref) {
-		return this.from_(years, months, days + weeks * 7, p, ref);
+		return this.from_(years, months, days + weeks * 7, p, ref, false);
+	}
+	
+
+	public java.util.Date back(int years, int months, int weeks, int days, DatePosition p, java.util.Date ref) {
+		return this.from_(years, months, days + weeks * 7, p, ref, true);
 	}
 
 	@Override

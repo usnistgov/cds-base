@@ -63,6 +63,7 @@ import gov.nist.healthcare.cds.repositories.VaccineRepository;
 import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.FormatService;
 import gov.nist.healthcare.cds.service.MetaDataService;
+import gov.nist.healthcare.cds.service.NameTranslationService;
 import gov.nist.healthcare.cds.service.VaccineService;
 
 @Service
@@ -80,8 +81,9 @@ public class CSSFormatServiceImpl implements FormatService {
 	private VaccineService vaxService;
 	@Autowired
 	private DateService dateService;
-	
-	private Hashtable<String,String> transform;
+	@Autowired
+	private NameTranslationService transform;
+
 	
 //	private XSSFDataFormat df;
 	private CellStyle csDate;
@@ -227,14 +229,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 	}
 
-	public void exportForecast(Row r, ExpectedForecast ef) {
-		transform = new Hashtable<String, String>();
-		transform.put("polio","POL");
-		transform.put("pneumopcv", "PCV");
-		transform.put("rotavirus", "ROTA");
-		transform.put("meningb", "MCV");
-		transform.put("varicella", "VAR");
-		
+	public void exportForecast(Row r, ExpectedForecast ef) {		
 		Cell _SERIESTATUS = r.createCell(SERIESTATUS);
 		_SERIESTATUS.setCellValue(ef.getSerieStatus().getDetails());
 		
@@ -262,17 +257,9 @@ public class CSSFormatServiceImpl implements FormatService {
 		Cell _TARGET = r.createCell(TARGET);
 		String target = getTarget(ef.getTarget().getCvx());
 		_TARGET.setCellValue(target);
-		
 	}
 	
-	public String getTarget(String cvx){
-		Hashtable<String, String> transform = new Hashtable<String, String>();
-		transform.put("polio","POL");
-		transform.put("pneumopcv", "PCV");
-		transform.put("rotavirus", "ROTA");
-		transform.put("meningb", "MCV");
-		transform.put("varicella", "VAR");
-		
+	public String getTarget(String cvx){		
 		String target = "";
 		VaccineMapping mp = this.vaccineMpRepository.findMapping(cvx);
 		if(mp.getGroups().size() > 1 || mp.getGroups().size() == 0){
@@ -282,11 +269,7 @@ public class CSSFormatServiceImpl implements FormatService {
 			target = mp.getGroups().toArray(new VaccineGroup[0])[0].getName();
 		}
 		
-		if(transform.containsKey(target.toLowerCase())){
-			target = transform.get(target.toLowerCase());
-		}
-		
-		return target;
+		return this.transform.nameToRep(target);
 	}
 	
 	public Vaccine fillForecast(Row r, TestCase tc) throws NoDataInCell, VaccineNotFoundException{
@@ -562,12 +545,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	public TransformResult importFromFile(InputStream in, ImportConfig config) throws ConfigurationException {
 		
 		TransformResult ret = new TransformResult();
-		transform = new Hashtable<String, String>();
-		transform.put("POL", "POLIO");
-		transform.put("PCV", "PneumoPCV");
-		transform.put("ROTA", "ROTAVIRUS");
-		transform.put("MCV", "MeningB");
-		transform.put("VAR", "VARICELLA");
+
 		int total = 0;
 		List<Integer> includes;
 		
@@ -765,7 +743,7 @@ public class CSSFormatServiceImpl implements FormatService {
 				Row r = sheet.createRow(i++);
 				nfcast++;
 				//-- INFO --
-				this.exportTestCaseInfo(r, tc, postfix ? "-"+nfcast+"" : "");
+				this.exportTestCaseInfo(r, tc, postfix && nfcast > 1 ? "-"+nfcast+"" : "");
 				
 				//-- EVENTS --
 				int position = START_EVENTS;
