@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -156,6 +157,11 @@ public class CSSFormatServiceImpl implements FormatService {
 		}
 	}
 	
+	public FixedDate getFixedDate(Cell cell,int i) throws NoDataInCell {
+		return new FixedDate(FixedDate.DATE_FORMAT.format(getDate(cell,i)));
+		
+	}
+	
 	public boolean emptyLine(Row r){
 		return r.getCell(0).getCellType() == Cell.CELL_TYPE_BLANK;
 	}
@@ -165,11 +171,11 @@ public class CSSFormatServiceImpl implements FormatService {
 		tc.setName(this.getString(r.getCell(NAME),NAME));
 		tc.setUid(this.getString(r.getCell(UID),UID));
 		tc.setDescription(this.getStringOpt(r.getCell(DESCRIPTION),""));
-		tc.setEvalDate(new FixedDate(this.getDate(r.getCell(EVAL_DATE),EVAL_DATE)));
+		tc.setEvalDate(this.getFixedDate(r.getCell(EVAL_DATE),EVAL_DATE));
 		tc.setGroupTag(this.getString(r.getCell(TARGET),TARGET));
 		
 		Patient p = new Patient();
-		p.setDob(new FixedDate(this.getDate(r.getCell(DOB),DOB)));
+		p.setDob(this.getFixedDate(r.getCell(DOB),DOB));
 		p.setGender(Gender.valueOf(this.getString(r.getCell(GENDER),GENDER)));
 		
 		MetaData md = mdService.create(true);
@@ -284,7 +290,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 		try {
 			if(this.getDate(r.getCell(EARLIEST),EARLIEST) != null){
-				fc.setEarliest(new FixedDate(this.getDate(r.getCell(EARLIEST),EARLIEST)));
+				fc.setEarliest(this.getFixedDate(r.getCell(EARLIEST),EARLIEST));
 			}
 		}
 		catch(Exception x){
@@ -295,7 +301,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 		try {
 			if(this.getDate(r.getCell(RECOMMENDED),RECOMMENDED) != null){
-				fc.setRecommended(new FixedDate(this.getDate(r.getCell(RECOMMENDED),RECOMMENDED)));
+				fc.setRecommended(this.getFixedDate(r.getCell(RECOMMENDED),RECOMMENDED));
 			}	
 		}
 		catch(Exception x){
@@ -306,7 +312,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 		try {
 			if(this.getDate(r.getCell(PAST_DUE),PAST_DUE) != null){
-				fc.setPastDue(new FixedDate(this.getDate(r.getCell(PAST_DUE),PAST_DUE)));
+				fc.setPastDue(this.getFixedDate(r.getCell(PAST_DUE),PAST_DUE));
 			}
 		}
 		catch(Exception x){
@@ -416,7 +422,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		VaccinationEvent ve = new VaccinationEvent();
 		ve.setPosition(id);
 		ve.setDoseNumber(0);
-		ve.setDate(new FixedDate(this.getDate(r.getCell(start+ADMIN_DATE),start+ADMIN_DATE)));
+		ve.setDate(this.getFixedDate(r.getCell(start+ADMIN_DATE),start+ADMIN_DATE));
 		String cvx = r.getCell(start+CVX).getCellType() == Cell.CELL_TYPE_STRING ? this.getString(r.getCell(start+CVX),start+CVX) : ""+ (int) r.getCell(start+CVX).getNumericCellValue();
 		String mvx ="";
 		try {
@@ -790,8 +796,8 @@ public class CSSFormatServiceImpl implements FormatService {
 	}
 	
 	
-	private java.util.Date asFixed(Date d){
-		return ((FixedDate) d).getDate();
+	private java.util.Date asFixed(Date d) {
+		return ((FixedDate) d).asDate();
 	}
 
 

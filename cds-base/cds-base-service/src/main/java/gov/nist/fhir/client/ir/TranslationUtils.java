@@ -40,7 +40,7 @@ public class TranslationUtils {
     
     public static String translateCsdiDateToFhirDate(FixedDate date) {
         SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
-        return print.format(date.getDate());
+        return print.format(date.getDateString());
     }
     
     public static Date translateHl7DateToJavaDate(String date) throws ParseException {
@@ -352,16 +352,16 @@ public class TranslationUtils {
 //                        af.setRecommended(date.getDate());
   //                      break;
                     case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_EARLIEST:
-                        af.setEarliest(date.getDate());
+                        af.setEarliest(date.asDate());
                         break;
                     case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_OVERDUE:
-                        af.setPastDue(date.getDate());
+                        af.setPastDue(date.asDate());
                         break;
                     case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_LATEST:
-                        af.setComplete(date.getDate());
+                        af.setComplete(date.asDate());
                         break;
                     case IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_RECOMMENDED:
-                        af.setRecommended(date.getDate());
+                        af.setRecommended(date.asDate());
                         break;                    
                 }
             }

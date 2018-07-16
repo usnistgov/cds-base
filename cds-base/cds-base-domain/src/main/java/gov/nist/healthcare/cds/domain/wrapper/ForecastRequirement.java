@@ -1,17 +1,16 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
-import java.util.Date;
-
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
+import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.enumeration.SerieStatus;
 
 public class ForecastRequirement {
 
 	private ExpectedForecast expForecast;
-	private Date earliest;
-	private Date recommended;
-	private Date pastDue;
-	private Date complete;
+	private FixedDate earliest;
+	private FixedDate recommended;
+	private FixedDate pastDue;
+	private FixedDate complete;
 	private SerieStatus seriesStatus;
 	
 	public ExpectedForecast getExpForecast() {
@@ -20,28 +19,28 @@ public class ForecastRequirement {
 	public void setExpForecast(ExpectedForecast expForecast) {
 		this.expForecast = expForecast;
 	}
-	public Date getEarliest() {
+	public FixedDate getEarliest() {
 		return earliest;
 	}
-	public void setEarliest(Date earliest) {
+	public void setEarliest(FixedDate earliest) {
 		this.earliest = earliest;
 	}
-	public Date getRecommended() {
+	public FixedDate getRecommended() {
 		return recommended;
 	}
-	public void setRecommended(Date recommended) {
+	public void setRecommended(FixedDate recommended) {
 		this.recommended = recommended;
 	}
-	public Date getPastDue() {
+	public FixedDate getPastDue() {
 		return pastDue;
 	}
-	public void setPastDue(Date pastDue) {
+	public void setPastDue(FixedDate pastDue) {
 		this.pastDue = pastDue;
 	}
-	public Date getComplete() {
+	public FixedDate getComplete() {
 		return complete;
 	}
-	public void setComplete(Date complete) {
+	public void setComplete(FixedDate complete) {
 		this.complete = complete;
 	}
 	public SerieStatus getSeriesStatus() {

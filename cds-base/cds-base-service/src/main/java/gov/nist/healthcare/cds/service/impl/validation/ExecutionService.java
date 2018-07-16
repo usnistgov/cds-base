@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
+import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.domain.Injection;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
@@ -83,7 +84,7 @@ public class ExecutionService implements TestCaseExecutionService {
 				VaccinationEvent ve = (VaccinationEvent) e;
 				java.util.Date dA = rds.getEvents().get(ve.getPosition());
 				VaccinationEventRequirement vReq = new VaccinationEventRequirement();
-				vReq.setDateAdministred(dA);
+				vReq.setDateAdministred(new FixedDate(dA));
 				vReq.setvEvent(ve);
 				veRequirements.add(vReq);
 			}
@@ -97,13 +98,13 @@ public class ExecutionService implements TestCaseExecutionService {
 			ForecastRequirement fcReq = new ForecastRequirement();		
 			fcReq.setExpForecast(fc);
 			if(fc.getEarliest() != null)
-				fcReq.setEarliest(dates.fix(rds, fc.getEarliest()));
+				fcReq.setEarliest(new FixedDate(dates.fix(rds, fc.getEarliest())));
 			if(fc.getRecommended() != null)
-				fcReq.setRecommended(dates.fix(rds, fc.getRecommended()));
+				fcReq.setRecommended(new FixedDate(dates.fix(rds, fc.getRecommended())));
 			if(fc.getPastDue() != null)
-				fcReq.setPastDue(dates.fix(rds, fc.getPastDue()));
+				fcReq.setPastDue(new FixedDate(dates.fix(rds, fc.getPastDue())));
 			if(fc.getComplete() != null)
-				fcReq.setComplete(dates.fix(rds, fc.getComplete()));
+				fcReq.setComplete(new FixedDate(dates.fix(rds, fc.getComplete())));
 			if(fc.getSerieStatus() != null)
 				fcReq.setSeriesStatus(fc.getSerieStatus());
 			

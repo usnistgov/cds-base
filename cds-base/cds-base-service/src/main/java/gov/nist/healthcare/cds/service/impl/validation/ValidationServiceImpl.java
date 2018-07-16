@@ -133,7 +133,7 @@ public class ValidationServiceImpl implements ValidationService {
 	
 	public ResponseVaccinationEvent findMatch(List<ResponseVaccinationEvent> rveL, VaccinationEventRequirement ve){
 		for(ResponseVaccinationEvent rve : rveL){
-			if(matcher.match(rve.getAdministred(), ve.getvEvent().getAdministred()) && dates.same(((FixedDate) rve.getDate()).getDate(), ve.getDateAdministred())){
+			if(matcher.match(rve.getAdministred(), ve.getvEvent().getAdministred()) && dates.same(((FixedDate) rve.getDate()).asDate(), ve.getDateAdministred().asDate())){
 				return rve;
 			}
 		}
@@ -180,7 +180,7 @@ public class ValidationServiceImpl implements ValidationService {
 		else if(af.getEarliest() == null) {
 			earliest = new DateCriterion(ValidationStatus.U);
 		}
-		else if(dates.same(fr.getEarliest(),af.getEarliest())){
+		else if(dates.same(fr.getEarliest().asDate(),af.getEarliest())){
 			earliest = new DateCriterion(ValidationStatus.P, af.getEarliest());
 		}
 		else {
@@ -198,7 +198,7 @@ public class ValidationServiceImpl implements ValidationService {
 		else if(af.getRecommended() == null){
 			recommended = new DateCriterion(ValidationStatus.U);
 		}
-		else if(dates.same(fr.getRecommended(),af.getRecommended())){
+		else if(dates.same(fr.getRecommended().asDate(),af.getRecommended())){
 			recommended = new DateCriterion(ValidationStatus.P, af.getRecommended());
 		}
 		else {
@@ -216,7 +216,7 @@ public class ValidationServiceImpl implements ValidationService {
 		else if(af.getPastDue() == null){
 			pastDue = new DateCriterion(ValidationStatus.U);
 		}
-		else if(dates.same(fr.getPastDue(),af.getPastDue())){
+		else if(dates.same(fr.getPastDue().asDate(),af.getPastDue())){
 			pastDue = new DateCriterion(ValidationStatus.P, af.getPastDue());
 		}
 		else {
@@ -234,7 +234,7 @@ public class ValidationServiceImpl implements ValidationService {
 		else if(af.getComplete() == null){
 			complete = new DateCriterion(ValidationStatus.U);
 		}
-		else if(dates.same(fr.getComplete(),af.getComplete())){
+		else if(dates.same(fr.getComplete().asDate(),af.getComplete())){
 			complete = new DateCriterion(ValidationStatus.P, af.getComplete());
 		}
 		else {

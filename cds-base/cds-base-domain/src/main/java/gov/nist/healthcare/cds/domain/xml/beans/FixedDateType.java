@@ -39,7 +39,7 @@ public class FixedDateType {
 
     @XmlAttribute(name = "date")
     @XmlSchemaType(name = "date")
-    protected XMLGregorianCalendar date;
+    protected String date;
 
     /**
      * Gets the value of the date property.
@@ -49,7 +49,7 @@ public class FixedDateType {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public XMLGregorianCalendar getDate() {
+    public String getDate() {
         return date;
     }
 
@@ -61,7 +61,7 @@ public class FixedDateType {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public void setDate(XMLGregorianCalendar value) {
+    public void setDate(String value) {
         this.date = value;
     }
 

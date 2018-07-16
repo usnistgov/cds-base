@@ -1,23 +1,20 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 public class ExecutionConfig {
 
 	private String software;
-	@Temporal(TemporalType.TIMESTAMP)
-	private java.util.Date date;
+	private String date;
 	public String getSoftware() {
 		return software;
 	}
 	public void setSoftware(String software) {
 		this.software = software;
 	}
-	public java.util.Date getDate() {
+	public String getDate() {
 		return date;
 	}
-	public void setDate(java.util.Date date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 	

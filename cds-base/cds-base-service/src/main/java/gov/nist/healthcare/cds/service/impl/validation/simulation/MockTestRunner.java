@@ -30,8 +30,8 @@ public class MockTestRunner implements TestRunnerService {
 			Date earliest = dateformat.parse("30/05/2011");
 			Date recommended = dateformat.parse("26/06/2011");
 			Date pastDue = dateformat.parse("22/08/2011");
-			Date e1d = dateformat.parse("06/04/2011");
-			Date e2d = dateformat.parse("02/05/2011");
+			String e1d = "06/04/2011";
+			String e2d = "02/05/2011";
 			
 			EngineResponse er = new EngineResponse();
 			List<ActualForecast> afl = new ArrayList<ActualForecast>();

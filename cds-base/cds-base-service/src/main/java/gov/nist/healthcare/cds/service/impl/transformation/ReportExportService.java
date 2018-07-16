@@ -11,6 +11,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.springframework.stereotype.Service;
+
+import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.domain.Injection;
 import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
@@ -117,7 +119,7 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		EventValidationType evt = new EventValidationType();
 		VaccinationEventReportType vert = new VaccinationEventReportType();
 		vert.setAdministred(inject(vev.getVeRequirement().getvEvent().getAdministred()));
-		vert.setDate(date(vev.getVeRequirement().getDateAdministred()));
+		vert.setDate(date(vev.getVeRequirement().getDateAdministred().asDate()));
 		evt.setEvaluations(evtt(vev));
 		evt.setVaccinationEvent(vert);
 		return evt;
@@ -207,10 +209,10 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 	public ForecastValidationType fv(ForecastValidation f) throws DatatypeConfigurationException{
 		ForecastValidationType fvt = new ForecastValidationType();
 		fvt.setDoseNumber(dovt(f.getDose(),f.getForecastRequirement().getExpForecast().getDoseNumber()));
-		fvt.setEarliestDate(dvt(f.getEarliest(),f.getForecastRequirement().getEarliest()));
-		fvt.setRecommendedDate(dvt(f.getRecommended(),f.getForecastRequirement().getRecommended()));
-		fvt.setPastDueDate(dvt(f.getPastDue(),f.getForecastRequirement().getPastDue()));
-		fvt.setLatestDate(dvt(f.getComplete(),f.getForecastRequirement().getComplete()));
+		fvt.setEarliestDate(dvt(f.getEarliest(),f.getForecastRequirement().getEarliest().asDate()));
+		fvt.setRecommendedDate(dvt(f.getRecommended(),f.getForecastRequirement().getRecommended().asDate()));
+		fvt.setPastDueDate(dvt(f.getPastDue(),f.getForecastRequirement().getPastDue().asDate()));
+		fvt.setLatestDate(dvt(f.getComplete(),f.getForecastRequirement().getComplete().asDate()));
 		
 		VaccineType target = new VaccineType();
 		target.setCvx(f.getForecastRequirement().getExpForecast().getTarget().getCvx());
@@ -238,7 +240,7 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		}
 		
 		if(dc.getValue() != null){
-			dvt.setActual(date(dc.getValue()));
+			dvt.setActual(date(dc.getValue().asDate()));
 		}
 		if(d != null){
 			dvt.setExpected(date(d));

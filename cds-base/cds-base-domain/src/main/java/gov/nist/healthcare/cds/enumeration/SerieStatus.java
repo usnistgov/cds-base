@@ -19,7 +19,8 @@ public enum SerieStatus {
 	X("Contraindicated", false),
 	
 	Z("Recommended but not required",true),
-	U("Other", false);
+	U("Other", false),
+	R("Not Recommended",false);
 	
 	private String details;
 	private boolean dates;
@@ -59,7 +60,8 @@ public enum SerieStatus {
 		case "waivered" : return SerieStatus.W;
 		case "contraindicated" : return SerieStatus.X;
 		case "recommended but not required" : return SerieStatus.Z;
-		default : return null;
+		case "not recommended" : return SerieStatus.R;
+		default : return SerieStatus.U;
 		}
 	}
 }

@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
@@ -78,6 +79,7 @@ public class NISTFormatServiceImpl implements FormatService {
 	@Autowired
 	private MetaDataService mdService;
 	
+	
 	final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	
 	public InputStream export(TestCase tc, ExportConfig config) {
@@ -87,8 +89,9 @@ public class NISTFormatServiceImpl implements FormatService {
 			tcp.setDescription(tc.getDescription());
 			tcp.setAssessmentDate(date(tc.getEvalDate()));
 			tcp.setDateType(tc.getDateType().toString());
-			if(tc.getGroupTag() != null && !tc.getGroupTag().isEmpty())
+			if(tc.getGroupTag() != null && !tc.getGroupTag().isEmpty()) {
 				tcp.setGroup(tc.getGroupTag());
+			}
 			if(tc.getUid() != null && !tc.getUid().isEmpty())
 				tcp.setUID(tc.getUid());
 			
@@ -228,13 +231,13 @@ public class NISTFormatServiceImpl implements FormatService {
 		
 		if(d instanceof FixedDate){
 			FixedDate fd = (FixedDate) d;
-			GregorianCalendar gregory = new GregorianCalendar();
-			gregory.setTime(fd.getDate());
-			XMLGregorianCalendar calendar = DatatypeFactory.newInstance()
-			        .newXMLGregorianCalendar(
-			            gregory);
+//			GregorianCalendar gregory = new GregorianCalendar();
+//			gregory.setTime(fd.asDate());
+//			XMLGregorianCalendar calendar = DatatypeFactory.newInstance()
+//			        .newXMLGregorianCalendar(
+//			            gregory);
 			FixedDateType fdt = new FixedDateType();
-			fdt.setDate(calendar);
+			fdt.setDate(fd.getDateString());
 			dt.setFixed(fdt);
 		}
 		else if(d instanceof RelativeDate){
@@ -265,7 +268,10 @@ public class NISTFormatServiceImpl implements FormatService {
 	public Date date(DateType d) throws DatatypeConfigurationException{
 		if(d.getFixed() != null){
 			FixedDateType fd = d.getFixed();
-			FixedDate f = new FixedDate(fd.getDate().toGregorianCalendar().getTime());
+//			System.out.println(fd.getDate());
+//			System.out.println(d);
+//			SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-ddT");
+			FixedDate f = new FixedDate(fd.getDate());
 			return f;
 		}
 		else if(d.getRelative() != null){
