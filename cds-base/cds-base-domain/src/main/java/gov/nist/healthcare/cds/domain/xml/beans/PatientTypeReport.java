@@ -47,7 +47,7 @@ public class PatientTypeReport {
     protected GenderType gender;
     @XmlElement(name = "DateOfBirth", required = true)
     @XmlSchemaType(name = "date")
-    protected XMLGregorianCalendar dateOfBirth;
+    protected String dateOfBirth;
 
     /**
      * Gets the value of the gender property.
@@ -81,7 +81,7 @@ public class PatientTypeReport {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public XMLGregorianCalendar getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
@@ -93,7 +93,7 @@ public class PatientTypeReport {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public void setDateOfBirth(XMLGregorianCalendar value) {
+    public void setDateOfBirth(String value) {
         this.dateOfBirth = value;
     }
 

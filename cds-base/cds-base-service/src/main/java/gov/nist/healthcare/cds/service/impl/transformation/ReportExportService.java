@@ -119,7 +119,7 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		EventValidationType evt = new EventValidationType();
 		VaccinationEventReportType vert = new VaccinationEventReportType();
 		vert.setAdministred(inject(vev.getVeRequirement().getvEvent().getAdministred()));
-		vert.setDate(date(vev.getVeRequirement().getDateAdministred().asDate()));
+		vert.setDate(dateStr(vev.getVeRequirement().getDateAdministred().asDate()));
 		evt.setEvaluations(evtt(vev));
 		evt.setVaccinationEvent(vert);
 		return evt;
@@ -209,10 +209,18 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 	public ForecastValidationType fv(ForecastValidation f) throws DatatypeConfigurationException{
 		ForecastValidationType fvt = new ForecastValidationType();
 		fvt.setDoseNumber(dovt(f.getDose(),f.getForecastRequirement().getExpForecast().getDoseNumber()));
-		fvt.setEarliestDate(dvt(f.getEarliest(),f.getForecastRequirement().getEarliest().asDate()));
-		fvt.setRecommendedDate(dvt(f.getRecommended(),f.getForecastRequirement().getRecommended().asDate()));
-		fvt.setPastDueDate(dvt(f.getPastDue(),f.getForecastRequirement().getPastDue().asDate()));
-		fvt.setLatestDate(dvt(f.getComplete(),f.getForecastRequirement().getComplete().asDate()));
+		
+		if(f.getForecastRequirement().getEarliest() != null)
+			fvt.setEarliestDate(dvt(f.getEarliest(),f.getForecastRequirement().getEarliest().asDate()));
+		
+		if(f.getForecastRequirement().getRecommended() != null)
+			fvt.setRecommendedDate(dvt(f.getRecommended(),f.getForecastRequirement().getRecommended().asDate()));
+		
+		if(f.getForecastRequirement().getPastDue() != null)
+			fvt.setPastDueDate(dvt(f.getPastDue(),f.getForecastRequirement().getPastDue().asDate()));
+
+		if(f.getForecastRequirement().getComplete() != null)
+			fvt.setLatestDate(dvt(f.getComplete(),f.getForecastRequirement().getComplete().asDate()));
 		
 		VaccineType target = new VaccineType();
 		target.setCvx(f.getForecastRequirement().getExpForecast().getTarget().getCvx());
@@ -240,10 +248,10 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		}
 		
 		if(dc.getValue() != null){
-			dvt.setActual(date(dc.getValue().asDate()));
+			dvt.setActual(dateStr(dc.getValue().asDate()));
 		}
 		if(d != null){
-			dvt.setExpected(date(d));
+			dvt.setExpected(dateStr(d));
 		}
 				
 		return dvt;
@@ -319,10 +327,10 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		} else {
 			pt.setGender(GenderType.MALE);
 		}
-		pt.setDateOfBirth(date(r.getDob()));
+		pt.setDateOfBirth(dateStr(r.getDob()));
 		TestCaseInformationType tcit = new TestCaseInformationType();
 		tcit.setPatient(pt);
-		tcit.setAssessmentDate(date(r.getExecutionDate()));
+		tcit.setAssessmentDate(dateStr(r.getExecutionDate()));
 		return tcit;
 	}
 
@@ -343,6 +351,10 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		gregory.setTime(d);
 		XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregory);
 		return calendar;
+	}
+	
+	public String dateStr(java.util.Date d) throws DatatypeConfigurationException {
+		return FixedDate.DATE_FORMAT.format(d);
 	}
 
 }

@@ -40,7 +40,7 @@ public class TranslationUtils {
     
     public static String translateCsdiDateToFhirDate(FixedDate date) {
         SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
-        return print.format(date.getDateString());
+        return print.format(date.asDate());
     }
     
     public static Date translateHl7DateToJavaDate(String date) throws ParseException {
@@ -388,7 +388,7 @@ public class TranslationUtils {
                     af.setSerieStatus(SerieStatus.F);
                 } else if(status.equalsIgnoreCase("aged out")) {
                     af.setSerieStatus(SerieStatus.G);                    
-                } else if(status.equalsIgnoreCase("immue")) {
+                } else if(status.equalsIgnoreCase("immune")) {
                     af.setSerieStatus(SerieStatus.I);
                 } else if(status.equalsIgnoreCase("due later")) {
                     af.setSerieStatus(SerieStatus.L);

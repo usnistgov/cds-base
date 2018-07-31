@@ -96,10 +96,7 @@
 						<td>
 							<xsl:choose>
 								<xsl:when test="AssessmentDate/Fixed">
-									<xsl:call-template name="dateTransformer">
-										<xsl:with-param name="myDate"
-											select="AssessmentDate/Fixed/@date" />
-									</xsl:call-template>
+									<xsl:value-of select="AssessmentDate/Fixed/@date" />
 								</xsl:when>
 								<xsl:otherwise>
 									Relative (Today)
@@ -114,10 +111,7 @@
 						<td>
 							<xsl:choose>
 								<xsl:when test="Patient/DateOfBirth/Fixed">
-									<xsl:call-template name="dateTransformer">
-										<xsl:with-param name="myDate"
-											select="Patient/DateOfBirth/Fixed/@date" />
-									</xsl:call-template>
+									<xsl:value-of select="Patient/DateOfBirth/Fixed/@date" />
 								</xsl:when>
 								<xsl:otherwise>
 									<xsl:apply-templates select="Patient/DateOfBirth/Relative" />
@@ -232,9 +226,7 @@
 					<td>
 						<xsl:choose>
 							<xsl:when test="EventDate/Fixed">
-								<xsl:call-template name="dateTransformer">
-									<xsl:with-param name="myDate" select="EventDate/Fixed/@date" />
-								</xsl:call-template>
+								<xsl:value-of select="EventDate/Fixed/@date" />
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:apply-templates select="EventDate/Relative" />
@@ -301,9 +293,7 @@
 					<td>
 						<xsl:choose>
 							<xsl:when test="Earliest/Fixed">
-								<xsl:call-template name="dateTransformer">
-									<xsl:with-param name="myDate" select="Earliest/Fixed/@date" />
-								</xsl:call-template>
+								<xsl:value-of select="Earliest/Fixed/@date" />
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:apply-templates select="Earliest/Relative" />
@@ -318,9 +308,7 @@
 					<td>
 						<xsl:choose>
 							<xsl:when test="Recommended/Fixed">
-								<xsl:call-template name="dateTransformer">
-									<xsl:with-param name="myDate" select="Recommended/Fixed/@date" />
-								</xsl:call-template>
+								<xsl:value-of select="Recommended/Fixed/@date" />
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:apply-templates select="Recommended/Relative" />
@@ -335,9 +323,7 @@
 					<td>
 						<xsl:choose>
 							<xsl:when test="PastDue/Fixed">
-								<xsl:call-template name="dateTransformer">
-									<xsl:with-param name="myDate" select="PastDue/Fixed/@date" />
-								</xsl:call-template>
+								<xsl:value-of select="PastDue/Fixed/@date" />
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:apply-templates select="PastDue/Relative" />

@@ -44,14 +44,26 @@ public class VaccineMatcherServiceTest {
 		return vm;
 	}
 	
+	public VaccineMapping mapping(String cvx, List<VaccineGroup> groups){
+		VaccineMapping vm = new VaccineMapping();
+		vm.setGroup(false);
+		if(groups != null)
+		vm.setGroups(new HashSet<VaccineGroup>(groups));
+		Vaccine generic = vx(cvx);
+		vm.setVx(generic);
+		return vm;
+	}
+	
 	public Vaccine vx(String cvx){
 		Vaccine vx = new Vaccine();
+		vx.setType("generic");
 		vx.setCvx(cvx);
 		return vx;
 	}
 	
 	public Product px(Vaccine vx, String mvx){
 		Product p = new Product();
+		p.setType("specific");
 		p.setMx(mx(mvx));
 		p.setVx(vx);
 		return p;
@@ -77,6 +89,9 @@ public class VaccineMatcherServiceTest {
 		Mockito.when(repo.findMapping("z")).thenReturn(mapping("z","n",Arrays.asList(gx("a"))));
 		Mockito.when(repo.findMapping("t")).thenReturn(mapping("t","n",Arrays.asList(gx("a"),gx("none"))));
 		Mockito.when(repo.findMapping("s")).thenReturn(mapping("s","n",Arrays.asList(gx("a"),gx("b"),gx("none"))));
+		Mockito.when(repo.findMapping("a")).thenReturn(mapping("a", Arrays.asList(gx("a"))));
+		Mockito.when(repo.findMapping("b")).thenReturn(mapping("b", Arrays.asList(gx("b"))));
+		Mockito.when(repo.findMapping("none")).thenReturn(mapping("none", Arrays.asList(gx("none"))));
 		Mockito.when(repo.findMapping("s")).thenReturn(mapping("e","f",null));
 	}
 	

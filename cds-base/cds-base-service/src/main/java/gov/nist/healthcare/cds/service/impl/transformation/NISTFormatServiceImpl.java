@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -545,10 +546,23 @@ public class NISTFormatServiceImpl implements FormatService {
 	@Override
 	public ExportResult exportToFile(List<TestCase> tcs, ExportConfig config) throws ConfigurationException {
 		ExportResult exportResult = new ExportResult();
+		List<String> names = new ArrayList<>();
+		
 		for(TestCase tc : tcs){
-			exportResult.add(tc.getName().replaceAll(" ","-")+".xml",this.export(tc, config));
+			String name = tc.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+			exportResult.add(findName(name, names)+".xml",this.export(tc, config));
 		}
 		return exportResult;
+	}
+	
+	public String findName(String str, List<String> names){
+		if(names.contains(str)){
+			return findName(str+"_1", names);
+		}
+		else {
+			names.add(str);
+			return str;
+		}
 	}
 
 }

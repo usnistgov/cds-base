@@ -47,7 +47,7 @@ public class TestCaseInformationType {
     protected PatientTypeReport patient;
     @XmlElement(name = "AssessmentDate", required = true)
     @XmlSchemaType(name = "date")
-    protected XMLGregorianCalendar assessmentDate;
+    protected String assessmentDate;
 
     /**
      * Gets the value of the patient property.
@@ -81,7 +81,7 @@ public class TestCaseInformationType {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public XMLGregorianCalendar getAssessmentDate() {
+    public String getAssessmentDate() {
         return assessmentDate;
     }
 
@@ -93,7 +93,7 @@ public class TestCaseInformationType {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public void setAssessmentDate(XMLGregorianCalendar value) {
+    public void setAssessmentDate(String value) {
         this.assessmentDate = value;
     }
 

@@ -61,11 +61,6 @@ public class FixedDate extends Date implements Serializable {
 		}
 	}
 
-	
-	public java.util.Date getDate() {
-		return date;
-	}
-
 	public void setDate(java.util.Date date) {
 		this.date = date;
 	}

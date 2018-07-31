@@ -11,7 +11,6 @@ public interface DateService {
 	public void toFixed(TestCase tc, java.util.Date today);
 	public java.util.Date fix(ResolvedDates rds, Date d);
 	public boolean same(java.util.Date d1, java.util.Date d2);
-//	public java.util.Date from(int years, int months, int days, DatePosition p, java.util.Date ref);
 	java.util.Date from(int years, int months, int weeks, int days, DatePosition p, java.util.Date ref);
 
 }

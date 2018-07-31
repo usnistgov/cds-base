@@ -160,7 +160,7 @@
     </complexType>
 
     <complexType name="FixedDateType">
-    	<attribute name="date" type="date"></attribute>
+    	<attribute name="date" type="string"></attribute>
     </complexType>
 
     <complexType name="RelativeDateType">

@@ -50,10 +50,10 @@ public class DateValidationType {
 
     @XmlElement(name = "Expected", required = true)
     @XmlSchemaType(name = "date")
-    protected XMLGregorianCalendar expected;
+    protected String expected;
     @XmlElement(name = "Actual", required = true)
     @XmlSchemaType(name = "date")
-    protected XMLGregorianCalendar actual;
+    protected String actual;
     @XmlElement(name = "Assessment", required = true)
     protected ValidationStatus assessment;
     @XmlElement(name = "DaysOffset", required = true)
@@ -67,7 +67,7 @@ public class DateValidationType {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public XMLGregorianCalendar getExpected() {
+    public String getExpected() {
         return expected;
     }
 
@@ -79,7 +79,7 @@ public class DateValidationType {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public void setExpected(XMLGregorianCalendar value) {
+    public void setExpected(String value) {
         this.expected = value;
     }
 
@@ -91,7 +91,7 @@ public class DateValidationType {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public XMLGregorianCalendar getActual() {
+    public String getActual() {
         return actual;
     }
 
@@ -103,7 +103,7 @@ public class DateValidationType {
      *     {@link XMLGregorianCalendar }
      *     
      */
-    public void setActual(XMLGregorianCalendar value) {
+    public void setActual(String value) {
         this.actual = value;
     }
 
