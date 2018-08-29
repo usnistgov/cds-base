@@ -16,6 +16,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Document
 public class SoftwareConfig implements Serializable {
@@ -32,9 +34,10 @@ public class SoftwareConfig implements Serializable {
 	@Column(nullable=true)
 	@Enumerated(EnumType.STRING)
 	private FHIRAdapter connector;
-	private boolean auth;
-	private String username;
+	private String userId;
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
+	private String facilityId;
 	@JsonIgnore
 	private String user;
 	
@@ -99,22 +102,6 @@ public class SoftwareConfig implements Serializable {
 		this.user = user;
 	}
 
-	public boolean isAuth() {
-		return auth;
-	}
-
-	public void setAuth(boolean auth) {
-		this.auth = auth;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public String getPassword() {
 		return password;
 	}
@@ -122,7 +109,21 @@ public class SoftwareConfig implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getFacilityId() {
+		return facilityId;
+	}
+
+	public void setFacilityId(String facilityId) {
+		this.facilityId = facilityId;
+	}
 	
 }
