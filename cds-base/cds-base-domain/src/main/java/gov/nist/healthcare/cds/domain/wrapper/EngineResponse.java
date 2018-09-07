@@ -8,7 +8,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class EngineResponse {
 	
 	private String response;
-	private String request;
+	private String logs;
 	private List<ActualForecast> forecasts;
 	private List<ResponseVaccinationEvent> events;
 	
@@ -36,11 +36,11 @@ public class EngineResponse {
 	public void setResponse(String response) {
 		this.response = response;
 	}
-	public String getRequest() {
-		return request;
+	public String getLogs() {
+		return logs;
 	}
-	public void setRequest(String request) {
-		this.request = request;
+	public void setLogs(String logs) {
+		this.logs = logs;
 	}
 	@Override
 	public String toString() 

@@ -166,6 +166,30 @@ public class ImmunizationRecommendationClient {
             serviceUrlParameterFhir.setValue(serviceUrlString);
             parametersFhir.addParameter(serviceUrlParameterFhir);
 
+            
+            
+            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent userIdParameterFhir = new org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent();
+            userIdParameterFhir.setName(Consts.PARAMETER_NAME_USER_ID);
+            org.hl7.fhir.dstu3.model.StringType userIdString = new org.hl7.fhir.dstu3.model.StringType();
+            userIdString.setValue(routing.getUserId());
+            userIdParameterFhir.setValue(userIdString);
+            parametersFhir.addParameter(userIdParameterFhir);
+            
+            
+            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent facilityIdParameterFhir = new org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent();
+            facilityIdParameterFhir.setName(Consts.PARAMETER_NAME_FACILITY_ID);
+            org.hl7.fhir.dstu3.model.StringType facilityIdString = new org.hl7.fhir.dstu3.model.StringType();
+            facilityIdString.setValue(routing.getFacilityId());
+            facilityIdParameterFhir.setValue(facilityIdString);
+            parametersFhir.addParameter(facilityIdParameterFhir);
+            
+            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent passwordParameterFhir = new org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent();
+            passwordParameterFhir.setName(Consts.PARAMETER_NAME_PASSWORD);
+            org.hl7.fhir.dstu3.model.StringType passwordString = new org.hl7.fhir.dstu3.model.StringType();
+            passwordString.setValue(routing.getPassword());
+            passwordParameterFhir.setValue(passwordString);
+            parametersFhir.addParameter(passwordParameterFhir);
+     
             /*
                     
             ParametersParameter serviceTypeParameter = FhirFactory.eINSTANCE.createParametersParameter();
@@ -670,7 +694,7 @@ public static EObject loadEObjectFromString(String myModelXml, EPackage ePackage
 
         ImmunizationRecommendationClient irc = new ImmunizationRecommendationClient();
         Routing routing = new Routing();
-        routing.setFhirAdapterUrl("http://p860556.campus.nist.gov:9080/fhirAdapter/");
+        routing.setFhirAdapterUrl("http://localhost:8084/forecast/ImmunizationRecommendations");
         //routing.setFhirAdapterUrl("http://hit-dev.nist.gov:11080/fhirAdapter/fhir/Parameters/$cds-forecast");
         routing.setForecastType("TCH");
         //  routing.setForecastUrl("http://tchforecasttester.org/fv/forecast");
