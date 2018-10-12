@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import gov.nist.healthcare.cds.domain.ExpectedEvaluation;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.FixedDate;
+import gov.nist.healthcare.cds.domain.Injection;
+import gov.nist.healthcare.cds.domain.Product;
+import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.wrapper.ActualEvaluation;
 import gov.nist.healthcare.cds.domain.wrapper.ActualForecast;
 import gov.nist.healthcare.cds.domain.wrapper.DateCriterion;
@@ -24,9 +27,11 @@ import gov.nist.healthcare.cds.domain.wrapper.ResultCounts;
 import gov.nist.healthcare.cds.domain.wrapper.StringCriterion;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventValidation;
+import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 import gov.nist.healthcare.cds.enumeration.ValidationStatus;
 import gov.nist.healthcare.cds.service.DateService;
+import gov.nist.healthcare.cds.service.LoggerService;
 import gov.nist.healthcare.cds.service.VaccineMatcherService;
 import gov.nist.healthcare.cds.service.ValidationConfigService;
 import gov.nist.healthcare.cds.service.ValidationService;
@@ -46,19 +51,27 @@ public class ValidationServiceImpl implements ValidationService {
 		Report vr = new Report();
 		List<VaccinationEventValidation> veValidation = vr.getVeValidation();
 		List<ForecastValidation> fValidation = vr.getFcValidation();
-		ResultCounts fCounts = this.validateForecasts(response.getForecasts(), expForecast, fValidation,vr);
-		ResultCounts eCounts = this.validateEvents(response.getEvents(), events, veValidation,vr);
+		StringBuilder logs = new StringBuilder();
+		ResultCounts fCounts = this.validateForecasts(response.getForecasts(), expForecast, fValidation,vr, logs);
+		ResultCounts eCounts = this.validateEvents(response.getEvents(), events, veValidation,vr, logs);
 		vr.setEvents(eCounts);
 		vr.setForecasts(fCounts);
+		vr.setMatcherLogs(logs.toString());
 		return vr;
 	}
 	
-	public ResultCounts validateForecasts(List<ActualForecast> afL, List<ForecastRequirement> efL, List<ForecastValidation> fValidation,Report vr){
+	public ResultCounts validateForecasts(List<ActualForecast> afL, List<ForecastRequirement> efL, List<ForecastValidation> fValidation,Report vr, StringBuilder logs){
 		ResultCounts counts = new ResultCounts();
 		ForecastValidation tmp;
-		
+		LoggerService.separator(logs);
+		LoggerService.text("VALIDATING FORECASTS", logs, true, 6);
+		LoggerService.separator(logs);
 		for(ForecastRequirement ef : efL){
-			ActualForecast af = this.findMatch(afL, ef.getExpForecast());
+			
+			LoggerService.banner("RESOLVING MATCH FOR FORECAST", logs, false, 0);
+			LoggerService.vaccine(ef.getExpForecast().getTarget(), logs, true, 0);
+			
+			ActualForecast af = this.findMatch(afL, ef.getExpForecast(), logs);
 			if(af == null){
 				tmp = ForecastValidation.unMatched(ef);
 			}
@@ -71,33 +84,56 @@ public class ValidationServiceImpl implements ValidationService {
 		return counts;
 	}
 	
-	public ResultCounts validateEvents(List<ResponseVaccinationEvent> rveL, List<VaccinationEventRequirement> evL, List<VaccinationEventValidation> veValidation,Report vr){
+	public ResultCounts validateEvents(List<ResponseVaccinationEvent> rveL, List<VaccinationEventRequirement> evL, List<VaccinationEventValidation> veValidation,Report vr, StringBuilder logs){
 		ResultCounts counts = new ResultCounts();
 		VaccinationEventValidation tmp;
-		
+		LoggerService.separator(logs);
+		LoggerService.text("VALIDATING EVENTS", logs, true, 6);
+		LoggerService.separator(logs);
 		for(VaccinationEventRequirement ev : evL){
-			ResponseVaccinationEvent rve = this.findMatch(rveL, ev);
+			logs.append("\n");
+			LoggerService.banner("RESOLVING MATCH FOR", logs, false, 0);
+			LoggerService.event(ev.getvEvent().getAdministred(), ev.getDateAdministred().getDateString(), logs, 0);
+
+			ResponseVaccinationEvent rve = this.findMatch(rveL, ev, logs);
+			
 			if(rve == null){
+				LoggerService.result("No match found", logs, true, 1);
 				tmp = VaccinationEventValidation.unMatched(ev);
 			}
 			else {
-				tmp = this.validate(ev, rve, vr);
+				LoggerService.result("match found", logs, false, 1);
+				LoggerService.vaccineRef(rve.getAdministred(), logs, true, 0);
+
+				tmp = this.validate(ev, rve, vr, logs);
 			}
+			LoggerService.banner("DONE FOR", logs, false, 0);
+			LoggerService.event(ev.getvEvent().getAdministred(), ev.getDateAdministred().getDateString(), logs, 0);
+
 			veValidation.add(tmp);	
 			counts.addCounts(tmp.getCounts());
 		}
 		return counts;
 	}
 	
-	private VaccinationEventValidation validate(VaccinationEventRequirement ve, ResponseVaccinationEvent rve,Report vr) {
+	private VaccinationEventValidation validate(VaccinationEventRequirement ve, ResponseVaccinationEvent rve,Report vr, StringBuilder logs) {
 		VaccinationEventValidation vev = new VaccinationEventValidation();
 		ResultCounts counts = new ResultCounts();
 		vev.setCounts(counts);
 		vev.setVeRequirement(ve);
 		for(ExpectedEvaluation ee : ve.getvEvent().getEvaluations()){
-			ActualEvaluation ae = this.findMatch(rve.getEvaluations(), ee);
+			logs.append("\n");
+			LoggerService.banner("LOOKING FOR EVALUATION THAT MATCHES EXPECTED CVX", logs, false, 1);
+			LoggerService.comment("Expected Evaluation CVX "+ee.getRelatedTo().getCvx(), logs, true, 0);
+			ActualEvaluation ae = this.findMatch(rve.getEvaluations(), ee, logs);
 			EvaluationCriterion cr = null;
+			if(ae != null){
+				LoggerService.result("match found as ", logs, false, 1);
+				LoggerService.vaccineRef(ae.getVaccine(), logs, true, 0);
+			}
+			
 			if(ae == null){
+				LoggerService.result("match not found ", logs, true, 1);
 				cr = new EvaluationCriterion(ValidationStatus.U);
 			}
 			else if (ae.getStatus().equals(ee.getStatus())){
@@ -113,27 +149,27 @@ public class ValidationServiceImpl implements ValidationService {
 		return vev;
 	}
 
-	public ActualForecast findMatch(List<ActualForecast> afL, ExpectedForecast ef){
+	public ActualForecast findMatch(List<ActualForecast> afL, ExpectedForecast ef, StringBuilder logs){
 		for(ActualForecast af : afL){
-			if(matcher.match(af.getVaccine(), ef.getTarget())){
+			if(matcher.match(af.getVaccine(), ef.getTarget(), logs)){
 				return af;
 			}
 		}
 		return null;
 	}
 	
-	public ActualEvaluation findMatch(Set<ActualEvaluation> aeL, ExpectedEvaluation ee){
+	public ActualEvaluation findMatch(Set<ActualEvaluation> aeL, ExpectedEvaluation ee, StringBuilder logs){
 		for(ActualEvaluation ae : aeL){
-			if(matcher.match(ae.getVaccine(), ee.getRelatedTo())){
+			if(matcher.match(ae.getVaccine(), ee.getRelatedTo(), logs)){
 				return ae;
 			}
 		}
 		return null;
 	}
 	
-	public ResponseVaccinationEvent findMatch(List<ResponseVaccinationEvent> rveL, VaccinationEventRequirement ve){
+	public ResponseVaccinationEvent findMatch(List<ResponseVaccinationEvent> rveL, VaccinationEventRequirement ve, StringBuilder logs){
 		for(ResponseVaccinationEvent rve : rveL){
-			if(matcher.match(rve.getAdministred(), ve.getvEvent().getAdministred()) && dates.same(((FixedDate) rve.getDate()).asDate(), ve.getDateAdministred().asDate())){
+			if(dates.same(((FixedDate) rve.getDate()).asDate(), ve.getDateAdministred().asDate()) && matcher.match(rve.getAdministred(), ve.getvEvent().getAdministred(), logs)){
 				return rve;
 			}
 		}

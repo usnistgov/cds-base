@@ -23,7 +23,7 @@ public class SimpleVaccineMatcherService implements VaccineMatcherService {
 	private VaccineService vaccineService;
 	
 	@Override
-	public boolean match(VaccineRef ref, Injection i) {
+	public boolean match(VaccineRef ref, Injection i, StringBuilder log) {
 		
 		if(i instanceof Product){
 			Product p = (Product) i;

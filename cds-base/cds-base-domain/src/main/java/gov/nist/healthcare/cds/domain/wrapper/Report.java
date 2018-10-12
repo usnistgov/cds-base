@@ -32,11 +32,13 @@ public class Report extends Entity implements Serializable {
 	private List<ForecastValidation> fcValidation;
 	private Map<ValidationCriterion,Boolean> failures;
 	private String response;
+	private String adapterPayload;
+	private String adapterLogs;
+	private String matcherLogs;
 	private ResultCounts events;
 	private ResultCounts forecasts;
 	private String user;
-	
-	
+	private List<ExecutionIssue> issues;
 	
 	public Report() {
 		super();
@@ -166,6 +168,42 @@ public class Report extends Entity implements Serializable {
 
 
 
+	public String getAdapterPayload() {
+		return adapterPayload;
+	}
+
+
+
+	public void setAdapterPayload(String adapterPayload) {
+		this.adapterPayload = adapterPayload;
+	}
+
+
+
+	public String getAdapterLogs() {
+		return adapterLogs;
+	}
+
+
+
+	public void setAdapterLogs(String adapterLogs) {
+		this.adapterLogs = adapterLogs;
+	}
+
+
+
+	public String getMatcherLogs() {
+		return matcherLogs;
+	}
+
+
+
+	public void setMatcherLogs(String matcherLogs) {
+		this.matcherLogs = matcherLogs;
+	}
+
+
+
 	public MetaData getMetaData() {
 		return metaData;
 	}
@@ -174,6 +212,18 @@ public class Report extends Entity implements Serializable {
 
 	public void setMetaData(MetaData metaData) {
 		this.metaData = metaData;
+	}
+
+
+
+	public List<ExecutionIssue> getIssues() {
+		return issues;
+	}
+
+
+
+	public void setIssues(List<ExecutionIssue> issues) {
+		this.issues = issues;
 	}
 	
 

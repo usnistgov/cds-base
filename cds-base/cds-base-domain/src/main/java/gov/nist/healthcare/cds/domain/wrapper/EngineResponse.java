@@ -6,7 +6,8 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class EngineResponse {
-	
+
+	private List<ExecutionIssue> issues;
 	private String response;
 	private String logs;
 	private List<ActualForecast> forecasts;
@@ -41,6 +42,13 @@ public class EngineResponse {
 	}
 	public void setLogs(String logs) {
 		this.logs = logs;
+	}
+	
+	public List<ExecutionIssue> getIssues() {
+		return issues;
+	}
+	public void setIssues(List<ExecutionIssue> issues) {
+		this.issues = issues;
 	}
 	@Override
 	public String toString() 

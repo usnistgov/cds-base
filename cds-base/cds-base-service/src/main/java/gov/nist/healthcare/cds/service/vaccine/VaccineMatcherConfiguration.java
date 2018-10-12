@@ -27,12 +27,12 @@ public class VaccineMatcherConfiguration {
 	
 	private void initTuples(){
 		eqTuples = new ArrayList<EqTuple>();
-		EqTuple tuple = new EqTuple();
+		EqTuple tuple = new EqTuple("DTAP/TD/TDAP");
 		tuple.addNode(new VaccineMatcherCodeNode("139"));
 		tuple.addNode(new VaccineMatcherCodeNode("107"));
 		tuple.addNode(new VaccineMatcherCodeNode("115"));
 		eqTuples.add(tuple);
-		tuple = new EqTuple();
+		tuple = new EqTuple("PNEUMO");
 		tuple.addNode(new VaccineMatcherCodeNode("152"));
 		tuple.addNode(new VaccineMatcherCodeNode("33"));
 		tuple.addNode(new VaccineMatcherCodeNode("109"));
@@ -57,7 +57,7 @@ public class VaccineMatcherConfiguration {
 			}
 		}
 		
-		EqTuple tuple = new EqTuple();
+		EqTuple tuple = new EqTuple(node.getCvx());
 		tuple.addNode(node);
 		eqTuples.add(tuple);
 		return tuple;

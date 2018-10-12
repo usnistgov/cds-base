@@ -9,9 +9,9 @@ public class EqTuple {
 	private String eq;
 	private List<VaccineMatcherCodeNode> vmcnl;
 
-	public EqTuple() {
+	public EqTuple(String id) {
 		super();
-		eq = UUID.randomUUID().toString();
+		eq = id;
 		vmcnl = new ArrayList<VaccineMatcherCodeNode>();
 	}
 

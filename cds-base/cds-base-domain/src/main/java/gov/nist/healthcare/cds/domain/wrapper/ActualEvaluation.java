@@ -23,8 +23,7 @@ public class ActualEvaluation extends Evaluation {
 	}
 
 	@Override
-	public String toString() 
-	{ 
+	public String toString() { 
 	    return ToStringBuilder.reflectionToString(this); 
 	}
 	

@@ -10,6 +10,7 @@ import gov.nist.healthcare.cds.domain.Injection;
 import gov.nist.healthcare.cds.domain.VaccineGroup;
 import gov.nist.healthcare.cds.domain.exception.VaccineNotFoundException;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
+import gov.nist.healthcare.cds.service.LoggerService;
 import gov.nist.healthcare.cds.service.VaccineMatcherService;
 import gov.nist.healthcare.cds.service.VaccineService;
 import gov.nist.healthcare.cds.service.vaccine.VaccineMatcherConfiguration;
@@ -23,40 +24,70 @@ public class ConfigurableVaccineMatcher implements VaccineMatcherService {
 	
 	
 	@Override
-	public boolean match(VaccineRef ref, Injection i) {
+	public boolean match(VaccineRef ref, Injection i, StringBuilder logs) {
 		try {
+			LoggerService.banner("CHECKING AGAINST", logs, false, 1);
+			LoggerService.vaccineRef(ref, logs, true, 0);
+			
+			
 			Injection provided = vaxService.getVax(ref, true);
-			return this.straightMatch(provided, i) || this.groupMatch(provided, i)|| this.customMatch(provided, i);
+			return this.straightMatch(provided, i, logs) || this.groupMatch(provided, i, logs)|| this.customMatch(provided, i, logs);
+		
 		} catch (Exception e) {
 			return false;
 		}
 	}
 	
-	private boolean straightMatch(Injection p, Injection i){
+	private boolean straightMatch(Injection p, Injection i, StringBuilder logs){
+		LoggerService.banner("STRAIGHT MATCH CHECK", logs, true, 2);
 		
-		if(!p.getCvx().equals(i.getCvx())) 
+		if(!p.getCvx().equals(i.getCvx())) {
+			LoggerService.fail("CVX does not match", logs, 3);
 			return false;
-		else if(vaxService.typeOf(p).equals(vaxService.typeOf(i)) && vaxService.typeOf(p).equals("specific")){
-			return vaxService.asProduct(p).getMx().getMvx().equals(vaxService.asProduct(i).getMx().getMvx());
 		}
+		else if(vaxService.typeOf(p).equals(vaxService.typeOf(i)) && vaxService.typeOf(p).equals("specific")){
+			boolean mvx = vaxService.asProduct(p).getMx().getMvx().equals(vaxService.asProduct(i).getMx().getMvx());
+			LoggerService.passOrFail(mvx, "CVX and MVX match", "CVX does match, but MVX does not match on both specific products", logs, 3);
+			return mvx;
+		}
+		LoggerService.pass("CVX does match and both injections are generic", logs, 3);
 		return true;
 	}
 	
-	private boolean groupMatch(Injection p, Injection i) throws VaccineNotFoundException{
+	private boolean groupMatch(Injection p, Injection i, StringBuilder logs) throws VaccineNotFoundException{
+		LoggerService.banner("SAME GROUP MATCH CHECK", logs, true, 2);
 		Set<VaccineGroup> pGroups = vaxService.groupsOf(p.getCvx());
 		Set<VaccineGroup> iGroups = vaxService.groupsOf(i.getCvx());
 		
-		return pGroups.size() > 0 && iGroups.size() > 0 && pGroups.equals(iGroups);
+		LoggerService.comment("Administered Vaccine Group", logs, false, 3);
+		LoggerService.vaccineGroupSet(iGroups, logs, 0);
+		logs.append("\n");
+		LoggerService.comment("Candidate Vaccine Group", logs, false, 3);
+		LoggerService.vaccineGroupSet(pGroups, logs, 0);
+		logs.append("\n");
+		
+		boolean b = pGroups.size() > 0 && iGroups.size() > 0 && pGroups.equals(iGroups);
+		
+		LoggerService.passOrFail(b, "Both vaccinations belong to the same group(s)", "Vaccinations belong to different groups", logs, 3);
+		return b;
 	}
 	
-	private boolean customMatch(Injection p, Injection i) throws VaccineNotFoundException{
+	private boolean customMatch(Injection p, Injection i, StringBuilder logs) throws VaccineNotFoundException{
+		LoggerService.banner("CUSTOM MAPPING GROUP MATCH CHECK", logs, true, 2);
 		Set<VaccineGroup> pGroups = vaxService.groupsOf(p.getCvx());
 		Set<VaccineGroup> iGroups = vaxService.groupsOf(i.getCvx());
 		
 		Set<String> pGroupsC = transform(pGroups);
 		Set<String> iGroupsC = transform(iGroups);
 		
-		return pGroupsC.size() > 0 && iGroupsC.size() > 0 && pGroupsC.equals(iGroupsC);
+		LoggerService.comment("Administered Vaccine Group Transformed to "+iGroupsC, logs, false, 3);
+		logs.append("\n");
+		LoggerService.comment("Candidate Vaccine Group Transformed to"+pGroupsC, logs, false, 3);
+		logs.append("\n");
+		
+		boolean b = pGroupsC.size() > 0 && iGroupsC.size() > 0 && pGroupsC.equals(iGroupsC);
+		LoggerService.passOrFail(b, "Both vaccinations belong to the same custom mapped group(s)", "Vaccinations belong to different groups", logs, 3);
+		return b;
 	}
 	
 	
@@ -66,7 +97,6 @@ public class ConfigurableVaccineMatcher implements VaccineMatcherService {
 
 			EqTuple tuple = configuration.tupleFor(grp.getCvx());
 			if(tuple != null){
-				System.out.println(tuple.getEq());
 				pGroupsC.add(tuple.getEq());
 			}
 			else{
