@@ -12,12 +12,13 @@ public class EngineResponse {
 	private String logs;
 	private List<ActualForecast> forecasts;
 	private List<ResponseVaccinationEvent> events;
-	
+	private String softwareResultStatus = null;
 	
 	public EngineResponse() {
 		super();
 		forecasts = new ArrayList<ActualForecast>();
 		events = new ArrayList<ResponseVaccinationEvent>();
+                issues = new ArrayList<>();
 	}
 	public List<ActualForecast> getForecasts() {
 		return forecasts;
@@ -55,6 +56,20 @@ public class EngineResponse {
 	{ 
 	    return ToStringBuilder.reflectionToString(this); 
 	}
+
+    /**
+     * @return the softwareResultStatus
+     */
+    public String getSoftwareResultStatus() {
+        return softwareResultStatus;
+    }
+
+    /**
+     * @param softwareResultStatus the softwareResultStatus to set
+     */
+    public void setSoftwareResultStatus(String softwareResultStatus) {
+        this.softwareResultStatus = softwareResultStatus;
+    }
 	
 	
 	
