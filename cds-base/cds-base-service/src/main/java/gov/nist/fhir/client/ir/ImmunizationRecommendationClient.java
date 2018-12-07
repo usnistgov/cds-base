@@ -300,9 +300,8 @@ public class ImmunizationRecommendationClient {
                     System.out.println("INSIDE!");
                     
                     
+                    immunizationFhir.getManufacturerTarget().getIdentifierFirstRep().setValue(immunization.getManufactorer());
                     mvxOrg.getIdentifierFirstRep().setValue(immunization.getManufactorer());
-                    
-                    
                     
                     /*
                     org.hl7.fhir.dstu3.model.Organization mvxOrg = new org.hl7.fhir.dstu3.model.Organization();
@@ -537,6 +536,7 @@ public class ImmunizationRecommendationClient {
         }
 
         if (!String.valueOf(httpResponse.getStatusLine().getStatusCode()).startsWith("2")) {
+        	System.out.println("DEBUG <=> "+ httpResponse.getStatusLine().getReasonPhrase());
             throw new ConnectionException(String.valueOf(httpResponse.getStatusLine().getStatusCode()), httpResponse.getStatusLine().getReasonPhrase());
         }
 

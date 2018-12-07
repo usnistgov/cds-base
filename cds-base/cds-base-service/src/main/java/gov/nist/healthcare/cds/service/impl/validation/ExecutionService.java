@@ -24,6 +24,7 @@ import gov.nist.healthcare.cds.domain.wrapper.TestCaseInformation;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
+import gov.nist.healthcare.cds.enumeration.EngineResponseStatus;
 import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.TestCaseExecutionService;
 import gov.nist.healthcare.cds.service.TestRunnerService;
@@ -48,7 +49,7 @@ public class ExecutionService implements TestCaseExecutionService {
 		TestCasePayLoad tcP = this.payLoad(tc, rds);
 		EngineResponse response = runner.run(conf, tcP);
 
-
+		
 		// Compute Requirements
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
 		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);
@@ -62,7 +63,7 @@ public class ExecutionService implements TestCaseExecutionService {
 		tcInfo.setName(tc.getName());
 		tcInfo.setUID(tc.getUid());
 		tcInfo.setDescription(tc.getDescription());
-		
+		rp.setEngineResponseStatus(response.getEngineResponseStatus());
 		rp.setTcInfo(tcInfo);
 		rp.setEvaluationDate(tcP.getEvaluationDate());
 		rp.setDob(tcP.getDateOfBirth());
@@ -113,7 +114,7 @@ public class ExecutionService implements TestCaseExecutionService {
 		return fcRequirements;
 	}
 	
-	public TestCasePayLoad payLoad(TestCase tc, ResolvedDates rds) throws UnresolvableDate{
+	public TestCasePayLoad payLoad(TestCase tc, ResolvedDates rds) throws UnresolvableDate {
 		TestCasePayLoad tcP = new TestCasePayLoad();
 		tcP.setGender(tc.getPatient().getGender());
 		tcP.setEvaluationDate(rds.getEval());

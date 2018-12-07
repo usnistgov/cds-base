@@ -33,6 +33,8 @@ public class VaccineMatcherServiceTest {
 	@Autowired
 	private VaccineMatcherService vaccineMatcher;
 	
+	private StringBuilder logs;
+	
 	public VaccineMapping mapping(String cvx, String mvx, List<VaccineGroup> groups){
 		VaccineMapping vm = new VaccineMapping();
 		vm.setGroup(false);
@@ -100,9 +102,9 @@ public class VaccineMatcherServiceTest {
 		Vaccine v = vx("c");
 		Product p = px(v,"m");
 		
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c","m"), p));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("c","none"), p));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none","m"), p));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c","m"), p, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("c","none"), p, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none","m"), p, logs));
 	}
 	
 	
@@ -110,18 +112,18 @@ public class VaccineMatcherServiceTest {
 	@Test
 	public void straightCompareVaccine(){
 		Vaccine v = vx("c");
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c",""), v));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none",""), v));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c",""), v, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none",""), v, logs));
 	}
 	
 	@Test
 	public void straightCompareProductAndVaccine(){
 		Vaccine v = vx("c");
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c","m"), v));
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c","none"), v));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c","m"), v, logs));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c","none"), v, logs));
 		
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none","m"), v));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none","none"), v));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none","m"), v, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none","none"), v, logs));
 	}
 	
 	@Test
@@ -129,17 +131,17 @@ public class VaccineMatcherServiceTest {
 		Vaccine v = vx("c");
 		Product p = px(v,"m");
 		
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c",""), p));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none",""), p));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("c",""), p, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none",""), p, logs));
 	}
 	
 	@Test
 	public void groupAsRefVaccine(){
 		Vaccine v = vx("c");
 		
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("a",""), v));
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("b",""), v));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none",""), v));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("a",""), v, logs));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("b",""), v, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none",""), v, logs));
 	}
 	
 	@Test
@@ -147,33 +149,33 @@ public class VaccineMatcherServiceTest {
 		Vaccine v = vx("c");
 		Product p = px(v,"m");
 		
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("a",""), p));
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("b",""), p));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none",""), p));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("a",""), p, logs));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("b",""), p, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("none",""), p, logs));
 	}
 	
 	@Test
 	public void siblingAsRefVaccine(){
 		Vaccine v = vx("c");
 		Product p = px(v,"m");
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("x",""), p));
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("y",""), p));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("z",""), p));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("t",""), p));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("s",""), p));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("e",""), p));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("x",""), p, logs));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("y",""), p, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("z",""), p, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("t",""), p, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("s",""), p, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("e",""), p, logs));
 	}
 	
 	@Test
 	public void siblingAsRefProduct(){
 		Vaccine v = vx("c");
 		
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("x",""), v));
-		Assert.isTrue(vaccineMatcher.match(new VaccineRef("y",""), v));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("z",""), v));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("t",""), v));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("s",""), v));
-		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("e",""), v));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("x",""), v, logs));
+		Assert.isTrue(vaccineMatcher.match(new VaccineRef("y",""), v, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("z",""), v, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("t",""), v, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("s",""), v, logs));
+		Assert.isTrue(!vaccineMatcher.match(new VaccineRef("e",""), v, logs));
 	}
 	
 

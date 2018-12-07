@@ -35,7 +35,6 @@ public class SimplePropretyService implements PropertyService {
 	public TestCase tcBelongsTo(String tc, String user, EntityAccess accessType) {
 		TestPlan tp = testPlanRepository.tcUser(tc);
 		if(tp != null){
-			System.out.println("TP NOT NULL");
 			boolean pass = tp.getUser().equals(user) || (accessType.equals(EntityAccess.R) && (tp.getViewers().contains(user) || tp.isPublic()));
 			return pass ? testCaseRepository.findOne(tc) : null;
 		}
@@ -73,7 +72,7 @@ public class SimplePropretyService implements PropertyService {
 	@Override
 	public TestCaseGroup tgBelongsTo(String tgId, String user, EntityAccess accessType) {
 		TestPlan tp = testPlanRepository.testCaseGroup(tgId);
-		if(tp != null && tp.getUser().equals(user)){
+		if(tp != null){
 			boolean pass = tp.getUser().equals(user) || (accessType.equals(EntityAccess.R) && (tp.getViewers().contains(user) || tp.isPublic()));
 			return pass ? tp.getGroup(tgId) : null;
 		}

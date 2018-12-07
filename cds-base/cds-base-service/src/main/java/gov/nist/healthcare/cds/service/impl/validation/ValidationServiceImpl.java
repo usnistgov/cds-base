@@ -2,7 +2,10 @@ package gov.nist.healthcare.cds.service.impl.validation;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +13,6 @@ import org.springframework.stereotype.Service;
 import gov.nist.healthcare.cds.domain.ExpectedEvaluation;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.FixedDate;
-import gov.nist.healthcare.cds.domain.Injection;
-import gov.nist.healthcare.cds.domain.Product;
-import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.wrapper.ActualEvaluation;
 import gov.nist.healthcare.cds.domain.wrapper.ActualForecast;
 import gov.nist.healthcare.cds.domain.wrapper.DateCriterion;
@@ -27,7 +27,6 @@ import gov.nist.healthcare.cds.domain.wrapper.ResultCounts;
 import gov.nist.healthcare.cds.domain.wrapper.StringCriterion;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventValidation;
-import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 import gov.nist.healthcare.cds.enumeration.ValidationStatus;
 import gov.nist.healthcare.cds.service.DateService;
@@ -71,7 +70,7 @@ public class ValidationServiceImpl implements ValidationService {
 			LoggerService.banner("RESOLVING MATCH FOR FORECAST", logs, false, 0);
 			LoggerService.vaccine(ef.getExpForecast().getTarget(), logs, true, 0);
 			
-			ActualForecast af = this.findMatch(afL, ef.getExpForecast(), logs);
+			ActualForecast af = this.findMatch(afL, ef, logs);
 			if(af == null){
 				tmp = ForecastValidation.unMatched(ef);
 			}
@@ -84,7 +83,7 @@ public class ValidationServiceImpl implements ValidationService {
 		return counts;
 	}
 	
-	public ResultCounts validateEvents(List<ResponseVaccinationEvent> rveL, List<VaccinationEventRequirement> evL, List<VaccinationEventValidation> veValidation,Report vr, StringBuilder logs){
+	public ResultCounts validateEvents(List<ResponseVaccinationEvent> rveL, List<VaccinationEventRequirement> evL, List<VaccinationEventValidation> veValidation,Report vr, StringBuilder logs) {
 		ResultCounts counts = new ResultCounts();
 		VaccinationEventValidation tmp;
 		LoggerService.separator(logs);
@@ -149,13 +148,45 @@ public class ValidationServiceImpl implements ValidationService {
 		return vev;
 	}
 
-	public ActualForecast findMatch(List<ActualForecast> afL, ExpectedForecast ef, StringBuilder logs){
+	public ActualForecast findMatch(List<ActualForecast> afL, ForecastRequirement fr, StringBuilder logs){
+		ExpectedForecast ef = fr.getExpForecast();
+		
+		List<ActualForecast> matches = new ArrayList<>();
 		for(ActualForecast af : afL){
 			if(matcher.match(af.getVaccine(), ef.getTarget(), logs)){
-				return af;
+				matches.add(af);
 			}
 		}
-		return null;
+		
+		if(matches.size() > 0) {
+			LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
+			LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
+			ActualForecast bestMatch = matches.get(0);
+			long smallestScore = Long.MAX_VALUE;
+			
+			for(ActualForecast match: matches) {
+				long distanceFromEarliest = match.getEarliest() != null ?
+						(long) Math.abs(fr.getEarliest().asDate().getTime() - match.getEarliest().getTime()) :
+						Long.MAX_VALUE/2;
+				long distanceFromRecommended = match.getRecommended() != null ?
+						(long) Math.abs(fr.getRecommended().asDate().getTime() - match.getRecommended().getTime()) :
+						Long.MAX_VALUE/2;
+
+				long score = distanceFromEarliest + distanceFromRecommended;
+				LoggerService.vaccineRef(match.getVaccine(), logs, false, 3);
+				LoggerService.text(" => " + score, logs, true, 1);
+				if(score <= smallestScore) {
+					smallestScore = score;
+					bestMatch = match;
+				}
+			}
+			LoggerService.banner("BEST MATCH", logs, false, 2);
+			LoggerService.vaccineRef(bestMatch.getVaccine(), logs, false, 0);
+			LoggerService.text("with distance from expected of "+smallestScore, logs, true, 0);
+			return bestMatch;
+		} else {
+			return null;
+		}
 	}
 	
 	public ActualEvaluation findMatch(Set<ActualEvaluation> aeL, ExpectedEvaluation ee, StringBuilder logs){

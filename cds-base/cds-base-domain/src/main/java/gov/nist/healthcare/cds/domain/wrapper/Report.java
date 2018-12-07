@@ -3,6 +3,7 @@ package gov.nist.healthcare.cds.domain.wrapper;
 
 import gov.nist.healthcare.cds.domain.Entity;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
+import gov.nist.healthcare.cds.enumeration.EngineResponseStatus;
 import gov.nist.healthcare.cds.enumeration.Gender;
 import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 
@@ -39,6 +40,7 @@ public class Report extends Entity implements Serializable {
 	private ResultCounts forecasts;
 	private String user;
 	private List<ExecutionIssue> issues;
+	private EngineResponseStatus engineResponseStatus;
 	
 	public Report() {
 		super();
@@ -224,6 +226,18 @@ public class Report extends Entity implements Serializable {
 
 	public void setIssues(List<ExecutionIssue> issues) {
 		this.issues = issues;
+	}
+
+
+
+	public EngineResponseStatus getEngineResponseStatus() {
+		return engineResponseStatus;
+	}
+
+
+
+	public void setEngineResponseStatus(EngineResponseStatus engineResponseStatus) {
+		this.engineResponseStatus = engineResponseStatus;
 	}
 	
 
