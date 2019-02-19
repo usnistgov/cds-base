@@ -2,10 +2,8 @@ package gov.nist.healthcare.cds.service.impl.validation;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +32,9 @@ import gov.nist.healthcare.cds.service.LoggerService;
 import gov.nist.healthcare.cds.service.VaccineMatcherService;
 import gov.nist.healthcare.cds.service.ValidationConfigService;
 import gov.nist.healthcare.cds.service.ValidationService;
+import gov.nist.healthcare.cds.service.domain.EvaluationMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.ForecastMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.VaccinationEventMatchCandidate;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
@@ -151,58 +152,81 @@ public class ValidationServiceImpl implements ValidationService {
 	public ActualForecast findMatch(List<ActualForecast> afL, ForecastRequirement fr, StringBuilder logs){
 		ExpectedForecast ef = fr.getExpForecast();
 		
-		List<ActualForecast> matches = new ArrayList<>();
+		List<ForecastMatchCandidate> matches = new ArrayList<>();
 		for(ActualForecast af : afL){
-			if(matcher.match(af.getVaccine(), ef.getTarget(), logs)){
-				matches.add(af);
+			int confidence = matcher.match(af.getVaccine(), ef.getTarget(), logs);
+			if(confidence > 0) {
+				matches.add(new ForecastMatchCandidate(af, confidence, fr.getEarliest(), fr.getRecommended()));
 			}
 		}
 		
-		if(matches.size() > 0) {
-			LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
-			LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
-			ActualForecast bestMatch = matches.get(0);
-			long smallestScore = Long.MAX_VALUE;
-			
-			for(ActualForecast match: matches) {
-				long distanceFromEarliest = match.getEarliest() != null ?
-						(long) Math.abs(fr.getEarliest().asDate().getTime() - match.getEarliest().getTime()) :
-						Long.MAX_VALUE/2;
-				long distanceFromRecommended = match.getRecommended() != null ?
-						(long) Math.abs(fr.getRecommended().asDate().getTime() - match.getRecommended().getTime()) :
-						Long.MAX_VALUE/2;
-
-				long score = distanceFromEarliest + distanceFromRecommended;
-				LoggerService.vaccineRef(match.getVaccine(), logs, false, 3);
-				LoggerService.text(" => " + score, logs, true, 1);
-				if(score <= smallestScore) {
-					smallestScore = score;
-					bestMatch = match;
-				}
-			}
-			LoggerService.banner("BEST MATCH", logs, false, 2);
-			LoggerService.vaccineRef(bestMatch.getVaccine(), logs, false, 0);
-			LoggerService.text("with distance from expected of "+smallestScore, logs, true, 0);
-			return bestMatch;
-		} else {
-			return null;
+		LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
+		LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
+		for(ForecastMatchCandidate match: matches) {
+			LoggerService.vaccineRef(match.getCandidate().getVaccine(), logs, false, 3);
+			LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", match.getConfidence(), match.getExpectation(), match.getCompleteness()), logs, true, 1);
 		}
+		
+		if(matches.size() > 0) {
+			Collections.sort(matches, Collections.reverseOrder());
+			LoggerService.banner("BEST MATCH", logs, false, 2);
+			LoggerService.vaccineRef(matches.get(0).getCandidate().getVaccine(), logs, false, 0);
+			LoggerService.text("with score of "+String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", matches.get(0).getConfidence(), matches.get(0).getExpectation(), matches.get(0).getCompleteness()), logs, true, 0);
+			return matches.get(0).getCandidate();
+		}
+		return null;
 	}
 	
 	public ActualEvaluation findMatch(Set<ActualEvaluation> aeL, ExpectedEvaluation ee, StringBuilder logs){
+		
+		List<EvaluationMatchCandidate> matches = new ArrayList<>();
 		for(ActualEvaluation ae : aeL){
-			if(matcher.match(ae.getVaccine(), ee.getRelatedTo(), logs)){
-				return ae;
+			int confidence = matcher.match(ae.getVaccine(), ee.getRelatedTo(), logs);
+			if(confidence > 0) {
+				matches.add(new EvaluationMatchCandidate(ae, confidence, ee.getStatus()));
 			}
+		}
+		LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
+		LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
+		for(EvaluationMatchCandidate match: matches) {
+			LoggerService.vaccineRef(match.getCandidate().getVaccine(), logs, false, 3);
+			LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", match.getConfidence(), match.getExpectation(), match.getCompleteness()), logs, true, 1);
+		}
+		
+		if(matches.size() > 0) {
+			Collections.sort(matches, Collections.reverseOrder());
+			LoggerService.banner("BEST MATCH", logs, false, 2);
+			LoggerService.vaccineRef(matches.get(0).getCandidate().getVaccine(), logs, false, 0);
+			LoggerService.text("with score of "+String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", matches.get(0).getConfidence(), matches.get(0).getExpectation(), matches.get(0).getCompleteness()), logs, true, 0);
+			return matches.get(0).getCandidate();
 		}
 		return null;
 	}
 	
 	public ResponseVaccinationEvent findMatch(List<ResponseVaccinationEvent> rveL, VaccinationEventRequirement ve, StringBuilder logs){
+		List<VaccinationEventMatchCandidate> matches = new ArrayList<>();
 		for(ResponseVaccinationEvent rve : rveL){
-			if(dates.same(((FixedDate) rve.getDate()).asDate(), ve.getDateAdministred().asDate()) && matcher.match(rve.getAdministred(), ve.getvEvent().getAdministred(), logs)){
-				return rve;
+			if(dates.same(((FixedDate) rve.getDate()).asDate(), ve.getDateAdministred().asDate())){
+				int confidence =  matcher.match(rve.getAdministred(), ve.getvEvent().getAdministred(), logs);
+				if(confidence > 0) {
+					matches.add(new VaccinationEventMatchCandidate(rve, confidence));
+				}
+//				return rve;
 			}
+		}
+		LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
+		LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
+		for(VaccinationEventMatchCandidate match: matches) {
+			LoggerService.vaccineRef(match.getCandidate().getAdministred(), logs, false, 3);
+			LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", match.getConfidence(), match.getExpectation(), match.getCompleteness()), logs, true, 1);
+		}
+		
+		if(matches.size() > 0) {
+			Collections.sort(matches, Collections.reverseOrder());
+			LoggerService.banner("BEST MATCH", logs, false, 2);
+			LoggerService.vaccineRef(matches.get(0).getCandidate().getAdministred(), logs, false, 0);
+			LoggerService.text("with score of "+String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", matches.get(0).getConfidence(), matches.get(0).getExpectation(), matches.get(0).getCompleteness()), logs, true, 0);
+			return matches.get(0).getCandidate();
 		}
 		return null;
 	}
@@ -214,6 +238,7 @@ public class ValidationServiceImpl implements ValidationService {
 		
 		return d1.toLowerCase().equals(d2.toLowerCase()) || (none.contains(d1) && none.contains(d2));
 	}
+	
 	public ForecastValidation validate(ForecastRequirement fr, ActualForecast af, Report vr){
 		ForecastValidation fv = new ForecastValidation();
 		ResultCounts counts = new ResultCounts();
