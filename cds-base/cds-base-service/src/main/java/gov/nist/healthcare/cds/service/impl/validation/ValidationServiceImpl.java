@@ -211,7 +211,6 @@ public class ValidationServiceImpl implements ValidationService {
 				if(confidence > 0) {
 					matches.add(new VaccinationEventMatchCandidate(rve, confidence));
 				}
-//				return rve;
 			}
 		}
 		LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
