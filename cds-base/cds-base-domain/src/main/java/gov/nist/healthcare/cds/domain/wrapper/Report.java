@@ -41,13 +41,12 @@ public class Report extends Entity implements Serializable {
 	private String user;
 	private List<ExecutionIssue> issues;
 	private EngineResponseStatus engineResponseStatus;
+	private PerformanceTimestamps timestamps;
 	
 	public Report() {
 		super();
 		failures = new HashMap<ValidationCriterion,Boolean>();
 	}
-
-
 
 	public List<ForecastValidation> getFcValidation() {
 		if(fcValidation == null){
@@ -55,20 +54,14 @@ public class Report extends Entity implements Serializable {
 		}
 		return fcValidation;
 	}
-	
-	
-	
+
 	public Boolean put(ValidationCriterion key, Boolean value) {
 		return failures.put(key, value);
 	}
 
-
-
 	public Map<ValidationCriterion, Boolean> getFailures() {
 		return failures;
 	}
-
-
 
 	public void setFailures(Map<ValidationCriterion, Boolean> failures) {
 		this.failures = failures;
@@ -239,6 +232,12 @@ public class Report extends Entity implements Serializable {
 	public void setEngineResponseStatus(EngineResponseStatus engineResponseStatus) {
 		this.engineResponseStatus = engineResponseStatus;
 	}
-	
 
+	public PerformanceTimestamps getTimestamps() {
+		return timestamps;
+	}
+
+	public void setTimestamps(PerformanceTimestamps timestamps) {
+		this.timestamps = timestamps;
+	}
 }
