@@ -11,7 +11,6 @@ import gov.nist.healthcare.cds.domain.wrapper.ResponseVaccinationEvent;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad.VaccinationEventPayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
-import gov.nist.healthcare.cds.enumeration.EngineResponseStatus;
 import gov.nist.healthcare.cds.enumeration.FHIRAdapter;
 import gov.nist.healthcare.cds.enumeration.Gender;
 import gov.nist.healthcare.cds.service.TestRunnerService;
@@ -222,11 +221,11 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
 
             StringType srs = (StringType) parameterSrs.getValue();
             //System.out.println("This is the TCH log = " + log.getValue());
-            if (srs != null) {
-            	response.setEngineResponseStatus(EngineResponseStatus.valueOf(srs.getValue()));
-            } else {
-                System.out.println("LOG: Software Status Result does not exist.");
-            }
+//            if (srs != null) {
+//                response.setSoftwareResultStatus(srs.getValue());
+//            } else {
+//                System.out.println("LOG: Software Status Result does not exist.");
+//            }
         } catch (IndexOutOfBoundsException e) {
 
             System.out.println("LOG:  Software Status Result does not exist.");
@@ -245,7 +244,7 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
 
                 response.setIssues(executionIssues);
             } else {
-                response.setIssues(new ArrayList<ExecutionIssue>());
+                response.setIssues(new ArrayList<>());
             }
 
         } catch (IndexOutOfBoundsException e) {
@@ -365,8 +364,8 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         //  TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:9080/fhirAdapter/fhir/Parameters/$cds-forecast");
         //TestRunnerService test = new TestRunnerServiceFhirImpl("https://hit-dev.nist.gov:11080/fhirAdapter/fhir/Parameters/$cds-forecast");
         //TestRunnerService test = new TestRunnerServiceFhirImpl("https://hit-dev.nist.gov:11080/fhirAdapter/fhir/Parameters/$cds-forecast");
-      //     TestRunnerService test = new TestRunnerServiceFhirImpl("https://hit-dev.nist.gov:15000/fhirAdapter/fhir/Parameters/$cds-forecast");
-        TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:9080/fhirAdapter/fhir/Parameters/$cds-forecast");
+         TestRunnerService test = new TestRunnerServiceFhirImpl("https://hit-dev.nist.gov:15000/fhirAdapter/fhir/Parameters/$cds-forecast");
+        // TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:9080/fhirAdapter/fhir/Parameters/$cds-forecast");
 
         // TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:8084/fhirAdapter/fhir/Parameters/$cds-forecast");
 //TestRunnerService test = new TestRunnerServiceFhirImpl();
@@ -376,9 +375,9 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         //  config.setConnector(FHIRAdapter.SWP);      
          config.setConnector(FHIRAdapter.TCH);
 
-      //  config.setConnector(FHIRAdapter.SWP);
+       // config.setConnector(FHIRAdapter.SWP);
 
-        // config.setConnector(FHIRAdapter.HL7);
+      //   config.setConnector(FHIRAdapter.HL7);
         //  config.setConnector(FHIRAdapter.ICE);
         //config.setConnector(FHIRAdapter.STC);
         //  config.setConnector(FHIRAdapter.FHIR);
@@ -388,6 +387,9 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         //    config.setEndPoint("http://testws.swpartners.com/vfmservice/VFMWebService?wsdl");
         //config.setEndPoint("http://testws.swpartners.com/vfmservice/VFMWebService");
              config.setEndPoint("http://tchforecasttester.org/fv/forecast");
+             
+         //    config.setEndPoint("https://app.immregistries.org/aart/soap");
+             
         //   config.setEndPoint("http://immlab.pagekite.me/aart/soap");
         //config.setEndPoint("http://testws.swpartners.com/mdsservice/mds");
 
@@ -399,8 +401,8 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
 //config.setEndPoint("http://69.64.70.10:8080/vfmservice/VFMWebService");
 //config.setEndPoint("http://immlab.pagekite.me/opencds-decision-support-service/evaluate?wsdl");
         config.setUserId("TEMP_CONN");
-        config.setFacilityId("74A");
-        config.setPassword("V1QTBXSS58FKQP8PJ2A");
+        config.setFacilityId("50B");
+        config.setPassword("HMH373XKT5CA1D26PJ6");
         //Patient patient = new Patient();
         //Date dob = new FixedDate("01/01/2016");
         //patient.setDob(dob);
@@ -477,7 +479,7 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         System.out.println("These are the logs of... " + run.getLogs());
 
         System.out.println("issues length = " + run.getIssues().size());
-        System.out.println("Status = " + run.getEngineResponseStatus());
+//        System.out.println("Status = " + run.getSoftwareResultStatus());
 
     }
 

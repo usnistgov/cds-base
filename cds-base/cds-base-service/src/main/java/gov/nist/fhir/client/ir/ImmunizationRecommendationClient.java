@@ -536,7 +536,6 @@ public class ImmunizationRecommendationClient {
         }
 
         if (!String.valueOf(httpResponse.getStatusLine().getStatusCode()).startsWith("2")) {
-        	System.out.println("DEBUG <=> "+ httpResponse.getStatusLine().getReasonPhrase());
             throw new ConnectionException(String.valueOf(httpResponse.getStatusLine().getStatusCode()), httpResponse.getStatusLine().getReasonPhrase());
         }
 

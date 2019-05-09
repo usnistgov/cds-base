@@ -2,6 +2,7 @@ package gov.nist.healthcare.cds.service.impl.data;
 
 import java.util.ArrayList;
 
+import gov.nist.healthcare.cds.service.UserMetadataService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class TestPlanClone {
 	
 	@Autowired
 	private RWTestPlanFilter filter;
+
+	@Autowired
+	private UserMetadataService userMetadataService;
 	
 	public TestPlan clone(String tpI, String user){
 		
@@ -53,6 +57,7 @@ public class TestPlanClone {
 				tc.setId(null);
 				testCases.add(tc);
 				tc.setTestPlan(tpId);
+				tc.setUser(user);
 			}
 			
 			for(TestCaseGroup tcg : tp.getTestCaseGroups()){
@@ -64,6 +69,7 @@ public class TestPlanClone {
 					tc.setId(null);
 					tc.setGroupTag(tcgId);
 					tc.setTestPlan(tpId);
+					tc.setUser(user);
 					testCases.add(tc);
 				}
 			}
@@ -74,6 +80,7 @@ public class TestPlanClone {
 			tp.setViewers(new ArrayList<String>());
 			tcRepo.save(testCases);
 			tpRepo.save(tp);
+			this.userMetadataService.updateTestCasesNumber(user);
 			return tp;
 		}
 		else {

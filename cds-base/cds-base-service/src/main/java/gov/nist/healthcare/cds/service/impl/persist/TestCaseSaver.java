@@ -27,7 +27,8 @@ public class TestCaseSaver extends EntitySaver<TestCase> {
 	public void prepare(TestCase persisted, TestCase e, String user) throws IllegalSave {
 		TestPlan tp = ledger.tpBelongsTo(e.getTestPlan(), user, EntityAccess.W);
 		this.verify(TestPlan.class, tp, e.getTestPlan());
-		
+		e.setUser(user);
+
 		//--- New
 		if(persisted == null){
 			

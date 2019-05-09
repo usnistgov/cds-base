@@ -2,10 +2,12 @@ package gov.nist.healthcare.cds.service.impl.validation;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import gov.nist.healthcare.cds.service.*;
+import gov.nist.healthcare.cds.service.domain.matcher.ForecastMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.matcher.ScoredMatches;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import gov.nist.healthcare.cds.domain.ExpectedEvaluation;
@@ -27,14 +29,8 @@ import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventValidation;
 import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 import gov.nist.healthcare.cds.enumeration.ValidationStatus;
-import gov.nist.healthcare.cds.service.DateService;
-import gov.nist.healthcare.cds.service.LoggerService;
-import gov.nist.healthcare.cds.service.VaccineMatcherService;
-import gov.nist.healthcare.cds.service.ValidationConfigService;
-import gov.nist.healthcare.cds.service.ValidationService;
-import gov.nist.healthcare.cds.service.domain.EvaluationMatchCandidate;
-import gov.nist.healthcare.cds.service.domain.ForecastMatchCandidate;
-import gov.nist.healthcare.cds.service.domain.VaccinationEventMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.matcher.EvaluationMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.matcher.VaccinationEventMatchCandidate;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
@@ -45,6 +41,8 @@ public class ValidationServiceImpl implements ValidationService {
 	private DateService dates;
 	@Autowired
 	private ValidationConfigService config;
+	@Autowired
+	private MatchCandidateSelector matchCandidateSelector;
 
 	@Override
 	public Report validate(EngineResponse response, List<VaccinationEventRequirement> events, List<ForecastRequirement> expForecast) {
@@ -159,20 +157,12 @@ public class ValidationServiceImpl implements ValidationService {
 				matches.add(new ForecastMatchCandidate(af, confidence, fr.getEarliest(), fr.getRecommended()));
 			}
 		}
-		
-		LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
-		LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
-		for(ForecastMatchCandidate match: matches) {
-			LoggerService.vaccineRef(match.getCandidate().getVaccine(), logs, false, 3);
-			LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", match.getConfidence(), match.getExpectation(), match.getCompleteness()), logs, true, 1);
-		}
-		
-		if(matches.size() > 0) {
-			Collections.sort(matches, Collections.reverseOrder());
-			LoggerService.banner("BEST MATCH", logs, false, 2);
-			LoggerService.vaccineRef(matches.get(0).getCandidate().getVaccine(), logs, false, 0);
-			LoggerService.text("with score of "+String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", matches.get(0).getConfidence(), matches.get(0).getExpectation(), matches.get(0).getCompleteness()), logs, true, 0);
-			return matches.get(0).getCandidate();
+
+		ScoredMatches<ForecastMatchCandidate> scoredMatches = this.matchCandidateSelector.getBestMatch(matches);
+		LoggerService.printScoredForecasts(scoredMatches, logs);
+
+		if(scoredMatches.getBestMatch() != null) {
+			return scoredMatches.getBestMatch().getPayload();
 		}
 		return null;
 	}
@@ -186,19 +176,12 @@ public class ValidationServiceImpl implements ValidationService {
 				matches.add(new EvaluationMatchCandidate(ae, confidence, ee.getStatus()));
 			}
 		}
-		LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
-		LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
-		for(EvaluationMatchCandidate match: matches) {
-			LoggerService.vaccineRef(match.getCandidate().getVaccine(), logs, false, 3);
-			LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", match.getConfidence(), match.getExpectation(), match.getCompleteness()), logs, true, 1);
-		}
-		
-		if(matches.size() > 0) {
-			Collections.sort(matches, Collections.reverseOrder());
-			LoggerService.banner("BEST MATCH", logs, false, 2);
-			LoggerService.vaccineRef(matches.get(0).getCandidate().getVaccine(), logs, false, 0);
-			LoggerService.text("with score of "+String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", matches.get(0).getConfidence(), matches.get(0).getExpectation(), matches.get(0).getCompleteness()), logs, true, 0);
-			return matches.get(0).getCandidate();
+
+		ScoredMatches<EvaluationMatchCandidate> scoredMatches = this.matchCandidateSelector.getBestMatch(matches);
+		LoggerService.printScoredEvaluations(scoredMatches, logs);
+
+		if(scoredMatches.getBestMatch() != null) {
+			return scoredMatches.getBestMatch().getPayload();
 		}
 		return null;
 	}
@@ -213,19 +196,12 @@ public class ValidationServiceImpl implements ValidationService {
 				}
 			}
 		}
-		LoggerService.banner("FOUND "+matches.size()+" MATCHES", logs, true, 1);
-		LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
-		for(VaccinationEventMatchCandidate match: matches) {
-			LoggerService.vaccineRef(match.getCandidate().getAdministred(), logs, false, 3);
-			LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", match.getConfidence(), match.getExpectation(), match.getCompleteness()), logs, true, 1);
-		}
-		
-		if(matches.size() > 0) {
-			Collections.sort(matches, Collections.reverseOrder());
-			LoggerService.banner("BEST MATCH", logs, false, 2);
-			LoggerService.vaccineRef(matches.get(0).getCandidate().getAdministred(), logs, false, 0);
-			LoggerService.text("with score of "+String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", matches.get(0).getConfidence(), matches.get(0).getExpectation(), matches.get(0).getCompleteness()), logs, true, 0);
-			return matches.get(0).getCandidate();
+
+		ScoredMatches<VaccinationEventMatchCandidate> scoredMatches = this.matchCandidateSelector.getBestMatch(matches);
+		LoggerService.printScoredVaccinationEvent(scoredMatches, logs);
+
+		if(scoredMatches.getBestMatch() != null) {
+			return scoredMatches.getBestMatch().getPayload();
 		}
 		return null;
 	}

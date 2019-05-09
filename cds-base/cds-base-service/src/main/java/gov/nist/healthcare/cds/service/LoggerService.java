@@ -3,12 +3,12 @@ package gov.nist.healthcare.cds.service;
 import java.util.Date;
 import java.util.Set;
 
-import gov.nist.healthcare.cds.domain.FixedDate;
-import gov.nist.healthcare.cds.domain.Injection;
-import gov.nist.healthcare.cds.domain.Product;
-import gov.nist.healthcare.cds.domain.Vaccine;
-import gov.nist.healthcare.cds.domain.VaccineGroup;
+import gov.nist.healthcare.cds.domain.*;
 import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
+import gov.nist.healthcare.cds.service.domain.matcher.EvaluationMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.matcher.ForecastMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.matcher.ScoredMatches;
+import gov.nist.healthcare.cds.service.domain.matcher.VaccinationEventMatchCandidate;
 
 public class LoggerService {
 
@@ -127,6 +127,85 @@ public class LoggerService {
 		log.append("[DECISION] "+data);
 		if(ln)
 		log.append("\n");
+	}
+
+	public static void printScoredForecasts(ScoredMatches<ForecastMatchCandidate> scored, StringBuilder logs) {
+		LoggerService.banner("FOUND "+scored.getSize()+" MATCHES", logs, true, 1);
+
+		if(scored.getSize() > 0) {
+			LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
+
+			for(Long score: scored.getMatchScores().keySet()) {
+				for(ForecastMatchCandidate candidate: scored.getMatchScores().get(score)) {
+					LoggerService.vaccineRef(candidate.getPayload().getVaccine(), logs, false, 3);
+					LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", candidate.getConfidence(), score, candidate.getCompleteness()), logs, true, 1);
+				}
+			}
+
+			LoggerService.banner("BEST MATCH", logs, false, 2);
+			LoggerService.vaccineRef(scored.getBestMatch().getPayload().getVaccine(), logs, false, 0);
+			LoggerService.text("with score of "+String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]",
+					scored.getBestMatch().getConfidence(),
+					scored.getScore(),
+					scored.getBestMatch().getCompleteness()),
+					logs,
+					true,
+					0
+			);
+		}
+
+	}
+
+	public static void printScoredEvaluations(ScoredMatches<EvaluationMatchCandidate> scored, StringBuilder logs) {
+		LoggerService.banner("FOUND "+scored.getSize()+" MATCHES", logs, true, 1);
+
+		if(scored.getSize() > 0) {
+			LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
+
+			for (Long score : scored.getMatchScores().keySet()) {
+				for (EvaluationMatchCandidate candidate : scored.getMatchScores().get(score)) {
+					LoggerService.vaccineRef(candidate.getPayload().getVaccine(), logs, false, 3);
+					LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", candidate.getConfidence(), score, candidate.getCompleteness()), logs, true, 1);
+				}
+			}
+
+			LoggerService.banner("BEST MATCH", logs, false, 2);
+			LoggerService.vaccineRef(scored.getBestMatch().getPayload().getVaccine(), logs, false, 0);
+			LoggerService.text("with score of " + String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]",
+					scored.getBestMatch().getConfidence(),
+					scored.getScore(),
+					scored.getBestMatch().getCompleteness()),
+					logs,
+					true,
+					0
+			);
+		}
+	}
+
+	public static void printScoredVaccinationEvent(ScoredMatches<VaccinationEventMatchCandidate> scored, StringBuilder logs) {
+		LoggerService.banner("FOUND "+scored.getSize()+" MATCHES", logs, true, 1);
+
+		if(scored.getSize() > 0) {
+			LoggerService.banner("CALCULATING MATCHES SCORES", logs, true, 2);
+
+			for (Long score : scored.getMatchScores().keySet()) {
+				for (VaccinationEventMatchCandidate candidate : scored.getMatchScores().get(score)) {
+					LoggerService.vaccineRef(candidate.getPayload().getAdministred(), logs, false, 3);
+					LoggerService.text(String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]", candidate.getConfidence(), score, candidate.getCompleteness()), logs, true, 1);
+				}
+			}
+
+			LoggerService.banner("BEST MATCH", logs, false, 2);
+			LoggerService.vaccineRef(scored.getBestMatch().getPayload().getAdministred(), logs, false, 0);
+			LoggerService.text("with score of " + String.format(" => [ Confidence = %d, Expectation = %d, Completeness = %d ]",
+					scored.getBestMatch().getConfidence(),
+					scored.getScore(),
+					scored.getBestMatch().getCompleteness()),
+					logs,
+					true,
+					0
+			);
+		}
 	}
 	
 }
