@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import gov.nist.healthcare.cds.enumeration.EngineResponseStatus;
+
 public class EngineResponse {
 
 	private List<ExecutionIssue> issues;
@@ -12,7 +14,7 @@ public class EngineResponse {
 	private String logs;
 	private List<ActualForecast> forecasts;
 	private List<ResponseVaccinationEvent> events;
-	private String softwareResultStatus = null;
+	private EngineResponseStatus engineResponseStatus = null;
 	
 	public EngineResponse() {
 		super();
@@ -56,22 +58,11 @@ public class EngineResponse {
 	{ 
 	    return ToStringBuilder.reflectionToString(this); 
 	}
-
-    /**
-     * @return the softwareResultStatus
-     */
-    public String getSoftwareResultStatus() {
-        return softwareResultStatus;
-    }
-
-    /**
-     * @param softwareResultStatus the softwareResultStatus to set
-     */
-    public void setSoftwareResultStatus(String softwareResultStatus) {
-        this.softwareResultStatus = softwareResultStatus;
-    }
-	
-	
-	
+	public EngineResponseStatus getEngineResponseStatus() {
+		return engineResponseStatus;
+	}
+	public void setEngineResponseStatus(EngineResponseStatus engineResponseStatus) {
+		this.engineResponseStatus = engineResponseStatus;
+	}
 	
 }

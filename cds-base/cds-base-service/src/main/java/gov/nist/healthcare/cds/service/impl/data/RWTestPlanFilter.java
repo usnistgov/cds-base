@@ -18,9 +18,8 @@ public class RWTestPlanFilter implements TestPlanFilter {
 	public void filterTestPlan(TestPlan x) {
 		List<String> emptyIds = new ArrayList<String>();
 		x.setTestCases(filter(x.getTestCases()));
-		System.out.println("PASSED_HT");
+
 		for(TestCaseGroup tcg : x.getTestCaseGroups()){
-			System.out.println("FILTER : "+tcg.getName());
 			tcg.setTestCases(filter(tcg.getTestCases()));
 			if(tcg.getTestCases().isEmpty()){
 				emptyIds.add(tcg.getId());
@@ -47,7 +46,6 @@ public class RWTestPlanFilter implements TestPlanFilter {
 	
 	@Override
 	public boolean conform(TestCase tc){
-		System.out.println(tc == null);
 		return tc.getWorkflowTag() != null && tc.getWorkflowTag().equals(WorkflowTag.FINAL);
 	}
 

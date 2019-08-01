@@ -1,10 +1,12 @@
 package gov.nist.fhir.client.ir;
 
 import ca.uhn.fhir.context.FhirContext;
+import gov.nist.fhir.client.ir.tch.TchUtils;
 import gov.nist.healthcare.cds.domain.wrapper.ActualForecast;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
+import gov.nist.healthcare.cds.domain.wrapper.ExecutionIssue;
 import gov.nist.healthcare.cds.domain.wrapper.ResponseVaccinationEvent;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
 import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad.VaccinationEventPayLoad;
@@ -155,9 +157,16 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
 
         //      System.out.println("COMING BACK = \n" + raw);
         //TODO: Error checking
-        org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent parameter = parameters.getParameter().get(0);
-
-        org.hl7.fhir.dstu3.model.ImmunizationRecommendation ir = (org.hl7.fhir.dstu3.model.ImmunizationRecommendation) parameter.getResource();
+        org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent parameter = null;
+        try {
+            parameter = parameters.getParameter().get(0);
+        } catch (IndexOutOfBoundsException ioobe) {
+            System.out.println("LOG: No immunization information in response.");
+        }
+        org.hl7.fhir.dstu3.model.ImmunizationRecommendation ir = null;
+        if (parameter != null) {
+            ir = (org.hl7.fhir.dstu3.model.ImmunizationRecommendation) parameter.getResource();
+        }
         if (ir != null) {
             List<ImmunizationRecommendationRecommendationComponent> irrs = ir.getRecommendation();
             Iterator<ImmunizationRecommendationRecommendationComponent> it = irrs.iterator();
@@ -186,21 +195,85 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
                 }
 
             }
+        } else {
+            System.out.println("LOG: No immunization information in response.");
         }
+
+        try {
+            //TODO: Do better than going by order of paramters
+            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent parameterLog = parameters.getParameter().get(1);
+
+            StringType log = (StringType) parameterLog.getValue();
+            //System.out.println("This is the TCH log = " + log.getValue());
+            if (log != null) {
+                response.setLogs(log.getValue());
+            } else {
+                System.out.println("LOG: TCH Log does not exist.");
+            }
+        } catch (IndexOutOfBoundsException e) {
+
+            System.out.println("LOG: TCH Log does not exist.");
+        }
+
+        try {
+            //TODO: Do better than going by order of paramters
+            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent parameterSrs = parameters.getParameter().get(2);
+
+            StringType srs = (StringType) parameterSrs.getValue();
+            //System.out.println("This is the TCH log = " + log.getValue());
+//            if (srs != null) {
+//                response.setSoftwareResultStatus(srs.getValue());
+//            } else {
+//                System.out.println("LOG: Software Status Result does not exist.");
+//            }
+        } catch (IndexOutOfBoundsException e) {
+
+            System.out.println("LOG:  Software Status Result does not exist.");
+        }
+
+        
         
         try {
-            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent parameterLog = parameters.getParameter().get(1);
-            
-            StringType log = (StringType) parameterLog.getValue();
-            //System.out.println("This is the TCH log = " + log.getValue());            
-            response.setLogs(log.getValue());
-            
-        } catch (Exception e)  {
-            //TODO: If no log... Make this better
-            e.printStackTrace();
+            //TODO: Do better than going by order of paramters
+            org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent parameterIssue = parameters.getParameter().get(3);
+
+            StringType issues = (StringType) parameterIssue.getValue();
+            if (issues != null) {
+                String issueString = issues.getValue();
+                List<ExecutionIssue> executionIssues = TchUtils.convertStringToExecutionIssues(issueString);
+
+                response.setIssues(executionIssues);
+            } else {
+                response.setIssues(new ArrayList<>());
+            }
+
+        } catch (IndexOutOfBoundsException e) {
+
+            System.out.println("LOG: No issues.");
         }
-        
         /*
+         try {
+             //TODO: Do better than going by order of paramters
+             org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent parameterIssue = parameters.getParameter().get(2);
+             
+             StringType issues = (StringType) parameterIssue.getValue();
+             //System.out.println("This is the TCH log = " + log.getValue());  
+             if(issues != null) {
+                 String issueString = issues.getValue();
+                 List<ExecutionIssue> executionIssues = TchUtils.convertStringToExecutionIssues(issueString);
+                 
+                 response.setIssues(executionIssues);
+             } else {
+                 response.setIssues(new ArrayList<>());
+             }
+ //            response.setLogs(log.getValue());
+   //          response.s
+         } catch (IndexOutOfBoundsException e)  {
+             //TODO: If no log... Make this better
+             IndexOutOfBoundsException
+         }
+         */
+ /*
 
             Parameters parameters = null;
             try {
@@ -292,7 +365,7 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         //TestRunnerService test = new TestRunnerServiceFhirImpl("https://hit-dev.nist.gov:11080/fhirAdapter/fhir/Parameters/$cds-forecast");
         //TestRunnerService test = new TestRunnerServiceFhirImpl("https://hit-dev.nist.gov:11080/fhirAdapter/fhir/Parameters/$cds-forecast");
          TestRunnerService test = new TestRunnerServiceFhirImpl("https://hit-dev.nist.gov:15000/fhirAdapter/fhir/Parameters/$cds-forecast");
-   //     TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:9080/fhirAdapter/fhir/Parameters/$cds-forecast");
+        // TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:9080/fhirAdapter/fhir/Parameters/$cds-forecast");
 
         // TestRunnerService test = new TestRunnerServiceFhirImpl("http://localhost:8084/fhirAdapter/fhir/Parameters/$cds-forecast");
 //TestRunnerService test = new TestRunnerServiceFhirImpl();
@@ -300,33 +373,36 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         TestCasePayLoad tc = new TestCasePayLoad();
         //    config.setConnector(FHIRAdapter.MA);      
         //  config.setConnector(FHIRAdapter.SWP);      
-          config.setConnector(FHIRAdapter.TCH);
+         config.setConnector(FHIRAdapter.TCH);
 
-        //config.setConnector(FHIRAdapter.HL7);
+       // config.setConnector(FHIRAdapter.SWP);
+
+      //   config.setConnector(FHIRAdapter.HL7);
         //  config.setConnector(FHIRAdapter.ICE);
         //config.setConnector(FHIRAdapter.STC);
         //  config.setConnector(FHIRAdapter.FHIR);
         //      config.setUser("TCH");
         //config.setUser("ice");
         //config.setUser("stc");
-
         //    config.setEndPoint("http://testws.swpartners.com/vfmservice/VFMWebService?wsdl");
         //config.setEndPoint("http://testws.swpartners.com/vfmservice/VFMWebService");
-            config.setEndPoint("http://tchforecasttester.org/fv/forecast");
-        
-        
-        
-      //  config.setEndPoint("http://imm.pagekite.me/aart/soap");
+             config.setEndPoint("http://tchforecasttester.org/fv/forecast");
+             
+         //    config.setEndPoint("https://app.immregistries.org/aart/soap");
+             
+        //   config.setEndPoint("http://immlab.pagekite.me/aart/soap");
+        //config.setEndPoint("http://testws.swpartners.com/mdsservice/mds");
+
+        //  config.setEndPoint("http://imm.pagekite.me/aart/soap");
         //    config.setEndPoint("http://imm.pagekite.me/iis-kernel/soap");
         //      config.setEndPoint("https://cds.hln.com/opencds-decision-support-service/evaluate?wsdl");
-
         //config.setEndPoint("http://epicenter.stchome.com/safdemo/soa/forecast/getForecast.wsdl");
         //      config.setEndPoint("http://test-cdsi.rhcloud.com/CDSi/cds-forecast");
 //config.setEndPoint("http://69.64.70.10:8080/vfmservice/VFMWebService");
 //config.setEndPoint("http://immlab.pagekite.me/opencds-decision-support-service/evaluate?wsdl");
         config.setUserId("TEMP_CONN");
-        config.setFacilityId("66D");
-        config.setPassword("Q9GQZWYJXJHV2JGX2ZB");
+        config.setFacilityId("50B");
+        config.setPassword("HMH373XKT5CA1D26PJ6");
         //Patient patient = new Patient();
         //Date dob = new FixedDate("01/01/2016");
         //patient.setDob(dob);
@@ -397,8 +473,13 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         System.out.println(run.getForecasts().size());
         System.out.println(run.getEvents().size());
         //System.out.println(run.getResponse());
-        
+
+        System.out.println("First CVX = " + run.getForecasts().get(0).getVaccine().getCvx());
+
         System.out.println("These are the logs of... " + run.getLogs());
+
+        System.out.println("issues length = " + run.getIssues().size());
+//        System.out.println("Status = " + run.getSoftwareResultStatus());
 
     }
 

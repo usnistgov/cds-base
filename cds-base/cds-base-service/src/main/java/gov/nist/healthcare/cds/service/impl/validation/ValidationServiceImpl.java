@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import gov.nist.healthcare.cds.service.*;
+import gov.nist.healthcare.cds.service.domain.matcher.ForecastMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.matcher.ScoredMatches;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import gov.nist.healthcare.cds.domain.ExpectedEvaluation;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.FixedDate;
-import gov.nist.healthcare.cds.domain.Injection;
-import gov.nist.healthcare.cds.domain.Product;
-import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.wrapper.ActualEvaluation;
 import gov.nist.healthcare.cds.domain.wrapper.ActualForecast;
 import gov.nist.healthcare.cds.domain.wrapper.DateCriterion;
@@ -27,14 +27,10 @@ import gov.nist.healthcare.cds.domain.wrapper.ResultCounts;
 import gov.nist.healthcare.cds.domain.wrapper.StringCriterion;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
 import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventValidation;
-import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 import gov.nist.healthcare.cds.enumeration.ValidationStatus;
-import gov.nist.healthcare.cds.service.DateService;
-import gov.nist.healthcare.cds.service.LoggerService;
-import gov.nist.healthcare.cds.service.VaccineMatcherService;
-import gov.nist.healthcare.cds.service.ValidationConfigService;
-import gov.nist.healthcare.cds.service.ValidationService;
+import gov.nist.healthcare.cds.service.domain.matcher.EvaluationMatchCandidate;
+import gov.nist.healthcare.cds.service.domain.matcher.VaccinationEventMatchCandidate;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
@@ -45,6 +41,8 @@ public class ValidationServiceImpl implements ValidationService {
 	private DateService dates;
 	@Autowired
 	private ValidationConfigService config;
+	@Autowired
+	private MatchCandidateSelector matchCandidateSelector;
 
 	@Override
 	public Report validate(EngineResponse response, List<VaccinationEventRequirement> events, List<ForecastRequirement> expForecast) {
@@ -71,7 +69,7 @@ public class ValidationServiceImpl implements ValidationService {
 			LoggerService.banner("RESOLVING MATCH FOR FORECAST", logs, false, 0);
 			LoggerService.vaccine(ef.getExpForecast().getTarget(), logs, true, 0);
 			
-			ActualForecast af = this.findMatch(afL, ef.getExpForecast(), logs);
+			ActualForecast af = this.findMatch(afL, ef, logs);
 			if(af == null){
 				tmp = ForecastValidation.unMatched(ef);
 			}
@@ -84,7 +82,7 @@ public class ValidationServiceImpl implements ValidationService {
 		return counts;
 	}
 	
-	public ResultCounts validateEvents(List<ResponseVaccinationEvent> rveL, List<VaccinationEventRequirement> evL, List<VaccinationEventValidation> veValidation,Report vr, StringBuilder logs){
+	public ResultCounts validateEvents(List<ResponseVaccinationEvent> rveL, List<VaccinationEventRequirement> evL, List<VaccinationEventValidation> veValidation,Report vr, StringBuilder logs) {
 		ResultCounts counts = new ResultCounts();
 		VaccinationEventValidation tmp;
 		LoggerService.separator(logs);
@@ -149,29 +147,61 @@ public class ValidationServiceImpl implements ValidationService {
 		return vev;
 	}
 
-	public ActualForecast findMatch(List<ActualForecast> afL, ExpectedForecast ef, StringBuilder logs){
+	public ActualForecast findMatch(List<ActualForecast> afL, ForecastRequirement fr, StringBuilder logs){
+		ExpectedForecast ef = fr.getExpForecast();
+		
+		List<ForecastMatchCandidate> matches = new ArrayList<>();
 		for(ActualForecast af : afL){
-			if(matcher.match(af.getVaccine(), ef.getTarget(), logs)){
-				return af;
+			int confidence = matcher.match(af.getVaccine(), ef.getTarget(), logs);
+			if(confidence > 0) {
+				matches.add(new ForecastMatchCandidate(af, confidence, fr.getEarliest(), fr.getRecommended()));
 			}
+		}
+
+		ScoredMatches<ForecastMatchCandidate> scoredMatches = this.matchCandidateSelector.getBestMatch(matches);
+		LoggerService.printScoredForecasts(scoredMatches, logs);
+
+		if(scoredMatches.getBestMatch() != null) {
+			return scoredMatches.getBestMatch().getPayload();
 		}
 		return null;
 	}
 	
 	public ActualEvaluation findMatch(Set<ActualEvaluation> aeL, ExpectedEvaluation ee, StringBuilder logs){
+		
+		List<EvaluationMatchCandidate> matches = new ArrayList<>();
 		for(ActualEvaluation ae : aeL){
-			if(matcher.match(ae.getVaccine(), ee.getRelatedTo(), logs)){
-				return ae;
+			int confidence = matcher.match(ae.getVaccine(), ee.getRelatedTo(), logs);
+			if(confidence > 0) {
+				matches.add(new EvaluationMatchCandidate(ae, confidence, ee.getStatus()));
 			}
+		}
+
+		ScoredMatches<EvaluationMatchCandidate> scoredMatches = this.matchCandidateSelector.getBestMatch(matches);
+		LoggerService.printScoredEvaluations(scoredMatches, logs);
+
+		if(scoredMatches.getBestMatch() != null) {
+			return scoredMatches.getBestMatch().getPayload();
 		}
 		return null;
 	}
 	
 	public ResponseVaccinationEvent findMatch(List<ResponseVaccinationEvent> rveL, VaccinationEventRequirement ve, StringBuilder logs){
+		List<VaccinationEventMatchCandidate> matches = new ArrayList<>();
 		for(ResponseVaccinationEvent rve : rveL){
-			if(dates.same(((FixedDate) rve.getDate()).asDate(), ve.getDateAdministred().asDate()) && matcher.match(rve.getAdministred(), ve.getvEvent().getAdministred(), logs)){
-				return rve;
+			if(dates.same(((FixedDate) rve.getDate()).asDate(), ve.getDateAdministred().asDate())){
+				int confidence =  matcher.match(rve.getAdministred(), ve.getvEvent().getAdministred(), logs);
+				if(confidence > 0) {
+					matches.add(new VaccinationEventMatchCandidate(rve, confidence));
+				}
 			}
+		}
+
+		ScoredMatches<VaccinationEventMatchCandidate> scoredMatches = this.matchCandidateSelector.getBestMatch(matches);
+		LoggerService.printScoredVaccinationEvent(scoredMatches, logs);
+
+		if(scoredMatches.getBestMatch() != null) {
+			return scoredMatches.getBestMatch().getPayload();
 		}
 		return null;
 	}
@@ -183,6 +213,7 @@ public class ValidationServiceImpl implements ValidationService {
 		
 		return d1.toLowerCase().equals(d2.toLowerCase()) || (none.contains(d1) && none.contains(d2));
 	}
+	
 	public ForecastValidation validate(ForecastRequirement fr, ActualForecast af, Report vr){
 		ForecastValidation fv = new ForecastValidation();
 		ResultCounts counts = new ResultCounts();

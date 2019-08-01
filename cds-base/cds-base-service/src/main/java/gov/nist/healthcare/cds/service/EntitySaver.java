@@ -32,14 +32,12 @@ public abstract class EntitySaver<T extends Entity> {
 	public T saveEntity(T e, String user) throws IllegalSave {
 		saveObject.clear();
 		if(this.exists(e)){
-			System.out.println("[HTEX]");
 			T persisted = ledger.belongsTo(e.getId(), user, clazz, EntityAccess.W);
 			this.verify(clazz, persisted, e.getId());
 			this.prepare(persisted, e, user);
 			return save(e);
 		}
 		else {
-			System.out.println("[NO HTEX]");
 			this.prepare(null, e, user);
 			return save(e);
 		}

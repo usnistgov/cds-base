@@ -15,6 +15,7 @@ import gov.nist.healthcare.cds.repositories.VaccineMappingRepository;
 import gov.nist.healthcare.cds.service.VaccineMatcherService;
 import gov.nist.healthcare.cds.service.VaccineService;
 
+@Deprecated
 public class SimpleVaccineMatcherService implements VaccineMatcherService {
 
 	@Autowired
@@ -23,24 +24,8 @@ public class SimpleVaccineMatcherService implements VaccineMatcherService {
 	private VaccineService vaccineService;
 	
 	@Override
-	public boolean match(VaccineRef ref, Injection i, StringBuilder log) {
-		
-		if(i instanceof Product){
-			Product p = (Product) i;
-			if(!ref.isHasMvx()){
-				return ref.getCvx().equals(p.getVx().getCvx()) || this.isGroupOf(ref.getCvx(), p.getVx().getCvx()) || this.isSiblingOf(ref.getCvx(), p.getVx().getCvx());
-			}
-			else {
-				return ref.getCvx().equals(p.getVx().getCvx()) && ref.getMvx().equals(p.getMx().getMvx());
-			}
-		}
-		else if (i instanceof Vaccine){
-			Vaccine v = (Vaccine) i;
-			return v.getCvx().equals(ref.getCvx()) || this.isGroupOf(ref.getCvx(), v.getCvx()) || this.isSiblingOf(ref.getCvx(), v.getCvx());
-		}
-		else {
-			return false;
-		}
+	public int match(VaccineRef ref, Injection i, StringBuilder log) {
+		return 0;
 	}
 	
 	public boolean isSiblingOf(String cvx, String iCvx){

@@ -49,6 +49,7 @@ public class TestCase extends Entity implements Serializable {
 	private WorkflowTag workflowTag;
 	private boolean runnable;
 	private List<ModelError> errors;
+	private String user;
 	
 	public TestCase(){
 		this.runnable = true;
@@ -85,45 +86,59 @@ public class TestCase extends Entity implements Serializable {
 	public void setErrors(List<ModelError> errors) {
 		this.errors = errors;
 	}
+
 	public boolean isRunnable() {
 		return runnable;
 	}
+
 	public void setRunnable(boolean runnable) {
 		this.runnable = runnable;
 	}
+
 	public String getGroupTag() {
 		return groupTag;
 	}
+
 	public void setGroupTag(String groupTag) {
 		this.groupTag = groupTag;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public Patient getPatient() {
 		return patient;
 	}
+
 	public void setPatient(Patient patient) {
 		this.patient = patient;
 	}
+
 	public Date getEvalDate() {
 		return evalDate;
 	}
+
 	public void setEvalDate(Date evalDate) {
 		this.evalDate = evalDate;
 	}
+
 	public List<Event> getEvents() {
 		return events;
 	}
+
 	public void setEvents(List<Event> events) {
 		this.events = events;
 	}
@@ -133,50 +148,38 @@ public class TestCase extends Entity implements Serializable {
 			events = new ArrayList<Event>();
 		events.add(e);
 	}
+
 	public List<ExpectedForecast> getForecast() {
 		if(forecast == null){
 			return new ArrayList<ExpectedForecast>();
 		}
 		return forecast;
 	}
+
 	public void setForecast(List<ExpectedForecast> forecast) {
 		this.forecast = forecast;
 	}
+
 	public String getUid() {
 		return uid;
 	}
+
 	public void setUid(String uid) {
 		this.uid = uid;
-	}
-	@Override
-	public String toString() 
-	{ 
-	    return ToStringBuilder.reflectionToString(this); 
 	}
 	
 	public String getTestPlan() {
 		return testPlan;
 	}
+
 	public void setTestPlan(String testPlan) {
 		this.testPlan = testPlan;
 	}
-	@Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (id == null || obj == null || getClass() != obj.getClass())
-            return false;
-        TestCase that = (TestCase) obj;
-        return id.equals(that.id);
-    }
-    
-    @Override
-    public int hashCode() {
-        return id == null ? 0 : id.hashCode();
-    }
+
 	public DateType getDateType() {
 		return dateType;
 	}
+
 	public void setDateType(DateType dateType) {
 		this.dateType = dateType;
 	}
@@ -188,5 +191,33 @@ public class TestCase extends Entity implements Serializable {
 	public void setWorkflowTag(WorkflowTag workflowTag) {
 		this.workflowTag = workflowTag;
 	}
-	
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (id == null || obj == null || getClass() != obj.getClass())
+			return false;
+		TestCase that = (TestCase) obj;
+		return id.equals(that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return id == null ? 0 : id.hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return ToStringBuilder.reflectionToString(this);
+	}
 }

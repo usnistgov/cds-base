@@ -24,17 +24,20 @@ public class ConfigurableVaccineMatcher implements VaccineMatcherService {
 	
 	
 	@Override
-	public boolean match(VaccineRef ref, Injection i, StringBuilder logs) {
+	public int match(VaccineRef ref, Injection i, StringBuilder logs) {
 		try {
 			LoggerService.banner("CHECKING AGAINST", logs, false, 1);
 			LoggerService.vaccineRef(ref, logs, true, 0);
 			
 			
 			Injection provided = vaxService.getVax(ref, true);
-			return this.straightMatch(provided, i, logs) || this.groupMatch(provided, i, logs)|| this.customMatch(provided, i, logs);
+
+			if(this.straightMatch(provided, i, logs)) return 1;
+			else if(this.groupMatch(provided, i, logs)|| this.customMatch(provided, i, logs)) return 2;
+			else return 0;
 		
 		} catch (Exception e) {
-			return false;
+			return 0;
 		}
 	}
 	

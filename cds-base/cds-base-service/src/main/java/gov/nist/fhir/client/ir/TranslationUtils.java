@@ -15,6 +15,7 @@ import gov.nist.healthcare.cds.enumeration.SerieStatus;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -116,8 +117,8 @@ public class TranslationUtils {
             vaccineRef.setCvx(imm.getVaccineCode().getCoding().get(0).getCode());
         }
         rve.setAdministred(vaccineRef);
-        
-        rve.setDate(new FixedDate(imm.getDate()));
+        if(imm.getDate() != null)
+            rve.setDate(new FixedDate(imm.getDate()));
         rve.setEvaluations(new HashSet<ActualEvaluation>());
         
         List<ImmunizationVaccinationProtocolComponent> vaccinationProtocols = imm.getVaccinationProtocol();
@@ -125,8 +126,10 @@ public class TranslationUtils {
         while (it.hasNext()) {
             ImmunizationVaccinationProtocolComponent ivp = it.next();            
             ActualEvaluation ae = new ActualEvaluation();
+            boolean safeToSend = true;
             String status = "";
             if (ivp.getDoseStatus() != null && ivp.getDoseStatus().getCoding() != null
+            		&& ivp.getDoseStatus().getCoding().size() > 0
                     && ivp.getDoseStatus().getCoding().get(0) != null
                     && ivp.getDoseStatus().getCoding().get(0).getCode() != null) {
                 status = ivp.getDoseStatus().getCoding().get(0).getCode();
@@ -144,8 +147,13 @@ public class TranslationUtils {
                 ae.setStatus(EvaluationStatus.SUBSTANDARD);
             } else if ("Y".equalsIgnoreCase(status)) {
                 ae.setStatus(EvaluationStatus.VALID);
-            } else {
+             } else if ("Invalid".equalsIgnoreCase(status)) {
                 ae.setStatus(EvaluationStatus.INVALID);
+            } else {
+                // ae.setStatus(EvaluationStatus.INVALID);
+                //Remove default 11/7/2018
+                // Also 11/7/2018, if no EvaluationStatus, DO NOT SEND
+                safeToSend = false;
             }
             VaccineRef vr = new VaccineRef();
             
@@ -159,7 +167,9 @@ public class TranslationUtils {
             }
             
             ae.setVaccine(vr);            
-            rve.getEvaluations().add(ae);
+            if(safeToSend) {
+                rve.getEvaluations().add(ae);
+            }
         }
         return rve;
     }
@@ -312,9 +322,11 @@ public class TranslationUtils {
     public static ActualForecast translateImmunizationRecommendationRecommendationToActualForecast(
             org.hl7.fhir.dstu3.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent irr) {
         
+        /* Removing March 19th, 2019. Even if there is no date, try to create the Actual Forecast anyway
         if (irr.getDate() == null || "".equals(irr.getDate())) {
             return null;
         }
+        */
         
         ActualForecast af = new ActualForecast();
         //TODO: Error checking
@@ -330,7 +342,11 @@ public class TranslationUtils {
         }
         af.setVaccine(vaccineRef);
         
-        List<ImmunizationRecommendationRecommendationDateCriterionComponent> dateCriterions = irr.getDateCriterion();
+        List<ImmunizationRecommendationRecommendationDateCriterionComponent> dateCriterions = null; 
+        if (irr.getDateCriterion() != null)
+            dateCriterions = irr.getDateCriterion();
+        else
+            dateCriterions = new ArrayList();
         
         Iterator<ImmunizationRecommendationRecommendationDateCriterionComponent> it = dateCriterions.iterator();
         while (it.hasNext()) {

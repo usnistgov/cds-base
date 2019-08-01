@@ -2,8 +2,10 @@ package gov.nist.healthcare.cds.service.impl.validation;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import gov.nist.healthcare.cds.domain.wrapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
@@ -16,14 +18,6 @@ import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 import gov.nist.healthcare.cds.domain.exception.UnresolvableDate;
-import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
-import gov.nist.healthcare.cds.domain.wrapper.ForecastRequirement;
-import gov.nist.healthcare.cds.domain.wrapper.Report;
-import gov.nist.healthcare.cds.domain.wrapper.ResolvedDates;
-import gov.nist.healthcare.cds.domain.wrapper.TestCaseInformation;
-import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
-import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
-import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.TestCaseExecutionService;
 import gov.nist.healthcare.cds.service.TestRunnerService;
@@ -40,29 +34,36 @@ public class ExecutionService implements TestCaseExecutionService {
 
 	@Override
 	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date reference) throws UnresolvableDate, ConnectionException {
+		PerformanceTimestamps performanceBenchmark = new PerformanceTimestamps();
+
 		java.util.Date today = Calendar.getInstance().getTime();
 		// Fix Eval, DOB, Events
 		ResolvedDates rds = dates.resolveDates(tc, reference);
 		
 		// Create PayLoad and Send request
 		TestCasePayLoad tcP = this.payLoad(tc, rds);
+
+		// Send request to adapter
+		performanceBenchmark.setRequestSentToAdapter(new Date().getTime());
 		EngineResponse response = runner.run(conf, tcP);
+		performanceBenchmark.setResponseReceivedFromAdapter(new Date().getTime());
 
-
+		
 		// Compute Requirements
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
 		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);
 		
 		// Validate 
 		Report rp = validation.validate(response, veRequirements, fcRequirements);
-		
+		performanceBenchmark.setResponseValidated(new Date().getTime());
+
 		// Set Report Properties
 		TestCaseInformation tcInfo = new TestCaseInformation();
 		tcInfo.setMetaData(tc.getMetaData());
 		tcInfo.setName(tc.getName());
 		tcInfo.setUID(tc.getUid());
 		tcInfo.setDescription(tc.getDescription());
-		
+		rp.setEngineResponseStatus(response.getEngineResponseStatus());
 		rp.setTcInfo(tcInfo);
 		rp.setEvaluationDate(tcP.getEvaluationDate());
 		rp.setDob(tcP.getDateOfBirth());
@@ -73,6 +74,7 @@ public class ExecutionService implements TestCaseExecutionService {
 		rp.setExecutionDate(today);
 		rp.setAdapterLogs(response.getLogs());
 		rp.setIssues(response.getIssues());
+		rp.setTimestamps(performanceBenchmark);
 		return rp;
 	}
 	
@@ -113,7 +115,7 @@ public class ExecutionService implements TestCaseExecutionService {
 		return fcRequirements;
 	}
 	
-	public TestCasePayLoad payLoad(TestCase tc, ResolvedDates rds) throws UnresolvableDate{
+	public TestCasePayLoad payLoad(TestCase tc, ResolvedDates rds) throws UnresolvableDate {
 		TestCasePayLoad tcP = new TestCasePayLoad();
 		tcP.setGender(tc.getPatient().getGender());
 		tcP.setEvaluationDate(rds.getEval());
