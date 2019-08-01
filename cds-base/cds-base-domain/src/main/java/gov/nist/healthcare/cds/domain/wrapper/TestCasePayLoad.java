@@ -28,6 +28,7 @@ public class TestCasePayLoad {
 		}
 	}
 	
+        private String testCaseNumber;
 	private Gender gender;
 	private Date dateOfBirth;
 	private Date evaluationDate;
@@ -45,6 +46,14 @@ public class TestCasePayLoad {
 		vep.setRef(vr);
 		this.immunizations.add(vep);
 	}
+        public String getTestCaseNumber() {
+            return testCaseNumber;            
+        }
+        
+        public void setTestCaseNumber(String testCaseNumber) {
+		this.testCaseNumber = testCaseNumber;
+	}
+        
 	public Gender getGender() {
 		return gender;
 	}
