@@ -37,6 +37,10 @@ public class VaccineMatcherConfiguration {
 		tuple.addNode(new VaccineMatcherCodeNode("33"));
 		tuple.addNode(new VaccineMatcherCodeNode("109"));
 		eqTuples.add(tuple);
+		tuple = new EqTuple("ZOSTER");
+		tuple.addNode(new VaccineMatcherCodeNode("188"));
+		tuple.addNode(new VaccineMatcherCodeNode("121"));
+		eqTuples.add(tuple);
 	}
 	
 	private VaccineMatcherCodeNode getVMCNode(Object node){

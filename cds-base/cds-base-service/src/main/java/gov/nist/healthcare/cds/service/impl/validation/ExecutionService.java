@@ -42,13 +42,13 @@ public class ExecutionService implements TestCaseExecutionService {
 		
 		// Create PayLoad and Send request
 		TestCasePayLoad tcP = this.payLoad(tc, rds);
-
+		tcP.setTestCaseNumber(tc.getUid());
+		
 		// Send request to adapter
 		performanceBenchmark.setRequestSentToAdapter(new Date().getTime());
 		EngineResponse response = runner.run(conf, tcP);
 		performanceBenchmark.setResponseReceivedFromAdapter(new Date().getTime());
 
-		
 		// Compute Requirements
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
 		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);

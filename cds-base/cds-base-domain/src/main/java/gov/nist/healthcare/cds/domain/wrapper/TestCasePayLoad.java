@@ -28,6 +28,7 @@ public class TestCasePayLoad {
 		}
 	}
 	
+	private String testCaseNumber;
 	private Gender gender;
 	private Date dateOfBirth;
 	private Date evaluationDate;
@@ -69,7 +70,13 @@ public class TestCasePayLoad {
 	public void setEvaluationDate(Date evaluationDate) {
 		this.evaluationDate = evaluationDate;
 	}
-	
+	public String getTestCaseNumber() {
+		return testCaseNumber;
+	}
+	public void setTestCaseNumber(String testCaseNumber) {
+		this.testCaseNumber = testCaseNumber;
+	}
+
 	@Override
 	public String toString() 
 	{ 

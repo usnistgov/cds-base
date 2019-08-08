@@ -78,13 +78,17 @@
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
-<dependency> <groupId>ca.uhn.hapi.fhir</groupId> <artifactId>hapi-fhir-base</artifactId> 
-			<version>3.4.0</version> </dependency> <dependency> <groupId>ca.uhn.hapi.fhir</groupId> 
-			<artifactId>hapi-fhir-structures-dstu3</artifactId> <version>3.4.0</version> 
-			</dependency> <dependency> <groupId>gov.nist</groupId> <artifactId>fhirForecast</artifactId> 
-			<version>1.0-SNAPSHOT</version> </dependency> <dependency> <groupId>gov.nist</groupId> 
-			<artifactId>fhirModel</artifactId> <version>1.0-SNAPSHOT</version> </dependency> 
-					<dependency>
+         <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-base</artifactId>
+            <version>3.8.0</version>
+        </dependency>  
+   		<dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-structures-dstu3</artifactId>
+            <version>3.8.0</version>
+        </dependency> 
+		<dependency>
 			<groupId>gov.nist.healthcare.cds</groupId>
 			<artifactId>cds-base-auth</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
