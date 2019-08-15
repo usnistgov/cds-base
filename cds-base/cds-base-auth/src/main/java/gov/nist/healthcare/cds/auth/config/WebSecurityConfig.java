@@ -5,6 +5,7 @@ import java.io.IOException;
 import gov.nist.healthcare.cds.auth.security.AccountUserDetailService;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,6 +18,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -59,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/api/documentation/**")
 				.permitAll()
 		.antMatchers("/api/sooa/**")
-				.permitAll()
+				.anonymous()
 		.antMatchers("/api/**")
 				.fullyAuthenticated()
 			.and()
@@ -68,25 +70,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 				.logout()
 					.logoutSuccessHandler(new LogoutSuccessHandler() {
-						@Override
-						public void onLogoutSuccess(HttpServletRequest request,
-								HttpServletResponse response, Authentication authentication) throws IOException,
-								ServletException {
-							 if (authentication != null && authentication.getDetails() != null) {
-						            try {
-						            	request.getSession().invalidate();
-						            } catch (Exception e) {
-						                e.printStackTrace();
-						            }
-						        }
-						 
-							 response.setStatus(HttpServletResponse.SC_OK);
-							 response.sendRedirect("/fits");
-						}
-					})
+			@Override
+			public void onLogoutSuccess(HttpServletRequest request,
+										HttpServletResponse response, Authentication authentication) throws IOException,
+					ServletException {
+				System.out.println("LOGOUT SUCCESS HANDLER");
+				if (authentication != null && authentication.getDetails() != null) {
+					try {
+						request.getSession().invalidate();
+						Cookie c = new Cookie("JSESSIONID", "");
+						c.setHttpOnly(true);
+						c.setMaxAge(0);
+						response.addCookie(c);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.sendRedirect("/");
+			}
+		})
 			.and()
 				.sessionManagement()
-					.maximumSessions(1);
+
+				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+				.maximumSessions(1);
 		http
 			.csrf()
 				.disable();
