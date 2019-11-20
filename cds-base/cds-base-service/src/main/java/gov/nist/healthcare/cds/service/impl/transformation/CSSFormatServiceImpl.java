@@ -700,7 +700,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		r.createCell(SERIESTATUS).setCellValue("Series_Status");
 		int i = 1;
 		for(int event = START_EVENTS; event <= END_EVENTS; event = event + 6){
-			r.createCell(event).setCellValue("Date_Administred_"+i);
+			r.createCell(event).setCellValue("Date_Administered_"+i);
 			r.createCell(event+1).setCellValue("Vaccine_Name_"+i);
 			r.createCell(event+2).setCellValue("CVX_"+i);
 			r.createCell(event+3).setCellValue("MVX_"+i);
