@@ -18,6 +18,9 @@ public class NameTranslationService implements gov.nist.healthcare.cds.service.N
 		rep.put("meningb", "MENB");
 		rep.put("varicella", "VAR");
 
+		rep.put("pneumococcal, unspecified formulation", "PCV");
+		rep.put("pneumoppv", "PCV");
+
 		name.put("POL", "POLIO");
 		name.put("PCV", "PneumoPCV");
 		name.put("ROTA", "ROTAVIRUS");
