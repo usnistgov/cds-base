@@ -15,6 +15,11 @@ import gov.nist.healthcare.cds.service.TestPlanFilter;
 public class RWTestPlanFilter implements TestPlanFilter {
 
 	@Override
+	public boolean elect(TestPlan tp, String user) {
+		return !tp.getUser().equals(user) && (tp.getViewers().contains(user) || tp.isPublic());
+	}
+
+	@Override
 	public void filterTestPlan(TestPlan x) {
 		List<String> emptyIds = new ArrayList<String>();
 		x.setTestCases(filter(x.getTestCases()));
