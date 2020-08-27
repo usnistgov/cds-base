@@ -49,8 +49,7 @@ public class TestExecutionSimulation implements TestCaseExecutionService {
 		
 		// Create PayLoad and Send request
 		TestCasePayLoad tcP = this.payLoad(tc, rds);
-		
-		System.out.println(simulationMap.getResult(tc.getUid()));
+
 //		EngineResponse response = FHIRParse.parseResponseFromXml(simulationMap.getResult(tc.getUid()));
 		EngineResponse response = new EngineResponse();
 		

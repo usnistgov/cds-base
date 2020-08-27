@@ -47,6 +47,7 @@ public class ExecutionService implements TestCaseExecutionService {
 		// Send request to adapter
 		performanceBenchmark.setRequestSentToAdapter(new Date().getTime());
 		EngineResponse response = runner.run(conf, tcP);
+
 		performanceBenchmark.setResponseReceivedFromAdapter(new Date().getTime());
 
 		// Compute Requirements

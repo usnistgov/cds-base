@@ -103,7 +103,6 @@ public class ConfigurableVaccineMatcher implements VaccineMatcherService {
 				pGroupsC.add(tuple.getEq());
 			}
 			else{
-				System.out.println(grp.getCvx());
 				pGroupsC.add(grp.getCvx());
 			}
 		}

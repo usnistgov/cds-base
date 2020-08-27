@@ -98,8 +98,6 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 				Set<Product> s_pr = products(CVX, ba_products);
 				for(Product p : s_pr){
 					p.setVx(vx_s);
-					//UUID uuid = UUID.randomUUID();
-					//System.out.println("[UUID]"+uuid);
 					String code = p.getVx().getCvx()+":"+p.getMx().getMvx()+":"+p.getName();
 					p.setCode(code);
 				}

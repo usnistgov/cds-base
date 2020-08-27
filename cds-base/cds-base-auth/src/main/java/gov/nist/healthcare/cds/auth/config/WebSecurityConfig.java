@@ -74,7 +74,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			public void onLogoutSuccess(HttpServletRequest request,
 										HttpServletResponse response, Authentication authentication) throws IOException,
 					ServletException {
-				System.out.println("LOGOUT SUCCESS HANDLER");
 				if (authentication != null && authentication.getDetails() != null) {
 					try {
 						request.getSession().invalidate();

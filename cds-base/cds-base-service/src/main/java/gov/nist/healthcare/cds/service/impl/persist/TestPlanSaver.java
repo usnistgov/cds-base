@@ -1,15 +1,11 @@
 package gov.nist.healthcare.cds.service.impl.persist;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import gov.nist.healthcare.cds.domain.TestPlan;
-import gov.nist.healthcare.cds.domain.exception.IllegalSave;
-import gov.nist.healthcare.cds.repositories.TestCaseRepository;
 import gov.nist.healthcare.cds.repositories.TestPlanRepository;
 import gov.nist.healthcare.cds.service.EntitySaver;
-import gov.nist.healthcare.cds.service.domain.SaveObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TestPlanSaver extends EntitySaver<TestPlan> {
@@ -23,7 +19,7 @@ public class TestPlanSaver extends EntitySaver<TestPlan> {
 	}
 
 	@Override
-	public void prepare(TestPlan persisted, TestPlan e, String user) throws IllegalSave {
+	public void prepare(TestPlan persisted, TestPlan e, String user) {
 		if(persisted == null){
 			e.setUser(user);
 		}

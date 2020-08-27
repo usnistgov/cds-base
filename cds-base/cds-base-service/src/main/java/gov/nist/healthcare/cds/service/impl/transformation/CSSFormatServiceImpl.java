@@ -562,8 +562,6 @@ public class CSSFormatServiceImpl implements FormatService {
 			e.printStackTrace();
 			throw new ConfigurationException();
 		}
-		System.out.println("[HT-INCLUDE]");
-		System.out.println(includes);
 		
 		try {
 			
@@ -587,8 +585,6 @@ public class CSSFormatServiceImpl implements FormatService {
 			while(rowIterator.hasNext()){
 				Row r = rowIterator.next();
 				if(this.emptyLine(r)){
-					System.out.println("EMPTY "+this.emptyLine(r));
-					System.out.println("[CDC SPR] FINISHED AT LINE "+i);
 					break;
 				}
 				else if (config.isAll() || includes.contains(i-1)) {

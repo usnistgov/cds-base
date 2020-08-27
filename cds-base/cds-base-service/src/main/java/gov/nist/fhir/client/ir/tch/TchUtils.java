@@ -11,15 +11,14 @@ import gov.nist.fhir.client.ir.SendingConfig;
 import gov.nist.healthcare.cds.domain.wrapper.ExecutionIssue;
 import gov.nist.healthcare.cds.enumeration.IssueCategory;
 import gov.nist.healthcare.cds.enumeration.IssueLevel;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.immregistries.vfa.connect.model.ForecastEngineIssue;
-import org.immregistries.vfa.connect.model.ForecastEngineIssueLevel;
-import org.immregistries.vfa.connect.model.ForecastEngineIssueType;
 import org.immregistries.vfa.connect.model.Service;
 import org.immregistries.vfa.connect.model.Software;
 import org.immregistries.vfa.connect.model.TestCase;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *

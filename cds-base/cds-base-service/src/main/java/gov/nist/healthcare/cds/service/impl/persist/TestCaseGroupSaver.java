@@ -44,8 +44,6 @@ public class TestCaseGroupSaver extends EntitySaver<TestCaseGroup> {
 
 	@Override
 	public boolean exists(TestCaseGroup e) {
-		System.out.println("[LOOK F]"+e.getId());
-		System.out.println(tpRepository.testCaseGroup(e.getId()));
 		return tpRepository.testCaseGroup(e.getId()) != null;
 	}
 

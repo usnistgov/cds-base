@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Strings;
 import gov.nist.healthcare.cds.service.*;
 import gov.nist.healthcare.cds.service.domain.matcher.ForecastMatchCandidate;
 import gov.nist.healthcare.cds.service.domain.matcher.ScoredMatches;
@@ -223,10 +224,10 @@ public class ValidationServiceImpl implements ValidationService {
 		
 		// Dose
 		StringCriterion dose = null;
-		if(ef.getDoseNumber().isEmpty()){
+		if(Strings.isNullOrEmpty(ef.getDoseNumber())){
 			dose = new StringCriterion(ValidationStatus.N);
 		}
-		else if(af.getDoseNumber().isEmpty()){
+		else if(Strings.isNullOrEmpty(af.getDoseNumber())){
 			dose = new StringCriterion(ValidationStatus.U);
 		}
 		else if(doseEqual(ef.getDoseNumber(),af.getDoseNumber())) {

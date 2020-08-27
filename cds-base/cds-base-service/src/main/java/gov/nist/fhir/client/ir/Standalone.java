@@ -8,6 +8,7 @@ package gov.nist.fhir.client.ir;
 
 import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

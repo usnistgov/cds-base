@@ -89,7 +89,7 @@ public class PDFFormatServiceImpl implements FormatService {
 		transformer.transform(new StreamSource(tcXml), new StreamResult(os));
 		String str = os.toString();
 		str = str.replace("[STYLE]", style);
-		System.out.println(str);
+
 		ITextRenderer renderer = new ITextRenderer();
 		renderer.setDocumentFromString( str );
 	
