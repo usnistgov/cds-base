@@ -71,5 +71,8 @@ public class Product extends Injection implements Serializable {
 	public String getCvx() {
 		return this.getVx().getCvx();
 	}
+	public String getMvx() {
+		return this.getMx().getMvx();
+	}
 	
 }

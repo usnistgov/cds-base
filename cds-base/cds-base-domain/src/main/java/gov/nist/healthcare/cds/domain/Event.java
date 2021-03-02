@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public abstract class Event {
 	
-	@NotNull(message = "Administred Date is required")
+	@NotNull(message = "Administered Date is required")
 	@Valid
 	private Date date;
 
