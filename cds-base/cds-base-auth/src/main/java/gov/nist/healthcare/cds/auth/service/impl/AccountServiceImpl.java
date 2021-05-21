@@ -6,8 +6,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -74,15 +72,15 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public User getCurrentUser() {
+	public Account getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
 		if (authentication == null
-				|| !(authentication.getPrincipal() instanceof UserDetails)) {
+				|| !(authentication.getPrincipal() instanceof Account)) {
 			return null;
 		}
 
-		return (User) authentication.getPrincipal();
+		return (Account) authentication.getPrincipal();
 	}
 
 	@Override

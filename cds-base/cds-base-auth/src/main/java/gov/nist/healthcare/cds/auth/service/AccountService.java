@@ -1,7 +1,5 @@
 package gov.nist.healthcare.cds.auth.service;
 
-import org.springframework.security.core.userdetails.User;
-
 import gov.nist.healthcare.cds.auth.domain.Account;
 import gov.nist.healthcare.cds.auth.domain.PasswordChange;
 import gov.nist.healthcare.cds.auth.domain.PasswordChangeException;
@@ -9,7 +7,7 @@ import gov.nist.healthcare.cds.auth.domain.Privilege;
 
 public interface AccountService {
 
-	public User getCurrentUser();
+	public Account getCurrentUser();
 	public Account getAccountByUsername(String username);
 	public Account createAdmin(Account account);
 	public Account createTester(Account account);

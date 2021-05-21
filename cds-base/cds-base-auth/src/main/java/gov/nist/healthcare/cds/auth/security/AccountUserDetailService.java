@@ -30,12 +30,7 @@ public class AccountUserDetailService implements UserDetailsService {
 			throw new UsernameNotFoundException(username);
 		}
 		else {
-			Collection<GrantedAuthority> privileges = new ArrayList<>();
-			for(Privilege p : account.getPrivileges()){
-				privileges.add(new SimpleGrantedAuthority(p.getRole()));
-			}
-			UserDetails userDetails = new User(account.getUsername(), account.getPassword(), !account.isPending(),true, true, true, privileges);
-			return userDetails;
+			return account;
 		}
 	}
 

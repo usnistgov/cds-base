@@ -1,15 +1,22 @@
 package gov.nist.healthcare.cds.auth.domain;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 @Document
-public class Account {
+public class Account implements UserDetails {
 
 	@Id
 	private String id;
@@ -109,9 +116,38 @@ public class Account {
 	public String getUsername() {
 		return username;
 	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return !this.isPending();
+	}
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
+
+	@Override
+	public Collection<GrantedAuthority> getAuthorities() {
+		return this.privileges != null ? privileges.stream().map(
+				p -> new SimpleGrantedAuthority(p.getRole())
+		).collect(Collectors.toSet()) : new HashSet<>();
+	}
+
 	public String getPassword() {
 		return password;
 	}
