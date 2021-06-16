@@ -9,7 +9,8 @@ public enum EvaluationReason {
 	F("Vaccine Dose Administered amount was less than the recommended amount."),
 	G("Vaccine product was not a preferable or allowable vaccine for this series."),
 	H("Vaccine Dose Administered was administered at too old of an age."),
-	I("Patient has already completed the vaccination schedule.");
+	I("Patient has already completed the vaccination schedule."),
+	J("Vaccine Dose Administered was an inadvertent vaccine");
 	
 	private String details;
 	

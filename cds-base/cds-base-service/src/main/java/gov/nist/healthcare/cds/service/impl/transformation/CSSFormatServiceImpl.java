@@ -363,11 +363,14 @@ public class CSSFormatServiceImpl implements FormatService {
 		Hashtable<EvaluationReason, String> transform = new Hashtable<EvaluationReason, String>();
 		transform.put(EvaluationReason.H, "Age: Too Old");
 		transform.put(EvaluationReason.C, "Age: Too Young");
-		transform.put(EvaluationReason.G, "Inadvertent Vaccine");
 		transform.put(EvaluationReason.D, "Interval: too short");
 		transform.put(EvaluationReason.E, "Live Virus Conflict");
 		transform.put(EvaluationReason.I, "Series Already Complete");
-		
+
+		transform.put(EvaluationReason.G, "Not a preferable or allowable vaccine");
+		transform.put(EvaluationReason.J, "Inadvertent Vaccine");
+
+
 		Cell _ADMIN_DATE = r.createCell(start+ADMIN_DATE);
 		_ADMIN_DATE.setCellValue(asFixed(ve.getDate()));
 		_ADMIN_DATE.setCellStyle(csDate);
@@ -412,13 +415,15 @@ public class CSSFormatServiceImpl implements FormatService {
 		Hashtable<String,EvaluationReason> transform = new Hashtable<String,EvaluationReason>();
 		transform.put("age: too old", EvaluationReason.H);
 		transform.put("age: too young", EvaluationReason.C);
-		transform.put("inadvertent vaccine", EvaluationReason.G);
-		transform.put("inadvertent vaccine: inadvertent administration", EvaluationReason.G);
 		transform.put("vaccine: invalid usage", EvaluationReason.G);
 		transform.put("interval: too short", EvaluationReason.D);
 		transform.put("live virus conflict", EvaluationReason.E);
 		transform.put("series already complete", EvaluationReason.I);
-		
+
+		transform.put("inadvertent vaccine", EvaluationReason.J);
+		transform.put("inadvertent vaccine: inadvertent administration", EvaluationReason.J);
+		transform.put("not a preferable or allowable vaccine", EvaluationReason.G);
+
 		VaccinationEvent ve = new VaccinationEvent();
 		ve.setPosition(id);
 		ve.setDoseNumber(0);
@@ -478,44 +483,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		else {
 			evalt.setRelatedTo(vaxService.asVaccine(injection));
 		}
-		
-//		if(mvx != null && !mvx.isEmpty()){
-//			VaccineMapping vm = vaccineMpRepository.findMapping(cvx);
-//			if(vm == null){
-//				throw new ProductNotFoundException(cvx+"", mvx);
-//			}
-//			else {
-//				Product pr = null;
-//				for(Product cp : vm.getProducts()){
-//					if(cp.getMx().getMvx().equals(mvx)){
-//						pr = cp;
-//						break;
-//					}
-//				}
-//				if(pr == null){
-//					if(ignore){
-//						throw new ProductNotFoundException(cvx+"", mvx);
-//					}
-//					else {
-//						ve.setAdministred(vm.getVx());
-//						evalt.setRelatedTo(vm.getVx());
-//					}
-//				}
-//				else {
-//					ve.setAdministred(pr);
-//					evalt.setRelatedTo(pr.getVx());
-//				}
-//			}
-//		}
-//		else {
-//			Vaccine vx = vaccineRepository.findOne(cvx+"");
-//			if(vx == null){
-//				throw new VaccineNotFoundException(cvx+"");
-//			}
-//			ve.setAdministred(vx);
-//			evalt.setRelatedTo(vx);
-//		}
-		
+
 		ve.setEvaluations(new HashSet<ExpectedEvaluation>(Arrays.asList(evalt)));
 		tc.getEvents().add(ve);
 	}
@@ -573,13 +541,6 @@ public class CSSFormatServiceImpl implements FormatService {
 			
 			// INIT COUNTERS - GO TO START LINE
 			int i = 1;
-//			if(!config.isAll()){
-//				for(int j = 1; j < config.getFrom(); j++){
-//					if(rowIterator.hasNext())
-//						rowIterator.next();
-//				}
-//				i = config.getFrom();
-//			}
 			
 			// LOOP ON ROWS
 			while(rowIterator.hasNext()){
@@ -760,19 +721,6 @@ public class CSSFormatServiceImpl implements FormatService {
 				//-- FORECAST
 				this.exportForecast(r , fcast);
 			}
-//			Row r = sheet.createRow(i++);
-//			this.exportTestCaseInfo(r, tc);
-//			if(tc.getForecast().size() == 1)
-//				this.exportForecast(r , tc.getForecast().get(0));
-//			
-//			int position = START_EVENTS;
-//			for(Event e : tc.getEvents()){
-//				if(e instanceof VaccinationEvent && position <= END_EVENTS){
-//					VaccinationEvent ve = (VaccinationEvent) e;
-//					this.exportEvent(r, ve, position);
-//					position += 6;
-//				}
-//			}
 		}
 		for(int j = 0; j < 63; j++){
 			sheet.autoSizeColumn(j);
