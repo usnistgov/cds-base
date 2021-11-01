@@ -58,7 +58,21 @@ public class ValidationServiceImpl implements ValidationService {
 		vr.setMatcherLogs(logs.toString());
 		return vr;
 	}
-	
+
+	@Override
+	public Report validate(List<ActualForecast> forecasts, List<ResponseVaccinationEvent> evaluations, List<VaccinationEventRequirement> events, List<ForecastRequirement> expForecast) {
+		Report vr = new Report();
+		List<VaccinationEventValidation> veValidation = vr.getVeValidation();
+		List<ForecastValidation> fValidation = vr.getFcValidation();
+		StringBuilder logs = new StringBuilder();
+		ResultCounts fCounts = this.validateForecasts(forecasts, expForecast, fValidation,vr, logs);
+		ResultCounts eCounts = this.validateEvents(evaluations, events, veValidation,vr, logs);
+		vr.setEvents(eCounts);
+		vr.setForecasts(fCounts);
+		vr.setMatcherLogs(logs.toString());
+		return vr;
+	}
+
 	public ResultCounts validateForecasts(List<ActualForecast> afL, List<ForecastRequirement> efL, List<ForecastValidation> fValidation,Report vr, StringBuilder logs){
 		ResultCounts counts = new ResultCounts();
 		ForecastValidation tmp;

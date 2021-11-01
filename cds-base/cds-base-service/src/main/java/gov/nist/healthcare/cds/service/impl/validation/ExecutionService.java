@@ -32,6 +32,21 @@ public class ExecutionService implements TestCaseExecutionService {
 	@Autowired
 	private TestRunnerService runner;
 
+
+	public Report validateResponse(List<ActualForecast> forecasts, List<ResponseVaccinationEvent> events, TestCase tc, java.util.Date evaluationDate) {
+		ResolvedDates rds = dates.resolveDates(tc, evaluationDate);
+		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
+		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);
+		return validation.validate(forecasts, events, veRequirements, fcRequirements);
+	}
+
+	public TestCasePayLoad getTestCasePayload(TestCase tc, java.util.Date evaluationDate) throws UnresolvableDate {
+		// Fix Eval, DOB, Events
+		ResolvedDates rds = dates.resolveDates(tc, evaluationDate);
+		// Create PayLoad and Send request
+		return this.payLoad(tc, rds);
+	}
+
 	@Override
 	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date reference) throws UnresolvableDate, ConnectionException {
 		PerformanceTimestamps performanceBenchmark = new PerformanceTimestamps();

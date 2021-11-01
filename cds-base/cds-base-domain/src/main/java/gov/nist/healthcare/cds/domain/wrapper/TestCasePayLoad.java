@@ -27,7 +27,7 @@ public class TestCasePayLoad {
 			this.administred = administred;
 		}
 	}
-	
+	private String testCaseId;
 	private String testCaseNumber;
 	private Gender gender;
 	private Date dateOfBirth;
@@ -75,6 +75,12 @@ public class TestCasePayLoad {
 	}
 	public void setTestCaseNumber(String testCaseNumber) {
 		this.testCaseNumber = testCaseNumber;
+	}
+	public String getTestCaseId() {
+		return testCaseId;
+	}
+	public void setTestCaseId(String testCaseId) {
+		this.testCaseId = testCaseId;
 	}
 
 	@Override
