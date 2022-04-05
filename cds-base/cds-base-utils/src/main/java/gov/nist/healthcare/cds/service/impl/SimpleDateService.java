@@ -1,18 +1,14 @@
-package gov.nist.healthcare.cds.service.impl.validation.simulation;
+package gov.nist.healthcare.cds.service.impl;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
-import org.joda.time.ReadablePeriod;
 import org.springframework.stereotype.Service;
 
 import gov.nist.healthcare.cds.domain.Date;
@@ -26,7 +22,6 @@ import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.VaccineDateReference;
 import gov.nist.healthcare.cds.domain.wrapper.ResolvedDates;
-import gov.nist.healthcare.cds.enumeration.DateField;
 import gov.nist.healthcare.cds.enumeration.DatePosition;
 import gov.nist.healthcare.cds.enumeration.DateType;
 import gov.nist.healthcare.cds.enumeration.RelativeTo;
@@ -341,6 +336,10 @@ private void move(int field, int distance, Calendar calendar, Calendar origin){
 	
 	public FixedDate fixed(java.util.Date date){
 		return new FixedDate(FixedDate.DATE_FORMAT.format(date));
+	}
+
+	protected static SimpleDateService getInstance() {
+		return new SimpleDateService();
 	}
 
 }

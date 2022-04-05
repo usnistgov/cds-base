@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import gov.nist.healthcare.cds.domain.wrapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
@@ -17,15 +18,6 @@ import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 import gov.nist.healthcare.cds.domain.exception.UnresolvableDate;
-import gov.nist.healthcare.cds.domain.wrapper.EngineResponse;
-import gov.nist.healthcare.cds.domain.wrapper.ForecastRequirement;
-import gov.nist.healthcare.cds.domain.wrapper.Report;
-import gov.nist.healthcare.cds.domain.wrapper.ResolvedDates;
-import gov.nist.healthcare.cds.domain.wrapper.SimulationMap;
-import gov.nist.healthcare.cds.domain.wrapper.TestCaseInformation;
-import gov.nist.healthcare.cds.domain.wrapper.TestCasePayLoad;
-import gov.nist.healthcare.cds.domain.wrapper.VaccinationEventRequirement;
-import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.service.DateService;
 import gov.nist.healthcare.cds.service.TestCaseExecutionService;
 import gov.nist.healthcare.cds.service.ValidationService;
@@ -40,7 +32,12 @@ public class TestExecutionSimulation implements TestCaseExecutionService {
 	
 	@Autowired
 	private DateService dates;
-	
+
+	@Override
+	public Report validateResponse(List<ActualForecast> forecasts, List<ResponseVaccinationEvent> events, TestCase tc, Date evaluationDate) {
+		return null;
+	}
+
 	@Override
 	public Report execute(SoftwareConfig conf, TestCase tc, Date reference) throws UnresolvableDate, ConnectionException {
 		java.util.Date today = Calendar.getInstance().getTime();

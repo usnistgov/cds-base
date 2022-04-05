@@ -6,22 +6,16 @@ import java.util.Date;
 import java.util.List;
 
 import gov.nist.healthcare.cds.domain.wrapper.*;
+import gov.nist.healthcare.cds.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import gov.nist.healthcare.cds.domain.Event;
 import gov.nist.healthcare.cds.domain.ExpectedForecast;
 import gov.nist.healthcare.cds.domain.FixedDate;
-import gov.nist.healthcare.cds.domain.Injection;
-import gov.nist.healthcare.cds.domain.Product;
 import gov.nist.healthcare.cds.domain.SoftwareConfig;
 import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
-import gov.nist.healthcare.cds.domain.Vaccine;
 import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 import gov.nist.healthcare.cds.domain.exception.UnresolvableDate;
-import gov.nist.healthcare.cds.service.DateService;
-import gov.nist.healthcare.cds.service.TestCaseExecutionService;
-import gov.nist.healthcare.cds.service.TestRunnerService;
-import gov.nist.healthcare.cds.service.ValidationService;
 
 public class ExecutionService implements TestCaseExecutionService {
 
@@ -31,20 +25,16 @@ public class ExecutionService implements TestCaseExecutionService {
 	private DateService dates;
 	@Autowired
 	private TestRunnerService runner;
+	@Autowired
+	private TestCaseUtilService testCaseUtilService;
 
 
+	@Override
 	public Report validateResponse(List<ActualForecast> forecasts, List<ResponseVaccinationEvent> events, TestCase tc, java.util.Date evaluationDate) {
 		ResolvedDates rds = dates.resolveDates(tc, evaluationDate);
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
 		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);
 		return validation.validate(forecasts, events, veRequirements, fcRequirements);
-	}
-
-	public TestCasePayLoad getTestCasePayload(TestCase tc, java.util.Date evaluationDate) throws UnresolvableDate {
-		// Fix Eval, DOB, Events
-		ResolvedDates rds = dates.resolveDates(tc, evaluationDate);
-		// Create PayLoad and Send request
-		return this.payLoad(tc, rds);
 	}
 
 	@Override
@@ -56,7 +46,7 @@ public class ExecutionService implements TestCaseExecutionService {
 		ResolvedDates rds = dates.resolveDates(tc, reference);
 		
 		// Create PayLoad and Send request
-		TestCasePayLoad tcP = this.payLoad(tc, rds);
+		TestCasePayLoad tcP = this.testCaseUtilService.getTestCasePayload(tc, rds);
 		tcP.setTestCaseNumber(tc.getUid());
 		
 		// Send request to adapter
@@ -130,34 +120,5 @@ public class ExecutionService implements TestCaseExecutionService {
 		}
 		return fcRequirements;
 	}
-	
-	public TestCasePayLoad payLoad(TestCase tc, ResolvedDates rds) throws UnresolvableDate {
-		TestCasePayLoad tcP = new TestCasePayLoad();
-		tcP.setGender(tc.getPatient().getGender());
-		tcP.setEvaluationDate(rds.getEval());
-		tcP.setDateOfBirth(rds.getDob());
-		for(Event e : tc.getEvents()){
-			if(e instanceof VaccinationEvent){
-				VaccinationEvent ve = (VaccinationEvent) e;
-				VaccineRef vr = this.vaccineRef(ve.getAdministred());
-				java.util.Date dA = rds.getEvents().get(ve.getPosition());
-				tcP.addImmunization(vr, dA);
-			}
-		}
-		return tcP;
-	}
-	
-	public VaccineRef vaccineRef(Injection i){
-		if(i instanceof Product){
-			Product p = (Product) i;
-			return new VaccineRef(p.getVx().getCvx(), p.getMx().getMvx());
-		}
-		else {
-			Vaccine v = (Vaccine) i;
-			return new VaccineRef(v.getCvx(), "");
-		}
-	}
-	
-
 
 }

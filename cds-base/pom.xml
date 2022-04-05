@@ -10,7 +10,8 @@
 		<module>cds-base-repo</module>
 		<module>cds-base-auth</module>
 		<module>cds-base-service</module>
-	</modules>
+        <module>cds-base-utils</module>
+    </modules>
 
 	<dependencies>
 		<dependency>
