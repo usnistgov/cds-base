@@ -34,7 +34,20 @@ public class ExecutionService implements TestCaseExecutionService {
 		ResolvedDates rds = dates.resolveDates(tc, evaluationDate);
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
 		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);
-		return validation.validate(forecasts, events, veRequirements, fcRequirements);
+		Report rp = validation.validate(forecasts, events, veRequirements, fcRequirements);
+
+		// Set Report Properties
+		TestCaseInformation tcInfo = new TestCaseInformation();
+		tcInfo.setMetaData(tc.getMetaData());
+		tcInfo.setName(tc.getName());
+		tcInfo.setUID(tc.getUid());
+		tcInfo.setDescription(tc.getDescription());
+		rp.setTcInfo(tcInfo);
+		rp.setEvaluationDate(rds.getEval());
+		rp.setDob(rds.getDob());
+		rp.setTc(tc.getId());
+		rp.setGender(tc.getPatient().getGender());
+		return rp;
 	}
 
 	@Override
