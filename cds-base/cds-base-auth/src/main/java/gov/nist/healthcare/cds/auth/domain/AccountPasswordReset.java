@@ -111,17 +111,11 @@ public class AccountPasswordReset implements Serializable  {
 		return result;
 	}
 
-	public String getNewToken() throws Exception {
-		if (this.getUsername() == null) {
-			throw new Exception("usernameIsNull");
-		}
-
-		String result = this.getUsername() + UUID.randomUUID().toString();
+	public static String getNewToken() throws Exception {
+		String result = UUID.randomUUID().toString();
 		// base 64 encoding
 		byte[] bs = Base64.encode(result.getBytes());
-
 		result = new String(bs, "UTF-8");
-
 		return result;
 	}
 

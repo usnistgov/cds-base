@@ -12,6 +12,5 @@ public interface AccountRepository extends MongoRepository<Account, String> {
 	
 	public Account findByUsername(String username);
 	
-	@Query("{ 'email' : ?0 }")
-	public Account findByEmail(String email);
+	public Account findByEmailIgnoreCase(String email);
 }
