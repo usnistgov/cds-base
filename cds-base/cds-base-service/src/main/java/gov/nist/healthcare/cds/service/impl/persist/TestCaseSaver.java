@@ -10,7 +10,6 @@ import gov.nist.healthcare.cds.domain.exception.IllegalSave;
 import gov.nist.healthcare.cds.enumeration.EntityAccess;
 import gov.nist.healthcare.cds.repositories.TestCaseRepository;
 import gov.nist.healthcare.cds.service.EntitySaver;
-import gov.nist.healthcare.cds.service.domain.SaveObject;
 
 @Service
 public class TestCaseSaver extends EntitySaver<TestCase> {

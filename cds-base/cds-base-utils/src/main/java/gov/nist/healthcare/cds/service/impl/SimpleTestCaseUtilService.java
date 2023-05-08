@@ -10,7 +10,7 @@ import gov.nist.healthcare.cds.service.TestCaseUtilService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Service
 public class SimpleTestCaseUtilService implements TestCaseUtilService {
@@ -26,7 +26,7 @@ public class SimpleTestCaseUtilService implements TestCaseUtilService {
     }
 
     @Override
-    public TestCasePayLoad getTestCasePayload(TestCase testCase, Date evaluationDate) throws UnresolvableDate {
+    public TestCasePayLoad getTestCasePayload(TestCase testCase, LocalDate evaluationDate) throws UnresolvableDate {
         // Fix Eval, DOB, Events
         ResolvedDates rds = dates.resolveDates(testCase, evaluationDate);
         // Create PayLoad and Send request
@@ -43,7 +43,7 @@ public class SimpleTestCaseUtilService implements TestCaseUtilService {
             if(e instanceof VaccinationEvent){
                 VaccinationEvent ve = (VaccinationEvent) e;
                 VaccineRef vr = this.vaccineRef(ve.getAdministred());
-                java.util.Date dA = rds.getEvents().get(ve.getPosition());
+                LocalDate dA = rds.getEvents().get(ve.getPosition());
                 tcP.addImmunization(vr, dA);
             }
         }

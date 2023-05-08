@@ -8,7 +8,6 @@ import gov.nist.healthcare.cds.domain.TestPlan;
 import gov.nist.healthcare.cds.domain.exception.IllegalSave;
 import gov.nist.healthcare.cds.repositories.TestPlanRepository;
 import gov.nist.healthcare.cds.service.EntitySaver;
-import gov.nist.healthcare.cds.service.domain.SaveObject;
 
 @Service
 public class TestCaseGroupSaver extends EntitySaver<TestCaseGroup> {

@@ -13,6 +13,7 @@ import gov.nist.healthcare.cds.domain.wrapper.VaccineRef;
 import gov.nist.healthcare.cds.enumeration.EvaluationStatus;
 import gov.nist.healthcare.cds.enumeration.SerieStatus;
 import org.hl7.fhir.dstu3.model.Coding;
+import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.Immunization.ImmunizationVaccinationProtocolComponent;
 import org.hl7.fhir.dstu3.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationDateCriterionComponent;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -20,6 +21,8 @@ import org.hl7.fhir.dstu3.model.Reference;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -41,13 +44,22 @@ public class TranslationUtils {
     }
     
     public static Date translateHl7DateToJavaDate(String date) throws ParseException {
-        
         DateFormat df = new SimpleDateFormat("yyy-MM-dd");
         return df.parse(date);
     }
-    
+
+    public static LocalDate translateHl7DateToJavaLocalDate(String date) throws ParseException {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyy-MM-dd");
+        return LocalDate.parse(date, df);
+    }
+
     public static String translateJavaDateToFhirDate(Date date) {
         SimpleDateFormat print = new SimpleDateFormat("yyyy-MM-dd");
+        return print.format(date);
+    }
+
+    public static String translateJavaDateToFhirDate(LocalDate date) {
+        DateTimeFormatter print = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return print.format(date);
     }
     
@@ -102,6 +114,19 @@ public class TranslationUtils {
         return rve;
     }
      */
+
+    public static String getDateString(org.hl7.fhir.dstu3.model.DateTimeType date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        sdf.setTimeZone(date.getTimeZone());
+        return sdf.format(date.getValue());
+    }
+
+    public static String getDateString(org.hl7.fhir.r4.model.DateTimeType date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        sdf.setTimeZone(date.getTimeZone());
+        return sdf.format(date.getValue());
+    }
+
     public static ResponseVaccinationEvent translateImmunizationToResponseVaccinationEvent(org.hl7.fhir.dstu3.model.Immunization imm) {
         
         ResponseVaccinationEvent rve = new ResponseVaccinationEvent();
@@ -114,7 +139,7 @@ public class TranslationUtils {
         }
         rve.setAdministred(vaccineRef);
         if(imm.getDate() != null)
-            rve.setDate(new FixedDate(imm.getDate()));
+            rve.setDate(new FixedDate(getDateString(imm.getDateElement())));
         rve.setEvaluations(new HashSet<ActualEvaluation>());
         
         List<ImmunizationVaccinationProtocolComponent> vaccinationProtocols = imm.getVaccinationProtocol();
@@ -185,7 +210,7 @@ public class TranslationUtils {
         rve.setAdministred(vaccineRef);
         */
         if(imm.getDate() != null)
-            rve.setDate(new FixedDate(imm.getDate()));
+            rve.setDate(new FixedDate(getDateString(imm.getDateElement())));
         rve.setEvaluations(new HashSet<ActualEvaluation>());
         
         if(imm.getDoseNumberPositiveIntType() != null
@@ -443,7 +468,7 @@ public class TranslationUtils {
             ImmunizationRecommendationRecommendationDateCriterionComponent dateCriterion = it.next();
             
             if (dateCriterion.getValue() != null && dateCriterion.getValue() != null) {
-                FixedDate date = new FixedDate(dateCriterion.getValue());
+                FixedDate date = new FixedDate(getDateString(dateCriterion.getValueElement()));
 
                 // TODO: Error checking
                 String status = "";
@@ -563,7 +588,7 @@ public class TranslationUtils {
             org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationDateCriterionComponent dateCriterion = it.next();
             
             if (dateCriterion.getValue() != null && dateCriterion.getValue() != null) {
-                FixedDate date = new FixedDate(dateCriterion.getValue());
+                FixedDate date = new FixedDate(getDateString(dateCriterion.getValueElement()));
 
                 // TODO: Error checking
                 String status = "";

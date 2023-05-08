@@ -178,6 +178,7 @@ public class NISTFormatServiceImpl implements FormatService {
 					ft.setPastDue(date(ef.getPastDue()));
 					ft.setLatest(date(ef.getComplete()));
 					ft.setForecastReason(ef.getForecastReason());
+					ft.setDoseNumber(ef.getDoseNumber());
 					
 					if(ef.getSerieStatus() != null){
 						SerieStatusType sst = new SerieStatusType();
@@ -232,11 +233,6 @@ public class NISTFormatServiceImpl implements FormatService {
 		
 		if(d instanceof FixedDate){
 			FixedDate fd = (FixedDate) d;
-//			GregorianCalendar gregory = new GregorianCalendar();
-//			gregory.setTime(fd.asDate());
-//			XMLGregorianCalendar calendar = DatatypeFactory.newInstance()
-//			        .newXMLGregorianCalendar(
-//			            gregory);
 			FixedDateType fdt = new FixedDateType();
 			fdt.setDate(fd.getDateString());
 			dt.setFixed(fdt);
@@ -269,9 +265,6 @@ public class NISTFormatServiceImpl implements FormatService {
 	public Date date(DateType d) throws DatatypeConfigurationException{
 		if(d.getFixed() != null){
 			FixedDateType fd = d.getFixed();
-//			System.out.println(fd.getDate());
-//			System.out.println(d);
-//			SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-ddT");
 			FixedDate f = new FixedDate(fd.getDate());
 			return f;
 		}
@@ -430,6 +423,9 @@ public class NISTFormatServiceImpl implements FormatService {
 					ef.setPastDue(date(ft.getPastDue()));
 					ef.setComplete(date(ft.getLatest()));
 					ef.setForecastReason(ft.getForecastReason());
+					if(ft.getDoseNumber() != null){
+						ef.setDoseNumber(ft.getDoseNumber());
+					}
 					if(ft.getSerieStatus() != null){
 						ef.setSerieStatus(SerieStatus.valueOf(ft.getSerieStatus().getCode()));
 					}

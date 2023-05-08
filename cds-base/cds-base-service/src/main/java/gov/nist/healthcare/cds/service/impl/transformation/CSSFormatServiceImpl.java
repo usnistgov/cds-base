@@ -4,7 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -84,6 +87,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	private DateService dateService;
 	@Autowired
 	private NameTranslationService transform;
+	SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
 	
 //	private XSSFDataFormat df;
@@ -158,7 +162,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	}
 	
 	public FixedDate getFixedDate(Cell cell,int i) throws NoDataInCell {
-		return new FixedDate(FixedDate.DATE_FORMAT.format(getDate(cell,i)));
+		return new FixedDate(dateFormat.format(getDate(cell,i)));
 		
 	}
 	
@@ -694,7 +698,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		
 		this.createHeader(sheet.createRow(0));
 		int i = 1;
-		java.util.Date today = new java.util.Date();
+		LocalDate today = LocalDate.now();
 		for(TestCase tc : tcs){
 			
 			if(tc.getDateType().equals(DateType.RELATIVE)){
@@ -741,7 +745,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	
 	
 	private java.util.Date asFixed(Date d) {
-		return ((FixedDate) d).asDate();
+		return java.util.Date.from(((FixedDate) d).asDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
 
 

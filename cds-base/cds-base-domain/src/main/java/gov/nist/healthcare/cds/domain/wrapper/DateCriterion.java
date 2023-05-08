@@ -3,6 +3,8 @@ package gov.nist.healthcare.cds.domain.wrapper;
 import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.enumeration.ValidationStatus;
 
+import java.time.LocalDate;
+
 public class DateCriterion extends Criterion {
 
 	private FixedDate value;
@@ -13,7 +15,7 @@ public class DateCriterion extends Criterion {
 		this.value = value;
 	}
 	
-	public DateCriterion(java.util.Date value) {
+	public DateCriterion(LocalDate value) {
 		super();
 		this.value = new FixedDate(value);
 	}
@@ -32,7 +34,7 @@ public class DateCriterion extends Criterion {
 		this.value = dt;
 	}
 	
-	public DateCriterion(ValidationStatus status, java.util.Date dt) {
+	public DateCriterion(ValidationStatus status, LocalDate dt) {
 		super(status);
 		this.value = new FixedDate(dt);
 	}

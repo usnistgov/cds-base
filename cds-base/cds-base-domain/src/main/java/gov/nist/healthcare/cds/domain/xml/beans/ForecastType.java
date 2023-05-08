@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="Recommended" type="{https://fits.nist.gov/xml/}DateType" minOccurs="0"/>
  *         &lt;element name="PastDue" type="{https://fits.nist.gov/xml/}DateType" minOccurs="0"/>
  *         &lt;element name="Latest" type="{https://fits.nist.gov/xml/}DateType" minOccurs="0"/>
+ *         &lt;element name="DoseNumber" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -47,7 +48,8 @@ import javax.xml.bind.annotation.XmlType;
     "earliest",
     "recommended",
     "pastDue",
-    "latest"
+    "latest",
+    "doseNumber",
 })
 public class ForecastType {
 
@@ -65,6 +67,8 @@ public class ForecastType {
     protected DateType pastDue;
     @XmlElement(name = "Latest")
     protected DateType latest;
+    @XmlElement(name = "DoseNumber")
+    protected String doseNumber;
 
     /**
      * Gets the value of the target property.
@@ -234,4 +238,11 @@ public class ForecastType {
         this.latest = value;
     }
 
+    public String getDoseNumber() {
+        return doseNumber;
+    }
+
+    public void setDoseNumber(String doseNumber) {
+        this.doseNumber = doseNumber;
+    }
 }

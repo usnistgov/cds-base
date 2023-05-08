@@ -1,5 +1,6 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,7 +13,7 @@ public class TestCasePayLoad {
 	
 	public class VaccinationEventPayLoad {
 		private VaccineRef ref;
-		private Date administred;
+		private LocalDate administred;
 		
 		public VaccineRef getRef() {
 			return ref;
@@ -20,18 +21,18 @@ public class TestCasePayLoad {
 		public void setRef(VaccineRef ref) {
 			this.ref = ref;
 		}
-		public Date getAdministred() {
+		public LocalDate getAdministred() {
 			return administred;
 		}
-		public void setAdministred(Date administred) {
+		public void setAdministred(LocalDate administred) {
 			this.administred = administred;
 		}
 	}
 	private String testCaseId;
 	private String testCaseNumber;
 	private Gender gender;
-	private Date dateOfBirth;
-	private Date evaluationDate;
+	private LocalDate dateOfBirth;
+	private LocalDate evaluationDate;
 	private List<VaccinationEventPayLoad> immunizations;
 	
 	
@@ -40,7 +41,7 @@ public class TestCasePayLoad {
 		this.immunizations = new ArrayList<VaccinationEventPayLoad>();
 	}
 	
-	public void addImmunization(VaccineRef vr, Date d){
+	public void addImmunization(VaccineRef vr, LocalDate d){
 		VaccinationEventPayLoad vep = new VaccinationEventPayLoad();
 		vep.setAdministred(d);
 		vep.setRef(vr);
@@ -52,10 +53,10 @@ public class TestCasePayLoad {
 	public void setGender(Gender gender) {
 		this.gender = gender;
 	}
-	public Date getDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
-	public void setDateOfBirth(Date dateOfBirth) {
+	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 	public List<VaccinationEventPayLoad> getImmunizations() {
@@ -64,10 +65,10 @@ public class TestCasePayLoad {
 	public void setImmunizations(List<VaccinationEventPayLoad> immunizations) {
 		this.immunizations = immunizations;
 	}
-	public Date getEvaluationDate() {
+	public LocalDate getEvaluationDate() {
 		return evaluationDate;
 	}
-	public void setEvaluationDate(Date evaluationDate) {
+	public void setEvaluationDate(LocalDate evaluationDate) {
 		this.evaluationDate = evaluationDate;
 	}
 	public String getTestCaseNumber() {

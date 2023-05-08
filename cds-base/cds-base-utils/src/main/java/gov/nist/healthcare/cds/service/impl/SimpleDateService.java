@@ -1,6 +1,8 @@
 package gov.nist.healthcare.cds.service.impl;
 
 import java.text.ParseException;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -31,7 +33,7 @@ import gov.nist.healthcare.cds.service.DateService;
 public class SimpleDateService implements DateService {
 
 	@Override
-	public ResolvedDates resolveDates(TestCase tc, java.util.Date today){
+	public ResolvedDates resolveDates(TestCase tc, LocalDate today){
 		ResolvedDates rds = new ResolvedDates();
 		if(tc.getDateType().equals(DateType.RELATIVE)){
 			RelativeDate dob = (RelativeDate) tc.getPatient().getDob();
@@ -61,17 +63,17 @@ public class SimpleDateService implements DateService {
 		}	
 	}
 	
-	public java.util.Date asFixed(Date d){
+	public LocalDate asFixed(Date d){
 		if(d instanceof FixedDate)
 			return ((FixedDate) d).asDate();
 		return null;
 	}
 	
 	@Override
-	public java.util.Date fix(ResolvedDates rds, Date dt) {
+	public LocalDate fix(ResolvedDates rds, Date dt) {
 		if(dt instanceof RelativeDate){
 			RelativeDate d = (RelativeDate) dt;
-			List<java.util.Date> rules = this.resolve(d.getRules(), rds, null, false);
+			List<LocalDate> rules = this.resolve(d.getRules(), rds, null, false);
 			return fit(rules);
 		}
 		else {
@@ -85,9 +87,9 @@ public class SimpleDateService implements DateService {
 		}
 	}
 	
-	public List<java.util.Date> resolve(List<RelativeDateRule> rdrs, ResolvedDates rdates,List<VaccinationEvent> events, boolean recursive){
-		List<java.util.Date> dates = new ArrayList<java.util.Date>();
-		java.util.Date d;
+	public List<LocalDate> resolve(List<RelativeDateRule> rdrs, ResolvedDates rdates,List<VaccinationEvent> events, boolean recursive){
+		List<LocalDate> dates = new ArrayList<>();
+		LocalDate d;
 		for(RelativeDateRule rule : rdrs){
 			if(rule.getRelativeTo() instanceof StaticDateReference){
 				StaticDateReference ref = (StaticDateReference) rule.getRelativeTo();
@@ -109,15 +111,15 @@ public class SimpleDateService implements DateService {
 		return dates;
 	}
 	
-	public java.util.Date resolveEvent(ResolvedDates dates, VaccinationEvent e, List<VaccinationEvent> events){
+	public LocalDate resolveEvent(ResolvedDates dates, VaccinationEvent e, List<VaccinationEvent> events){
 		RelativeDate dateRef = (RelativeDate) e.getDate();
-		List<java.util.Date> rules = this.resolve(dateRef.getRules(), dates, events, true);
-		java.util.Date result = fit(rules);
+		List<LocalDate> rules = this.resolve(dateRef.getRules(), dates, events, true);
+		LocalDate result = fit(rules);
 		dates.getEvents().put(e.getPosition(), result);
 		return result;
 	}
 	
-	public java.util.Date fit(List<java.util.Date> dates){
+	public LocalDate fit(List<LocalDate> dates){
 		Collections.sort(dates);
 		if(dates.isEmpty()){
 			return null;
@@ -134,13 +136,13 @@ public class SimpleDateService implements DateService {
 			return d.before(d1);
 	}
 	
-	public java.util.Date resolveStaticReference(RelativeTo to, RelativeDateRule rule, ResolvedDates dates){
-		java.util.Date ref = to.equals(RelativeTo.EVALDATE) ? dates.getEval() : dates.getDob();
-		java.util.Date date = this.from(rule.getYear(), rule.getMonth(), rule.getWeek(), rule.getDay(), rule.getPosition(), ref);
+	public LocalDate resolveStaticReference(RelativeTo to, RelativeDateRule rule, ResolvedDates dates){
+		LocalDate ref = to.equals(RelativeTo.EVALDATE) ? dates.getEval() : dates.getDob();
+		LocalDate date = this.from(rule.getYear(), rule.getMonth(), rule.getWeek(), rule.getDay(), rule.getPosition(), ref);
 		return date;
 	}
 	
-	public java.util.Date resolveDynamicReference(Integer id, RelativeDateRule rule, ResolvedDates dates){
+	public LocalDate resolveDynamicReference(Integer id, RelativeDateRule rule, ResolvedDates dates){
 		if(dates.getEvents().containsKey(id)){
 			return this.from(rule.getYear(), rule.getMonth(), rule.getWeek(), rule.getDay(), rule.getPosition(), dates.getEvents().get(id));
 		}
@@ -154,137 +156,45 @@ public class SimpleDateService implements DateService {
 		}
 		return null;
 	}
-
-	public static void main(String[] args) throws ParseException {
-		SimpleDateService sd = new SimpleDateService();
-		java.util.Date d = sd.from(6, 11, 0, 14, DatePosition.BEFORE, FixedDate.DATE_FORMAT.parse("03/08/2018"));
-		System.out.println(FixedDate.DATE_FORMAT.format(d));
-		java.util.Date d2 = sd.from(6, 11, 0, 14, DatePosition.AFTER, d);
-		System.out.println(FixedDate.DATE_FORMAT.format(d2));
-
-//		System.out.println(FixedDate.DATE_FORMAT.format(sd.from(0, 1, 0, 0, DatePosition.AFTER, FixedDate.DATE_FORMAT.parse("01/29/2018"))));
-//		System.out.println(FixedDate.DATE_FORMAT.format(sd.from(0, 1, 0, 0, DatePosition.AFTER, FixedDate.DATE_FORMAT.parse("01/29/2016"))));
-//		System.out.println(FixedDate.DATE_FORMAT.format(sd.from(0, 2, 0, 0, DatePosition.AFTER, FixedDate.DATE_FORMAT.parse("01/31/2018"))));
-//		System.out.println(FixedDate.DATE_FORMAT.format(sd.from(0, 12, 0, 0, DatePosition.AFTER, FixedDate.DATE_FORMAT.parse("06/30/2015"))));
-//		System.out.println(FixedDate.DATE_FORMAT.format(sd.from(1, 0, 0, 0, DatePosition.BEFORE, FixedDate.DATE_FORMAT.parse("07/17/2018"))));
-//		System.out.println(FixedDate.DATE_FORMAT.format(sd.from(0, 18, 0, 0, DatePosition.AFTER, FixedDate.DATE_FORMAT.parse("07/17/2017"))));
-//		System.out.println("==");
-//		LocalDateTime dateTime = new LocalDateTime(FixedDate.DATE_FORMAT.parse("07/17/2017"));
-////		LocalDateTime result = dateTime.plusMonths(18).toDate();
-//		java.util.Date date = dateTime.plusMonths(18).toDate();
-//		System.out.println(FixedDate.DATE_FORMAT.format(date));
-//		Calendar calendar = new GregorianCalendar();
-//		calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-//	    calendar.setTime(FixedDate.DATE_FORMAT.parse("07/17/2018"));
-//	    calendar.add(Calendar.MONTH, 18);
-//	    System.out.println(FixedDate.DATE_FORMAT.format(calendar.getTime()));
-//	    System.out.println(FixedDate.DATE_FORMAT.parse("07/17/2018"));
-//	    System.out.println(calendar.getTime());
-	    
-	}
 	
-//	@Override
-//	public java.util.Date from_(int years, int months, int days, DatePosition p, java.util.Date ref) {
-//		Calendar calendar = Calendar.getInstance();
-//		calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-//	    calendar.setTime(ref);
-//	    
-//	    Calendar editCalendar = Calendar.getInstance();
-//	    editCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-//	    editCalendar.setTime(ref);
-//	    
-//	    int multiple = 1;
-//	    if(p.equals(DatePosition.BEFORE)){
-//	    	multiple = multiple * -1;
-//	    }
-//	    
-//	    int nbYears = years * multiple;
-//	    int nbMonths = months * multiple;
-//	    int nbDays = days * multiple;
-//	    
-//	    
-//	    if(!backwards((nbYears * 365 + nbMonths * 30 + nbDays) < 0, p.equals(DatePosition.AFTER))){
-//	    	move(Calendar.YEAR, nbYears, editCalendar, calendar);
-//	    	move(Calendar.MONTH, nbMonths, editCalendar, calendar);
-//		    move(Calendar.DAY_OF_MONTH, nbDays, editCalendar, calendar);
-//	    }
-//	    else {
-//	    	move(Calendar.DAY_OF_MONTH, nbDays, editCalendar, calendar);
-//	    	move(Calendar.MONTH, nbMonths, editCalendar, calendar);
-//	    	move(Calendar.YEAR, nbYears, editCalendar, calendar);
-//	    }
-//	    
-//		return editCalendar.getTime();
-//	}
-//	
-//	private boolean backwards(boolean negative, boolean after){
-//		return (negative && after) || (!negative && !after);
-//	}
-//	
-//	private void move(int field, int distance, Calendar calendar, Calendar origin){
-//		
-//		if(distance != 0){
-//			calendar.add(field, distance);
-//			if(mustRollForward(origin, calendar, field)){
-//				calendar.add(Calendar.DAY_OF_MONTH, 1);
-//				
-//			}
-//		}
-//	}
-	
-	
-	public java.util.Date from_(int years, int months, int days, DatePosition p, java.util.Date ref) {
-		LocalDateTime jodaRef = new LocalDateTime(ref);
-	    int multiple = 1;
-	    if(p.equals(DatePosition.BEFORE)){
-	    	multiple = multiple * -1;
-	    }
-	    
+	public LocalDate from_(int years, int months, int days, DatePosition p, LocalDate ref) {
 	    if(!p.equals(DatePosition.BEFORE)){
-	    	return plus(DurationFieldType.days(), plus(DurationFieldType.months(), plus(DurationFieldType.years(), jodaRef, years), months), days).toDate();
+	    	return plus(Period.ofDays(days), plus(Period.ofMonths(months), plus(Period.ofYears(years), ref, false), false), true);
 	    }
 	    else {
-	    	return jodaRef.minusDays(days).minusMonths(months).minusYears(years).toDate();
+	    	return ref.minusDays(days).minusMonths(months).minusYears(years);
 	    }
 	}
 	
 	
-	private LocalDateTime rollForwardIfApplicable(LocalDateTime start, LocalDateTime end){
+	private LocalDate rollForwardIfApplicable(LocalDate localDateStart, LocalDate localDateEnd){
+		org.joda.time.LocalDateTime start = new org.joda.time.LocalDateTime(
+				localDateStart.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+		);
+		org.joda.time.LocalDateTime end = new org.joda.time.LocalDateTime(
+				localDateEnd.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+		);
+
 		boolean start_month_has_more_days_than_end_month = start.dayOfMonth().getMaximumValue() > end.dayOfMonth().getMaximumValue();
 		boolean end_day_of_month_is_last_day_of_month = end.dayOfMonth().getMaximumValue() == end.getDayOfMonth();
 		boolean start_day_of_month_greater_than_end_day_of_month = start.getDayOfMonth() > end.getDayOfMonth();
 		if(start_month_has_more_days_than_end_month && end_day_of_month_is_last_day_of_month && start_day_of_month_greater_than_end_day_of_month){
-			return end.plusDays(1);
+			return localDateEnd.plusDays(1);
 		}
 		else {
-			return end;
+			return localDateEnd;
 		}
 	}
 	
-	private LocalDateTime plus(DurationFieldType dateField, LocalDateTime reference, int nb){
-		if(dateField.equals(DurationFieldType.months()) || dateField.equals(DurationFieldType.years())){
-			LocalDateTime intermediate = reference.withFieldAdded(dateField, nb);
+	private LocalDate plus(Period duration, LocalDate reference, boolean days){
+		if(!days){
+			LocalDate intermediate = reference.plus(duration);
 			return rollForwardIfApplicable(reference, intermediate);
 		}
 		else {
-			return reference.plusDays(nb);
+			return reference.plus(duration);
 		}
 	}
-
-private boolean backwards(boolean negative, boolean after){
-	return (negative && after) || (!negative && !after);
-}
-
-private void move(int field, int distance, Calendar calendar, Calendar origin){
-	
-	if(distance != 0){
-		calendar.add(field, distance);
-		if(mustRollForward(origin, calendar, field)){
-			calendar.add(Calendar.DAY_OF_MONTH, 1);
-			
-		}
-	}
-}
 	
     private static boolean mustRollForward(Calendar calOrig, Calendar cal, int calField) {
         return ((calField == Calendar.YEAR || calField == Calendar.MONTH ) &&
@@ -294,19 +204,17 @@ private void move(int field, int distance, Calendar calendar, Calendar origin){
     }
 	
 	@Override
-	public java.util.Date from(int years, int months, int weeks, int days, DatePosition p, java.util.Date ref) {
+	public LocalDate from(int years, int months, int weeks, int days, DatePosition p, LocalDate ref) {
 		return this.from_(years, months, days + weeks * 7, p, ref);
 	}
 
 	@Override
-	public boolean same(java.util.Date d1, java.util.Date d2) {
-		DateTime dt1 = new DateTime(d1);
-		DateTime dt2 = new DateTime(d2);
-		return dt1.toLocalDate().compareTo(dt2.toLocalDate()) == 0;
+	public boolean same(LocalDate d1, LocalDate d2) {
+		return d1.isEqual(d2);
 	}
 
 	@Override
-	public void toFixed(TestCase tc, java.util.Date today) {
+	public void toFixed(TestCase tc, LocalDate today) {
 		
 		ResolvedDates dates = this.resolveDates(tc, today);
 		tc.getPatient().setDob(fixed(dates.getDob()));
@@ -315,7 +223,7 @@ private void move(int field, int distance, Calendar calendar, Calendar origin){
 		for(Event e : tc.getEvents()){
 			if(e instanceof VaccinationEvent){
 				VaccinationEvent ve = (VaccinationEvent) e;
-				java.util.Date dA = dates.getEvents().get(ve.getPosition());
+				LocalDate dA = dates.getEvents().get(ve.getPosition());
 				ve.setDate(fixed(dA));
 			}
 		}
@@ -334,8 +242,8 @@ private void move(int field, int distance, Calendar calendar, Calendar origin){
 		}
 	}
 	
-	public FixedDate fixed(java.util.Date date){
-		return new FixedDate(FixedDate.DATE_FORMAT.format(date));
+	public FixedDate fixed(LocalDate date){
+		return new FixedDate(FixedDate.formatter.format(date));
 	}
 
 	protected static SimpleDateService getInstance() {

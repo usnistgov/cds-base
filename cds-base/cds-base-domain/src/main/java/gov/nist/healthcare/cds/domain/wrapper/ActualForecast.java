@@ -1,5 +1,6 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import gov.nist.healthcare.cds.domain.Forecast;
@@ -14,10 +15,10 @@ public class ActualForecast extends Forecast {
 	 */
 	private static final long serialVersionUID = 1L;
 	private VaccineRef vaccine;
-	private Date earliest;
-	private Date recommended;
-	private Date pastDue;
-	private Date complete;
+	private LocalDate earliest;
+	private LocalDate recommended;
+	private LocalDate pastDue;
+	private LocalDate complete;
 	private SerieStatus serieStatus;
 	
 	@Override
@@ -32,28 +33,28 @@ public class ActualForecast extends Forecast {
 	public void setVaccine(VaccineRef vaccine) {
 		this.vaccine = vaccine;
 	}
-	public Date getEarliest() {
+	public LocalDate getEarliest() {
 		return earliest;
 	}
-	public void setEarliest(Date earliest) {
+	public void setEarliest(LocalDate earliest) {
 		this.earliest = earliest;
 	}
-	public Date getRecommended() {
+	public LocalDate getRecommended() {
 		return recommended;
 	}
-	public void setRecommended(Date recommended) {
+	public void setRecommended(LocalDate recommended) {
 		this.recommended = recommended;
 	}
-	public Date getPastDue() {
+	public LocalDate getPastDue() {
 		return pastDue;
 	}
-	public void setPastDue(Date pastDue) {
+	public void setPastDue(LocalDate pastDue) {
 		this.pastDue = pastDue;
 	}
-	public Date getComplete() {
+	public LocalDate getComplete() {
 		return complete;
 	}
-	public void setComplete(Date complete) {
+	public void setComplete(LocalDate complete) {
 		this.complete = complete;
 	}
 	public SerieStatus getSerieStatus() {

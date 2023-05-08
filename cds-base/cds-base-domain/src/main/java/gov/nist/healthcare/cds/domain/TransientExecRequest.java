@@ -1,5 +1,6 @@
 package gov.nist.healthcare.cds.domain;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class TransientExecRequest {
 	
 	private SoftwareConfig software;
 	@Temporal(TemporalType.TIMESTAMP)
-	private java.util.Date date;
+	private LocalDate date;
 	private List<String> testCases;
 	
 	
@@ -21,10 +22,10 @@ public class TransientExecRequest {
 	public void setSoftware(SoftwareConfig software) {
 		this.software = software;
 	}
-	public java.util.Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
-	public void setDate(java.util.Date date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 	public List<String> getTestCases() {

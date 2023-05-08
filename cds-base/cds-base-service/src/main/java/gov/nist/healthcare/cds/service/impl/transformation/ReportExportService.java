@@ -3,6 +3,9 @@ package gov.nist.healthcare.cds.service.impl.transformation;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -56,6 +59,9 @@ import gov.nist.healthcare.cds.enumeration.ValidationStatus;
 
 @Service
 public class ReportExportService implements gov.nist.healthcare.cds.service.ReportExportService {
+
+	SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+
 
 	@Override
 	public String exportXML(Report report, TestCase tc) throws UnsupportedEncodingException, JAXBException, DatatypeConfigurationException {
@@ -229,7 +235,7 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		return fvt;
 	}
 	
-	public DateValidationType dvt(DateCriterion dc, java.util.Date d) throws DatatypeConfigurationException{
+	public DateValidationType dvt(DateCriterion dc, LocalDate d) {
 		DateValidationType dvt = new DateValidationType();
 		if(dc.getStatus().equals(ValidationStatus.N)){
 			return null;
@@ -353,8 +359,12 @@ public class ReportExportService implements gov.nist.healthcare.cds.service.Repo
 		return calendar;
 	}
 	
-	public String dateStr(java.util.Date d) throws DatatypeConfigurationException {
-		return FixedDate.DATE_FORMAT.format(d);
+	public String dateStr(LocalDate d) {
+		return FixedDate.formatter.format(d);
+	}
+
+	public String dateStr(Date d) {
+		return dateFormat.format(d);
 	}
 
 }

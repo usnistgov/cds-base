@@ -2,6 +2,7 @@ package gov.nist.healthcare.cds.domain.wrapper;
 
 import gov.nist.healthcare.cds.domain.TestCase;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -9,9 +10,9 @@ public class ValidationRequest {
     List<ActualForecast> forecasts;
     List<ResponseVaccinationEvent> events;
     TestCase testCase;
-    Date evaluationDate;
+    LocalDate evaluationDate;
 
-    public ValidationRequest(List<ActualForecast> forecasts, List<ResponseVaccinationEvent> events, TestCase testCase, Date evaluationDate) {
+    public ValidationRequest(List<ActualForecast> forecasts, List<ResponseVaccinationEvent> events, TestCase testCase, LocalDate evaluationDate) {
         this.forecasts = forecasts;
         this.events = events;
         this.testCase = testCase;
@@ -45,11 +46,11 @@ public class ValidationRequest {
         this.testCase = testCase;
     }
 
-    public Date getEvaluationDate() {
+    public LocalDate getEvaluationDate() {
         return evaluationDate;
     }
 
-    public void setEvaluationDate(Date evaluationDate) {
+    public void setEvaluationDate(LocalDate evaluationDate) {
         this.evaluationDate = evaluationDate;
     }
 }

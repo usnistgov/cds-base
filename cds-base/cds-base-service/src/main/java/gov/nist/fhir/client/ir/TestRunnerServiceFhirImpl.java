@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,8 +66,8 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
 
         SendingConfig sendingConfig = new SendingConfig();
 
-        Date assessmentDate = tc.getEvaluationDate();
-        Date dob = tc.getDateOfBirth();
+        LocalDate assessmentDate = tc.getEvaluationDate();
+        LocalDate dob = tc.getDateOfBirth();
 
         sendingConfig.setAssessmentDate(TranslationUtils.translateJavaDateToFhirDate(assessmentDate));
         sendingConfig.setBirthdate(TranslationUtils.translateJavaDateToFhirDate(dob));
@@ -82,7 +84,7 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
                 VaccinationEventPayLoad event = (VaccinationEventPayLoad) it.next();
                 Immunization imm = new Immunization();
 
-                Date immDate = event.getAdministred();
+                LocalDate immDate = event.getAdministred();
                 imm.setDate(TranslationUtils.translateJavaDateToFhirDate(immDate));
                 // TODO: Check. Reference to patient no longer exists???
                 //imm.setPatientReference(tc.getPatient().getId());
@@ -586,11 +588,11 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         tc.setTestCaseNumber("123");
         Calendar evalCal = Calendar.getInstance();
         evalCal.set(2019, 5, 13);
-        Date evalDate = evalCal.getTime();
+        LocalDate evalDate = LocalDate.from(evalCal.toInstant());
 
         Calendar dobCal = Calendar.getInstance();
         dobCal.set(2007, 9, 2);
-        Date dobDate = dobCal.getTime();
+        LocalDate dobDate = LocalDate.from(dobCal.toInstant());
 
         tc.setEvaluationDate(evalDate);
         tc.setDateOfBirth(dobDate);
@@ -598,27 +600,27 @@ public class TestRunnerServiceFhirImpl implements TestRunnerService {
         //List<VaccinationEventPayLoad> vaccinationEvents = new ArrayList<VaccinationEventPayLoad>();
         Calendar immCal1 = Calendar.getInstance();
         immCal1.set(2007, 11, 2);
-        Date immDate1 = immCal1.getTime();
+        LocalDate immDate1 = LocalDate.from(immCal1.toInstant());
 
         Calendar immCal2 = Calendar.getInstance();
         immCal2.set(2008, 1, 2);
-        Date immDate2 = immCal2.getTime();
+        LocalDate immDate2 = LocalDate.from(immCal2.toInstant());
 
         Calendar immCal3 = Calendar.getInstance();
         immCal3.set(2008, 3, 2);
-        Date immDate3 = immCal3.getTime();
+        LocalDate immDate3 = LocalDate.from(immCal3.toInstant());
 
         Calendar immCal4 = Calendar.getInstance();
         immCal4.set(2008, 12, 2);
-        Date immDate4 = immCal4.getTime();
+        LocalDate immDate4 =LocalDate.from(immCal4.toInstant());
 
         Calendar immCal5 = Calendar.getInstance();
         immCal5.set(2013, 2, 5);
-        Date immDate5 = immCal5.getTime();
+        LocalDate immDate5 = LocalDate.from(immCal5.toInstant());
 
         Calendar immCal6 = Calendar.getInstance();
         immCal6.set(2019, 5, 13);
-        Date immDate6 = immCal1.getTime();
+        LocalDate immDate6 = LocalDate.from(immCal6.toInstant());
 
         /*
         Calendar immCal2 = Calendar.getInstance();

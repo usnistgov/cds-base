@@ -5,12 +5,14 @@ import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.wrapper.ResolvedDates;
 import gov.nist.healthcare.cds.enumeration.DatePosition;
 
+import java.time.LocalDate;
+
 public interface DateService {
 
-	public ResolvedDates resolveDates(TestCase tc, java.util.Date today);
-	public void toFixed(TestCase tc, java.util.Date today);
-	public java.util.Date fix(ResolvedDates rds, Date d);
-	public boolean same(java.util.Date d1, java.util.Date d2);
-	java.util.Date from(int years, int months, int weeks, int days, DatePosition p, java.util.Date ref);
+	ResolvedDates resolveDates(TestCase tc, LocalDate today);
+	void toFixed(TestCase tc, LocalDate today);
+	LocalDate fix(ResolvedDates rds, Date d);
+	boolean same(LocalDate d1, LocalDate d2);
+	LocalDate from(int years, int months, int weeks, int days, DatePosition p, LocalDate ref);
 
 }

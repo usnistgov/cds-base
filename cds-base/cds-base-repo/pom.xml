@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.nist.healthcare.cds</groupId>
 		<artifactId>cds-base</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<artifactId>cds-base-repo</artifactId>
 	<dependencies>

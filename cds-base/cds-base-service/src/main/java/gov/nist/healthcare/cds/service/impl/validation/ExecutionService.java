@@ -1,5 +1,6 @@
 package gov.nist.healthcare.cds.service.impl.validation;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,7 +17,9 @@ import gov.nist.healthcare.cds.domain.TestCase;
 import gov.nist.healthcare.cds.domain.VaccinationEvent;
 import gov.nist.healthcare.cds.domain.exception.ConnectionException;
 import gov.nist.healthcare.cds.domain.exception.UnresolvableDate;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ExecutionService implements TestCaseExecutionService {
 
 	@Autowired
@@ -30,7 +33,7 @@ public class ExecutionService implements TestCaseExecutionService {
 
 
 	@Override
-	public Report validateResponse(List<ActualForecast> forecasts, List<ResponseVaccinationEvent> events, TestCase tc, java.util.Date evaluationDate) {
+	public Report validateResponse(List<ActualForecast> forecasts, List<ResponseVaccinationEvent> events, TestCase tc, LocalDate evaluationDate) {
 		ResolvedDates rds = dates.resolveDates(tc, evaluationDate);
 		List<VaccinationEventRequirement> veRequirements = this.veRequirements(tc, rds);
 		List<ForecastRequirement> fcRequirements = this.fcRequirements(tc, rds);
@@ -51,7 +54,7 @@ public class ExecutionService implements TestCaseExecutionService {
 	}
 
 	@Override
-	public Report execute(SoftwareConfig conf, TestCase tc, java.util.Date reference) throws UnresolvableDate, ConnectionException {
+	public Report execute(SoftwareConfig conf, TestCase tc, LocalDate reference) throws UnresolvableDate, ConnectionException {
 		PerformanceTimestamps performanceBenchmark = new PerformanceTimestamps();
 
 		java.util.Date today = Calendar.getInstance().getTime();
@@ -103,7 +106,7 @@ public class ExecutionService implements TestCaseExecutionService {
 		for(Event e : tc.getEvents()){
 			if(e instanceof VaccinationEvent){
 				VaccinationEvent ve = (VaccinationEvent) e;
-				java.util.Date dA = rds.getEvents().get(ve.getPosition());
+				LocalDate dA = rds.getEvents().get(ve.getPosition());
 				VaccinationEventRequirement vReq = new VaccinationEventRequirement();
 				vReq.setDateAdministred(new FixedDate(dA));
 				vReq.setvEvent(ve);

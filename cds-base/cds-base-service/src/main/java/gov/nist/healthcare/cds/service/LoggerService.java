@@ -1,5 +1,6 @@
 package gov.nist.healthcare.cds.service;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -76,8 +77,8 @@ public class LoggerService {
 		}
 	}
 	
-	public static void event(Injection i, Date date, StringBuilder log, int t){
-		event(i, FixedDate.DATE_FORMAT.format(date), log, t);
+	public static void event(Injection i, LocalDate date, StringBuilder log, int t){
+		event(i, FixedDate.formatter.format(date), log, t);
 	}
 	
 	public static void separator(StringBuilder log){

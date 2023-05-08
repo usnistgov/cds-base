@@ -1,11 +1,8 @@
 package gov.nist.healthcare.cds.domain;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -18,30 +15,22 @@ public class FixedDate extends Date implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -8561218443824434426L;
-	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-	
+	public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
 	@NotNull(message = "Fixed Date is required")
 	private String dateStr;
-	@Temporal(TemporalType.TIMESTAMP)
-	@Deprecated
-	private java.util.Date date;
-
 	
 	public FixedDate(){
 		
 	}
 	
 	public FixedDate(String date){
-		try {
-			DATE_FORMAT.parse(date);
-			this.dateStr = date;
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		formatter.parse(date);
+		this.dateStr = date;
 	}
-	
-	public FixedDate(java.util.Date date){
-		this.dateStr = DATE_FORMAT.format(date);
+
+	public FixedDate(LocalDate date){
+		this.dateStr = formatter.format(date);
 	}
 
 	public String getDateString() {
@@ -52,17 +41,13 @@ public class FixedDate extends Date implements Serializable {
 		this.dateStr = date;
 	}
 	
-	public java.util.Date asDate() {
+	public LocalDate asDate() {
 		try {
-			return DATE_FORMAT.parse(dateStr);
-		} catch (ParseException e) {
+			return LocalDate.parse(dateStr, formatter);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	public void setDate(java.util.Date date) {
-		this.date = date;
 	}
 
 	@Override

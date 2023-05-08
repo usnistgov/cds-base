@@ -4,6 +4,9 @@ import gov.nist.healthcare.cds.domain.FixedDate;
 import gov.nist.healthcare.cds.domain.wrapper.ActualForecast;
 import gov.nist.healthcare.cds.service.domain.ResultMatch;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 public class ForecastMatchCandidate extends MatchCandidate<ActualForecast> {
@@ -11,8 +14,8 @@ public class ForecastMatchCandidate extends MatchCandidate<ActualForecast> {
 	public ForecastMatchCandidate(ActualForecast candidate, int confidence, FixedDate earliestFixed, FixedDate recommendedFixed) {
 		super();
 		
-		Date earliest = earliestFixed == null ? null : earliestFixed.asDate();
-		Date recommended = recommendedFixed == null ? null : recommendedFixed.asDate();
+		LocalDate earliest = earliestFixed == null ? null : earliestFixed.asDate();
+		LocalDate recommended = recommendedFixed == null ? null : recommendedFixed.asDate();
 		this.payload = candidate;
 		this.confidence = confidence;
 
@@ -22,12 +25,12 @@ public class ForecastMatchCandidate extends MatchCandidate<ActualForecast> {
 		boolean recommendedDateAvailable = candidate.getRecommended() != null;
 
 		if(earliestDateReq && earliestDateAvailable) {
-			this.scores.put("EARLIEST", Math.abs(earliest.getTime() - candidate.getEarliest().getTime()));
+			this.scores.put("EARLIEST", Math.abs(earliest.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() - candidate.getEarliest().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 			this.completeness++;
 		}
 
 		if(recommendedDateReq && recommendedDateAvailable) {
-			this.scores.put("RECOMMENDED", Math.abs(recommended.getTime() - candidate.getRecommended().getTime()));
+			this.scores.put("RECOMMENDED", Math.abs(recommended.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() - candidate.getRecommended().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 			this.completeness++;
 		}
 	}

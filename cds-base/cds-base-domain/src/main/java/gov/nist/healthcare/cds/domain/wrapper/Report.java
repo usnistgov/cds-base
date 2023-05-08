@@ -8,6 +8,7 @@ import gov.nist.healthcare.cds.enumeration.Gender;
 import gov.nist.healthcare.cds.enumeration.ValidationCriterion;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +28,8 @@ public class Report extends Entity implements Serializable {
 	private Gender gender;
 	private java.util.Date executionDate;
 	private SoftwareConfig softwareConfig;
-	private java.util.Date evaluationDate;
-	private java.util.Date dob;
+	private LocalDate evaluationDate;
+	private LocalDate dob;
 	private List<VaccinationEventValidation> veValidation;
 	private List<ForecastValidation> fcValidation;
 	private Map<ValidationCriterion,Boolean> failures;
@@ -97,16 +98,16 @@ public class Report extends Entity implements Serializable {
 	public void setResponse(String response) {
 		this.response = response;
 	}
-	public java.util.Date getEvaluationDate() {
+	public LocalDate getEvaluationDate() {
 		return evaluationDate;
 	}
-	public void setEvaluationDate(java.util.Date evaluationDate) {
+	public void setEvaluationDate(LocalDate evaluationDate) {
 		this.evaluationDate = evaluationDate;
 	}
-	public java.util.Date getDob() {
+	public LocalDate getDob() {
 		return dob;
 	}
-	public void setDob(java.util.Date dob) {
+	public void setDob(LocalDate dob) {
 		this.dob = dob;
 	}
 	public String getTc() {

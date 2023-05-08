@@ -1,35 +1,36 @@
 package gov.nist.healthcare.cds.domain.wrapper;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ResolvedDates {
-	private Date dob;
-	private Date eval;
-	private Map<Integer, Date> events;
+	private LocalDate dob;
+	private LocalDate eval;
+	private Map<Integer, LocalDate> events;
 	
 	
 	public ResolvedDates() {
 		super();
-		events = new HashMap<Integer, Date>();
+		events = new HashMap<Integer, LocalDate>();
 	}
-	public Date getDob() {
+	public LocalDate getDob() {
 		return dob;
 	}
-	public void setDob(Date dob) {
+	public void setDob(LocalDate dob) {
 		this.dob = dob;
 	}
-	public Date getEval() {
+	public LocalDate getEval() {
 		return eval;
 	}
-	public void setEval(Date eval) {
+	public void setEval(LocalDate eval) {
 		this.eval = eval;
 	}
-	public Map<Integer, Date> getEvents() {
+	public Map<Integer, LocalDate> getEvents() {
 		return events;
 	}
-	public void setEvents(Map<Integer, Date> events) {
+	public void setEvents(Map<Integer, LocalDate> events) {
 		this.events = events;
 	}
 	

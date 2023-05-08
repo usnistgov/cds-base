@@ -134,6 +134,9 @@
     		<element name="PastDue" type="tns:DateType" minOccurs="1"
     			maxOccurs="1">
     		</element>
+			<element name="DoseNumber" type="string" minOccurs="0"
+					 maxOccurs="1">
+			</element>
     	</sequence>
     </complexType>
 
