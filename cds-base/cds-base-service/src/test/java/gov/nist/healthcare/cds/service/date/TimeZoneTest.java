@@ -99,7 +99,7 @@ public class TimeZoneTest {
 	public void testGUAM() {
 		test(TimeZone.getTimeZone("Pacific/Guam"));
 	}
-	
+
 	public void test(TimeZone tz) {
 		TestCase testCase = createTestCase();
 		Date earliest = Date.from(LocalDateTime.of(2021, 10, 11, 0, 0).
