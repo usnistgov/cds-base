@@ -28,6 +28,8 @@ public class SimpleCodeRemapService {
     @Autowired
     private VaccineImportService vaccineService;
 
+    private Set<String> changes;
+
     public void reloadCodeSetsAndRemapTestCases(InputStream cvx, InputStream vg,InputStream mvx, InputStream products,   Map<String, String> cvxMapping, Map<String, String> productMapping) throws Exception {
         this.vaccineRepository.deleteAll();
         this.vaccineMappingRepository.deleteAll();
@@ -110,6 +112,7 @@ public class SimpleCodeRemapService {
         int fc = 0;
         int ev = 0;
         int evl = 0;
+        changes = new HashSet<>();
         for(TestCase tc: testCases) {
             boolean updated = false;
             for(Event e : tc.getEvents()) {
@@ -142,7 +145,9 @@ public class SimpleCodeRemapService {
         this.testCaseRepository.save(testCases);
         System.out.println("[TEST_CASE_REMAP] testcases : " + tcc +" , events: "+ev+" , evaluations: "+evl+", forecasts: " + fc);
         System.out.println("[TEST_CASE_REMAP] remapped " + updates.size() + " targets " + updates + " from users " + users);
-        return true;
+        System.out.println(String.join("\n", changes));
+        changes = new HashSet<>();
+        return updates.size() > 0;
     }
 
     public boolean mapOrCheckVaccinationEvent(VaccinationEvent event, Map<String, String> cvx, Map<String, String> product) throws Exception {
@@ -187,6 +192,21 @@ public class SimpleCodeRemapService {
             return true;
         } else if(this.vaccineRepository.findOne(vaccine.getId()) == null) {
             throw new Exception("Vaccine " + vaccine.getCvx() + " in testcase not found");
+        } else {
+            Vaccine v = this.vaccineRepository.findOne(vaccine.getId());
+            boolean name = v.getName().equals(vaccine.getName());
+            boolean details = v.getDetails().equals(vaccine.getDetails());
+            if(!name || !details) {
+                if(!name) {
+                    changes.add("Changing Vaccine "+ vaccine.getId() +" name from '"+vaccine.getName()+"' to '" + v.getName() +"'");
+                }
+                if(!details) {
+                    changes.add("Changing Vaccine "+ vaccine.getId() +" Details from '"+vaccine.getDetails()+"' to '" + v.getDetails() +"'");
+                }
+                vaccine.setName(v.getName());
+                vaccine.setDetails(v.getDetails());
+                return true;
+            }
         }
         return false;
     }
@@ -212,6 +232,26 @@ public class SimpleCodeRemapService {
             return true;
         } else if(this.productRepository.findOne(p.getCode()) == null) {
             throw new Exception("Product " +  p.getCode() + " in testcase not found");
+        } else {
+            Product existing = this.productRepository.findOne(p.getCode());
+            boolean name = existing.getName().equals(p.getName());
+            boolean vx = existing.getCvx().equals(p.getCvx());
+            boolean mx = existing.getMvx().equals(p.getMvx());
+            if(!name || !vx || !mx) {
+                p.setName(existing.getName());
+                p.setVx(existing.getVx());
+                p.setMx(existing.getMx());
+                if(!name) {
+                    changes.add("Changing Product "+p.getId()+" name from '"+p.getName()+"' to '" + existing.getName() +"'");
+                }
+                if(!vx) {
+                    changes.add("Changing Product "+p.getId()+" CVX from '"+p.getCvx()+"' to '" + existing.getCvx() +"'");
+                }
+                if(!mx) {
+                    changes.add("Changing Product "+p.getId()+" MVX from '"+p.getMvx()+"' to '" + existing.getMvx() +"'");
+                }
+                return true;
+            }
         }
         return false;
     }
