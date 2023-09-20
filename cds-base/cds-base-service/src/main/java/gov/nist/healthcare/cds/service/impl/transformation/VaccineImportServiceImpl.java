@@ -75,9 +75,9 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 				VaccineMapping vxm = new VaccineMapping();
 				
 				Row r = rowIterator.next();
-				String CVX = r.getCell(0).getStringCellValue();
-				String NAME = r.getCell(1).getStringCellValue();
-				String DTS = r.getCell(2).getStringCellValue();
+				String CVX = r.getCell(0).getStringCellValue().trim();
+				String NAME = r.getCell(1).getStringCellValue().trim();
+				String DTS = r.getCell(2).getStringCellValue().trim();
 				
 				Vaccine vx = new Vaccine();
 				vx.setCvx(CVX);
@@ -132,11 +132,11 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 			rowIterator.next();
 			while(rowIterator.hasNext()){
 				Row r = rowIterator.next();
-				String CVX = r.getCell(1).getStringCellValue();
+				String CVX = r.getCell(1).getStringCellValue().trim();
 				if(CVX.equals(cvx)){
 					VaccineGroup vg = new VaccineGroup();
-					String vgName = r.getCell(3).getStringCellValue();
-					String vgCVX = r.getCell(4).getStringCellValue();
+					String vgName = r.getCell(3).getStringCellValue().trim();
+					String vgCVX = r.getCell(4).getStringCellValue().trim();
 					vg.setCvx(vgCVX);
 					vg.setName(vgName);
 					vgs.add(vg);
@@ -164,10 +164,10 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 			rowIterator.next();
 			while(rowIterator.hasNext()){
 				Row r = rowIterator.next();
-				String CVX = r.getCell(2).getStringCellValue();
+				String CVX = r.getCell(2).getStringCellValue().trim();
 				if(CVX.equals(cvx)){
-					String MVX = r.getCell(4).getStringCellValue();
-					String name = r.getCell(0).getStringCellValue();
+					String MVX = r.getCell(4).getStringCellValue().trim();
+					String name = r.getCell(0).getStringCellValue().trim();
 					if(!MVX.isEmpty()){
 						Manufacturer m = manufacturerRepository.findByMvx(MVX);
 						if(m != null){
@@ -200,8 +200,8 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 			rowIterator.next();
 			while(rowIterator.hasNext()){
 				Row r = rowIterator.next();
-				String mvx = r.getCell(0).getStringCellValue();
-				String name = r.getCell(1).getStringCellValue();
+				String mvx = r.getCell(0).getStringCellValue().trim();
+				String name = r.getCell(1).getStringCellValue().trim();
 				Manufacturer m = new Manufacturer();
 				m.setMvx(mvx);
 				m.setName(name);
