@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import gov.nist.healthcare.cds.auth.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,11 @@ public class AccountServiceImpl implements AccountService {
 			return account;
 		}
 		return null;
+	}
+
+	public List<Account> getAdminUsers() {
+		Privilege admin = privilegeRepository.findByRole("ADMIN");
+		return this.accountRepository.findByRole(admin.getId());
 	}
 
 	@Override

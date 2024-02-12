@@ -10,6 +10,7 @@ public interface AccountService {
 	public Account getAccountByUsername(String username);
 	public Account createAdmin(Account account);
 	public Account createTester(Account account);
+	public List<Account> getAdminUsers();
 	public Account changePassword(Account account,PasswordChange pChange) throws PasswordChangeException;
 	Account changePasswordWithoutOldCheck(AccountPasswordReset token, String URLToken, Account account, String password) throws PasswordChangeException;
 	public Account changePasswordForUser(Account onRecordAccount, PasswordChange acc) throws PasswordChangeException;
