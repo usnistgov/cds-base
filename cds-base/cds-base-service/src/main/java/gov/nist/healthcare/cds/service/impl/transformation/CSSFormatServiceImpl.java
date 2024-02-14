@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,12 +17,8 @@ import java.util.UUID;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -121,7 +116,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	final int DESCRIPTION = 62;
 	
 	public String getString(Cell cell,int i) throws NoDataInCell{
-		if(cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING && !cell.getStringCellValue().isEmpty()){
+		if(cell != null && cell.getCellType() == CellType.STRING && !cell.getStringCellValue().isEmpty()){
 			return cell.getStringCellValue();
 		}
 		else {
@@ -130,7 +125,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	}
 	
 	public String getStringOpt(Cell cell,String def) {
-		if(cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING && !cell.getStringCellValue().isEmpty()){
+		if(cell != null && cell.getCellType() == CellType.STRING && !cell.getStringCellValue().isEmpty()){
 			return cell.getStringCellValue();
 		}
 		else {
@@ -139,7 +134,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	}
 	
 	public String getDoubleAsStringOpt(Cell cell,String def) {
-		if(cell != null && cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+		if(cell != null && cell.getCellType() == CellType.NUMERIC){
 			return cell.getNumericCellValue()+"";
 		}
 		else {
@@ -167,7 +162,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	}
 	
 	public boolean emptyLine(Row r){
-		return r.getCell(0).getCellType() == Cell.CELL_TYPE_BLANK;
+		return r.getCell(0).getCellType() == CellType.BLANK;
 	}
 	
 	public void fillTestCaseInfo(Row r, TestCase tc) throws NoDataInCell{
@@ -285,7 +280,7 @@ public class CSSFormatServiceImpl implements FormatService {
 	public Vaccine fillForecast(Row r, TestCase tc) throws NoDataInCell, VaccineNotFoundException{
 		ExpectedForecast fc = new ExpectedForecast();
 		fc.setSerieStatus(SerieStatus.getSerieStatus(this.getString(r.getCell(SERIESTATUS),SERIESTATUS)));
-		if(r.getCell(50).getCellType() == Cell.CELL_TYPE_STRING){
+		if(r.getCell(50).getCellType() == CellType.STRING){
 			fc.setDoseNumber(r.getCell(DOSE_N).getStringCellValue());
 		}
 		else {
@@ -432,7 +427,7 @@ public class CSSFormatServiceImpl implements FormatService {
 		ve.setPosition(id);
 		ve.setDoseNumber(0);
 		ve.setDate(this.getFixedDate(r.getCell(start+ADMIN_DATE),start+ADMIN_DATE));
-		String cvx = r.getCell(start+CVX).getCellType() == Cell.CELL_TYPE_STRING ? this.getString(r.getCell(start+CVX),start+CVX) : ""+ (int) r.getCell(start+CVX).getNumericCellValue();
+		String cvx = r.getCell(start+CVX).getCellType() == CellType.STRING ? this.getString(r.getCell(start+CVX),start+CVX) : ""+ (int) r.getCell(start+CVX).getNumericCellValue();
 		String mvx ="";
 		try {
 			mvx =  this.getString(r.getCell(start+MVX),start+MVX);
@@ -536,9 +531,8 @@ public class CSSFormatServiceImpl implements FormatService {
 		}
 		
 		try {
-			
 			//-- OPEN EXCEL SPREADSHEET - SHEET 0
-			Workbook workbook = WorkbookFactory.create(in);
+			Workbook workbook = new XSSFWorkbook(OPCPackage.open(in));
 			Sheet sheet = workbook.getSheetAt(config.getPosition()-1);
 			Iterator<Row> rowIterator = sheet.iterator();
 			rowIterator.next();
@@ -561,7 +555,7 @@ public class CSSFormatServiceImpl implements FormatService {
 						tc.setEvents(new ArrayList<Event>());
 						int position = 0;
 						for(int event = START_EVENTS; event <= END_EVENTS; event = event + 6){
-							if(r.getCell(event) == null || r.getCell(event).getCellType() == Cell.CELL_TYPE_BLANK){
+							if(r.getCell(event) == null || r.getCell(event).getCellType() == CellType.STRING){
 								break;
 							}
 							this.fillEvent(r, tc, event, position++, config.isIgnore(), targetV);

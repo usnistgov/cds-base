@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -116,9 +115,6 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 		} catch (EncryptedDocumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return l_vxm;
 	}
@@ -146,9 +142,6 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (EncryptedDocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -185,9 +178,6 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 		} catch (EncryptedDocumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return pds;
 	}
@@ -211,9 +201,6 @@ public class VaccineImportServiceImpl implements VaccineImportService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (EncryptedDocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
