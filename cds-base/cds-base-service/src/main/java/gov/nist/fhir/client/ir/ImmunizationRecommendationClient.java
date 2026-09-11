@@ -507,7 +507,7 @@ public class ImmunizationRecommendationClient {
             Logger.getLogger(ImmunizationRecommendationClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         */
-        request.addHeader("content-type", "application/xml; charset=utf8");
+        request.addHeader("content-type", "application/xml; charset=utf-8");
         request.addHeader("accept", "application/xml");
         request.setEntity(paramsXml);
 
